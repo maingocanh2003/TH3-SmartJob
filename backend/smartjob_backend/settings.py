@@ -12,16 +12,32 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load .env file from project root
+# Tự động đọc file .env mà không phụ thuộc vào thư viện ngoài (tránh lỗi missing import trong IDE)
+def load_env_file(filepath):
+    if not filepath.exists():
+        return
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip().strip("'\"")
+                    if key and key not in os.environ:
+                        os.environ[key] = value
+    except Exception:
+        pass
+
+# Load .env file from project root hoặc thư mục backend
 env_path = BASE_DIR.parent / '.env'
 if not env_path.exists():
     env_path = BASE_DIR / '.env'
-load_dotenv(env_path)
+load_env_file(env_path)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-xuby6(e24#yvn*s(lmem&xnbo0zyl&4(va%g0vz!w*g=_iqi)%')
@@ -162,3 +178,6 @@ REST_FRAMEWORK = {
 # Media files (for CV, avatars, logos)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
