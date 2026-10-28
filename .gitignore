@@ -1,0 +1,35 @@
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Frontend dependencies
+node_modules/
+dist/
+build/
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+tmp/
+
+# Local databases
+*.sqlite3
+*.db
+
+# Generated files
+coverage/
+.pytest_cache/
