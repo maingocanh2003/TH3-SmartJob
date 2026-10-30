@@ -128,7 +128,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO smartjob_user;
 
 ```bash
 # Di chuyển đến thư mục dự án
-cd d:/SUBJECTS/HTKDTM/BTVN/TH3-SmartJob
+cd TH3-SmartJob  # (hoặc đường dẫn thư mục dự án trên máy bạn)
 
 # Chạy schema (Windows)
 psql -U smartjob_user -d smartjob_db -f docs/database-schema.sql

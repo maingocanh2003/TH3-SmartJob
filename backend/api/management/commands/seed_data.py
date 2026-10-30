@@ -1,23 +1,131 @@
-from django.core.management.base import BaseCommand
-from django.contrib.auth.hashers import make_password
-from django.utils import timezone
-from datetime import date, timedelta
-from api.models import (
+"""
+SmartJob Database Seeder Management Command
+Seeds initial sample data directly into PostgreSQL:
+- Standard Skills
+- Sample Companies & User Accounts
+- Sample Jobs & Job Required Skills
+- Sample Candidates, Candidate Skills, Education & Experience
+- Sample Job Applications & Pre-calculated AI Matching Scores
+- Sample Job Views for BI Analytics
+"""
+
+import os
+import sys
+from datetime import date
+from pathlib import Path
+from typing import TypedDict, List, Tuple, Optional, Any, cast
+
+# Đảm bảo UTF-8 output trên Windows console
+for _stream in (sys.stdout, sys.stderr):
+    if _stream and hasattr(_stream, 'reconfigure'):
+        try:
+            _stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
+# Hỗ trợ thực thi trực tiếp script độc lập
+_backend_dir = str(Path(__file__).resolve().parent.parent.parent.parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'smartjob_backend.settings')
+
+import django  # noqa: E402
+from django.conf import settings  # noqa: E402
+
+if not settings.configured:
+    django.setup()
+
+from django.core.management.base import BaseCommand  # noqa: E402
+from django.contrib.auth.hashers import make_password  # noqa: E402
+from api.models import (  # noqa: E402
     Users, Candidates, Companies, Skills, CandidateSkills,
     Education, Experience, Jobs, JobSkills, Applications,
     JobViews
 )
-from api.ai_matching_service import calculate_match
+from api.ai_matching_service import calculate_match  # noqa: E402
+
+
+# ĐỊNH NGHĨA KIỂU DỮ LIỆU ĐỂ LOẠI BỎ TOÀN BỘ CẢNH BÁO PYREFLY / PYRIGHT (bad-unpacking)
+class CompanyData(TypedDict):
+    email: str
+    name: str
+    industry: str
+    size: str
+    address: str
+    phone: str
+    website: str
+    logo: str
+    desc: str
+
+
+class JobData(TypedDict):
+    company: Any
+    title: str
+    desc: str
+    req: str
+    benefits: str
+    level: str
+    type: str
+    salary_min: int
+    salary_max: int
+    location: str
+    exp: int
+    skills: List[Tuple[str, str, bool, float]]
+
+
+class CandidateData(TypedDict):
+    email: str
+    name: str
+    phone: str
+    pos: str
+    salary: int
+    exp: int
+    address: str
+    avatar: str
+    summary: str
+    skills: List[Tuple[str, str, int]]
+    edu: Tuple[str, str, str, int, int, float]
+    experiences: List[Tuple[str, str, date, Optional[date], bool, str]]
 
 
 class Command(BaseCommand):
-    help = 'Seeds initial sample data for SmartJob (Companies, Jobs, Candidates, Applications)'
+    help = 'Seeds initial sample data for SmartJob into PostgreSQL database'
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.NOTICE('🌱 Bắt đầu tạo dữ liệu mẫu cho SmartJob...'))
 
+        # 0. KHỞI TẠO CÁC KỸ NĂNG CHUẨN NẾU THIẾU
+        essential_skills = [
+            ('Python', 'Programming Language'),
+            ('Django', 'Backend Framework'),
+            ('PostgreSQL', 'Database'),
+            ('Docker', 'DevOps'),
+            ('REST API', 'API Development'),
+            ('Machine Learning', 'AI/ML'),
+            ('Natural Language Processing', 'AI/ML'),
+            ('Deep Learning', 'AI/ML'),
+            ('Data Analysis', 'Data Science'),
+            ('JavaScript', 'Programming Language'),
+            ('TypeScript', 'Programming Language'),
+            ('React', 'Frontend Framework'),
+            ('HTML/CSS', 'Web Development'),
+            ('UI/UX Design', 'Design'),
+            ('Kubernetes', 'DevOps'),
+            ('AWS', 'Cloud Platform'),
+            ('CI/CD', 'DevOps'),
+            ('Linux', 'DevOps'),
+            ('Git', 'Version Control')
+        ]
+        for sname, cat in essential_skills:
+            Skills.objects.get_or_create(
+                skill_name=sname,
+                defaults={'category': cat, 'description': f'Kỹ năng {sname}'}
+            )
+
+        skills_cache = {s.skill_name.lower(): s for s in Skills.objects.all()}
+
         # 1. TẠO CÁC CÔNG TY MẪU
-        companies_data = [
+        companies_data: List[CompanyData] = [
             {
                 'email': 'hr@fpt.com',
                 'name': 'FPT Software',
@@ -54,26 +162,26 @@ class Command(BaseCommand):
         ]
 
         created_companies = []
-        for cdata in companies_data:
-            user, u_created = Users.objects.get_or_create(
-                email=cdata['email'],
+        for comp_data in companies_data:
+            user, _ = Users.objects.update_or_create(
+                email=comp_data['email'],
                 defaults={
                     'password_hash': make_password('123456'),
                     'user_type': 'company',
                     'is_active': True
                 }
             )
-            company, comp_created = Companies.objects.get_or_create(
+            company, _ = Companies.objects.update_or_create(
                 user=user,
                 defaults={
-                    'company_name': cdata['name'],
-                    'industry': cdata['industry'],
-                    'company_size': cdata['size'],
-                    'address': cdata['address'],
-                    'phone': cdata['phone'],
-                    'website': cdata['website'],
-                    'logo_url': cdata['logo'],
-                    'description': cdata['desc']
+                    'company_name': comp_data['name'],
+                    'industry': comp_data['industry'],
+                    'company_size': comp_data['size'],
+                    'address': comp_data['address'],
+                    'phone': comp_data['phone'],
+                    'website': comp_data['website'],
+                    'logo_url': comp_data['logo'],
+                    'description': comp_data['desc']
                 }
             )
             created_companies.append(company)
@@ -81,9 +189,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'✅ Đã tạo/cập nhật {len(created_companies)} công ty mẫu.'))
 
         # 2. TẠO CÁC TIN TUYỂN DỤNG MẪU
-        skills_cache = {s.skill_name.lower(): s for s in Skills.objects.all()}
-
-        jobs_data = [
+        jobs_data: List[JobData] = [
             {
                 'company': created_companies[0],
                 'title': 'Senior Python / Django Backend Developer',
@@ -168,7 +274,7 @@ class Command(BaseCommand):
 
         created_jobs = []
         for jdata in jobs_data:
-            job, created = Jobs.objects.get_or_create(
+            job, _ = Jobs.objects.update_or_create(
                 company=jdata['company'],
                 job_title=jdata['title'],
                 defaults={
@@ -187,24 +293,30 @@ class Command(BaseCommand):
             )
             created_jobs.append(job)
 
-            # Thêm job skills
-            for sname, level, is_req, weight in jdata['skills']:
+            # Thêm job skills (dùng cast để bảo đảm kiểu cho Pyrefly/Pyright)
+            job_skills_list = cast(List[Tuple[str, str, bool, float]], jdata['skills'])
+            for sname, level, is_req, weight in job_skills_list:
                 skill_obj = skills_cache.get(sname.lower())
-                if skill_obj:
-                    JobSkills.objects.get_or_create(
-                        job=job,
-                        skill=skill_obj,
-                        defaults={
-                            'required_level': level,
-                            'is_required': is_req,
-                            'weight': weight
-                        }
+                if not skill_obj:
+                    skill_obj, _ = Skills.objects.get_or_create(
+                        skill_name=sname,
+                        defaults={'category': 'General'}
                     )
+                    skills_cache[sname.lower()] = skill_obj
+                JobSkills.objects.update_or_create(
+                    job=job,
+                    skill=skill_obj,
+                    defaults={
+                        'required_level': level,
+                        'is_required': is_req,
+                        'weight': weight
+                    }
+                )
 
         self.stdout.write(self.style.SUCCESS(f'✅ Đã tạo/cập nhật {len(created_jobs)} tin tuyển dụng mẫu.'))
 
         # 3. TẠO CÁC ỨNG VIÊN MẪU
-        candidates_data = [
+        candidates_data: List[CandidateData] = [
             {
                 'email': 'nguyen.vana@gmail.com',
                 'name': 'Nguyễn Văn An',
@@ -275,43 +387,49 @@ class Command(BaseCommand):
         ]
 
         created_candidates = []
-        for cdata in candidates_data:
-            user, u_created = Users.objects.get_or_create(
-                email=cdata['email'],
+        for cand_data in candidates_data:
+            user, _ = Users.objects.update_or_create(
+                email=cand_data['email'],
                 defaults={
                     'password_hash': make_password('123456'),
                     'user_type': 'candidate',
                     'is_active': True
                 }
             )
-            candidate, cand_created = Candidates.objects.get_or_create(
+            candidate, _ = Candidates.objects.update_or_create(
                 user=user,
                 defaults={
-                    'full_name': cdata['name'],
-                    'phone': cdata['phone'],
-                    'desired_position': cdata['pos'],
-                    'desired_salary': cdata['salary'],
-                    'years_of_experience': cdata['exp'],
-                    'address': cdata['address'],
-                    'avatar_url': cdata['avatar'],
-                    'summary': cdata['summary']
+                    'full_name': cand_data['name'],
+                    'phone': cand_data['phone'],
+                    'desired_position': cand_data['pos'],
+                    'desired_salary': cand_data['salary'],
+                    'years_of_experience': cand_data['exp'],
+                    'address': cand_data['address'],
+                    'avatar_url': cand_data['avatar'],
+                    'summary': cand_data['summary']
                 }
             )
             created_candidates.append(candidate)
 
-            # Thêm kỹ năng
-            for sname, level, years in cdata['skills']:
+            # Thêm kỹ năng (dùng cast để bảo đảm kiểu cho Pyrefly/Pyright)
+            cand_skills = cast(List[Tuple[str, str, int]], cand_data['skills'])
+            for sname, level, years in cand_skills:
                 skill_obj = skills_cache.get(sname.lower())
-                if skill_obj:
-                    CandidateSkills.objects.get_or_create(
-                        candidate=candidate,
-                        skill=skill_obj,
-                        defaults={'proficiency_level': level, 'years_of_experience': years}
+                if not skill_obj:
+                    skill_obj, _ = Skills.objects.get_or_create(
+                        skill_name=sname,
+                        defaults={'category': 'General'}
                     )
+                    skills_cache[sname.lower()] = skill_obj
+                CandidateSkills.objects.update_or_create(
+                    candidate=candidate,
+                    skill=skill_obj,
+                    defaults={'proficiency_level': level, 'years_of_experience': years}
+                )
 
             # Thêm học vấn
-            inst, deg, maj, s_year, e_year, gpa = cdata['edu']
-            Education.objects.get_or_create(
+            inst, deg, maj, s_year, e_year, gpa = cast(Tuple[str, str, str, int, int, float], cand_data['edu'])
+            Education.objects.update_or_create(
                 candidate=candidate,
                 institution_name=inst,
                 defaults={
@@ -323,13 +441,14 @@ class Command(BaseCommand):
                 }
             )
 
-            # Thêm kinh nghiệm
-            for comp, pos, s_date, e_date, is_curr, resp in cdata['experiences']:
-                Experience.objects.get_or_create(
+            # Thêm kinh nghiệm (dùng cast để bảo đảm kiểu cho Pyrefly/Pyright)
+            cand_experiences = cast(List[Tuple[str, str, date, Optional[date], bool, str]], cand_data['experiences'])
+            for comp, pos, s_date, e_date, is_curr, resp in cand_experiences:
+                Experience.objects.update_or_create(
                     candidate=candidate,
                     company_name=comp,
+                    position=pos,
                     defaults={
-                        'position': pos,
                         'start_date': s_date,
                         'end_date': e_date,
                         'is_current': is_curr,
@@ -347,7 +466,7 @@ class Command(BaseCommand):
         ]
 
         for job, cand, st, letter in app_samples:
-            Applications.objects.get_or_create(
+            Applications.objects.update_or_create(
                 job=job,
                 candidate=cand,
                 defaults={'status': st, 'cover_letter': letter}
@@ -356,10 +475,16 @@ class Command(BaseCommand):
             calculate_match(cand, job, save_to_db=True)
 
             # Tạo lượt xem mẫu
-            JobViews.objects.get_or_create(
-                job=job,
-                candidate=cand,
-                defaults={'ip_address': '127.0.0.1', 'user_agent': 'Mozilla/5.0'}
-            )
+            if not JobViews.objects.filter(job=job, candidate=cand).exists():
+                JobViews.objects.create(
+                    job=job,
+                    candidate=cand,
+                    ip_address='127.0.0.1',
+                    user_agent='Mozilla/5.0'
+                )
 
         self.stdout.write(self.style.SUCCESS('🎉 Hoàn thành nạp dữ liệu mẫu cho SmartJob thành công!'))
+
+
+if __name__ == '__main__':
+    Command().handle()
