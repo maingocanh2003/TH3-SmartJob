@@ -91,6 +91,7 @@ python test_db_connection.py
 - 🏗️ [Kiến trúc hệ thống](docs/architecture.md)
 - 🗄️ [Thiết kế Database (Chi tiết)](docs/database-design.md) ⭐
 - 📜 [SQL Schema Script](docs/database-schema.sql) ⭐
+- 💾 [SQL Seed Data Script](docs/seed-data.sql) ⭐
 - 🚀 [Hướng dẫn Setup Database](docs/SETUP_DATABASE.md) ⭐
 - 📊 [Báo cáo Checklist 1](docs/CHECKLIST_1_REPORT.md)
 
