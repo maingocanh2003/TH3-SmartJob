@@ -1,0 +1,369 @@
+[
+  {
+    "candidate_id": 1,
+    "full_name": "Nguyễn Văn An",
+    "email": "nguyenvanan.dev@gmail.com",
+    "phone": "0912345678",
+    "desired_position": "Senior Python Backend Developer",
+    "desired_salary": 45000000,
+    "years_of_experience": 5,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Thạc sĩ",
+      "institution": "Đại học Bách Khoa Hà Nội",
+      "major": "Khoa học Máy tính"
+    },
+    "skills": [
+      {"name": "Python", "level": "expert", "years": 5},
+      {"name": "Django", "level": "advanced", "years": 5},
+      {"name": "FastAPI", "level": "advanced", "years": 3},
+      {"name": "PostgreSQL", "level": "advanced", "years": 4},
+      {"name": "Docker", "level": "advanced", "years": 3},
+      {"name": "Redis", "level": "intermediate", "years": 3},
+      {"name": "AWS", "level": "intermediate", "years": 2},
+      {"name": "Git", "level": "advanced", "years": 5},
+      {"name": "REST API", "level": "expert", "years": 5}
+    ],
+    "raw_cv_text": "Họ và tên: Nguyễn Văn An\nEmail: nguyenvanan.dev@gmail.com\nSĐT: 0912345678\nVị trí ứng tuyển: Senior Python Backend Developer\nĐịa điểm: Hà Nội\n\nMỤC TIÊU NGHỀ NGHIỆP:\nKỹ sư phần mềm chuyên về Backend với hơn 5 năm kinh nghiệm chuyên sâu về Python, kiến trúc phân tán microservices, thiết kế cơ sở dữ liệu lớn với PostgreSQL.\n\nKINH NGHIỆM LÀM VIỆC:\n- 2021 - Hiện tại: Senior Backend Engineer tại TechCorp VN\n  + Thiết kế và xây dựng hệ thống API phục vụ hơn 500,000 người dùng hoạt động hàng ngày bằng Python, Django REST Framework và FastAPI.\n  + Tối ưu hóa truy vấn PostgreSQL và thiết lập Redis Caching, giảm độ trễ phản hồi hệ thống đi 45%.\n  + Đóng gói ứng dụng với Docker, triển khai CI/CD lên hạ tầng AWS (EC2, S3, RDS).\n- 2019 - 2021: Backend Developer tại FPT Software\n  + Phát triển các dịch vụ web bằng Python/Django, viết Unit test với Pytest.\n\nHỌC VẤN:\n- Thạc sĩ Khoa học Máy tính - Đại học Bách Khoa Hà Nội (GPA: 3.6/4.0)"
+  },
+  {
+    "candidate_id": 2,
+    "full_name": "Trần Thị Mai",
+    "email": "tranmai.frontend@gmail.com",
+    "phone": "0987654321",
+    "desired_position": "Senior Frontend React Developer",
+    "desired_salary": 38000000,
+    "years_of_experience": 4,
+    "location": "TP. Hồ Chí Minh",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Khoa học Tự nhiên TP.HCM",
+      "major": "Công nghệ Thông tin"
+    },
+    "skills": [
+      {"name": "React", "level": "expert", "years": 4},
+      {"name": "Next.js", "level": "advanced", "years": 3},
+      {"name": "TypeScript", "level": "advanced", "years": 3},
+      {"name": "JavaScript", "level": "expert", "years": 4},
+      {"name": "Tailwind CSS", "level": "advanced", "years": 3},
+      {"name": "Redux", "level": "advanced", "years": 4},
+      {"name": "HTML/CSS", "level": "expert", "years": 4},
+      {"name": "REST API", "level": "intermediate", "years": 4}
+    ],
+    "raw_cv_text": "Họ và tên: Trần Thị Mai\nEmail: tranmai.frontend@gmail.com\nSĐT: 0987654321\nVị trí: Senior Frontend React Developer\n\nTỔNG QUAN:\nFrontend Engineer 4 năm kinh nghiệm với đam mê xây dựng giao diện người dùng đẹp mắt, mượt mà và chuẩn UX bằng React, Next.js và TypeScript.\n\nKINH NGHIỆM:\n- Lead Frontend Developer tại FinTech VN (2022 - Nay): Xây dựng dashboard giao dịch tài chính với Next.js, TypeScript và Tailwind CSS. Quản lý global state với Redux Toolkit.\n- Frontend Developer tại VNG Corporation (2020 - 2022): Phát triển single page application với React, HTML5/CSS3 và REST API.\n\nHỌC VẤN:\n- Cử nhân CNTT - Đại học Khoa học Tự nhiên TP.HCM"
+  },
+  {
+    "candidate_id": 3,
+    "full_name": "Lê Hoàng Long",
+    "email": "lelong.ai@gmail.com",
+    "phone": "0933112233",
+    "desired_position": "AI / Machine Learning Engineer",
+    "desired_salary": 55000000,
+    "years_of_experience": 4,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Thạc sĩ",
+      "institution": "Đại học Bách Khoa Hà Nội",
+      "major": "Trí tuệ Nhân tạo & Khoa học Dữ liệu"
+    },
+    "skills": [
+      {"name": "Python", "level": "expert", "years": 4},
+      {"name": "Machine Learning", "level": "expert", "years": 4},
+      {"name": "Deep Learning", "level": "advanced", "years": 3},
+      {"name": "PyTorch", "level": "advanced", "years": 3},
+      {"name": "NLP", "level": "advanced", "years": 3},
+      {"name": "Pandas", "level": "expert", "years": 4},
+      {"name": "Computer Vision", "level": "intermediate", "years": 2},
+      {"name": "Docker", "level": "intermediate", "years": 2}
+    ],
+    "raw_cv_text": "Họ và tên: Lê Hoàng Long\nEmail: lelong.ai@gmail.com\nSĐT: 0933112233\nVị trí: AI / Machine Learning Engineer\n\nGIỚI THIỆU:\nKỹ sư Trí tuệ Nhân tạo với 4 năm kinh nghiệm nghiên cứu và triển khai các mô hình Machine Learning, Deep Learning, và NLP trong các bài toán thực tế quy mô lớn.\n\nKINH NGHIỆM:\n- AI Research Engineer tại Viettel AI (2021 - Hiện tại):\n  + Huấn luyện và tinh chỉnh các mô hình NLP và Deep Learning trên PyTorch cho hệ thống nhận dạng và tóm tắt văn bản tiếng Việt.\n  + Đóng gói mô hình Machine Learning thành microservices với FastAPI và Docker.\n- Data Science Intern tại VinAI Research (2020 - 2021).\n\nHỌC VẤN:\n- Thạc sĩ Trí tuệ Nhân tạo - ĐH Bách Khoa Hà Nội."
+  },
+  {
+    "candidate_id": 4,
+    "full_name": "Phạm Minh Đức",
+    "email": "phamduc.devops@gmail.com",
+    "phone": "0944556677",
+    "desired_position": "DevOps / Cloud Engineer",
+    "desired_salary": 48000000,
+    "years_of_experience": 5,
+    "location": "TP. Hồ Chí Minh",
+    "education": {
+      "degree": "Kỹ sư",
+      "institution": "Đại học Bách Khoa TP.HCM",
+      "major": "Mạng máy tính & Truyền thông"
+    },
+    "skills": [
+      {"name": "Docker", "level": "expert", "years": 5},
+      {"name": "Kubernetes", "level": "expert", "years": 4},
+      {"name": "AWS", "level": "advanced", "years": 4},
+      {"name": "CI/CD", "level": "expert", "years": 5},
+      {"name": "Linux", "level": "expert", "years": 5},
+      {"name": "Terraform", "level": "advanced", "years": 3},
+      {"name": "Git", "level": "advanced", "years": 5}
+    ],
+    "raw_cv_text": "Họ và tên: Phạm Minh Đức\nEmail: phamduc.devops@gmail.com\nSĐT: 0944556677\nVị trí: DevOps / Cloud Engineer\n\nKINH NGHIỆM:\n5 năm kinh nghiệm quản trị hạ tầng Cloud AWS, xây dựng pipeline CI/CD tự động và triển khai cụm Kubernetes (K8s) cho hơn 20 microservices. Thành thạo Docker, Linux, Terraform IaC."
+  },
+  {
+    "candidate_id": 5,
+    "full_name": "Vũ Thu Trang",
+    "email": "vutrang.data@gmail.com",
+    "phone": "0977889900",
+    "desired_position": "Data Analyst / BI Specialist",
+    "desired_salary": 26000000,
+    "years_of_experience": 3,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Kinh tế Quốc dân",
+      "major": "Hệ thống Thông tin Quản lý"
+    },
+    "skills": [
+      {"name": "SQL", "level": "expert", "years": 3},
+      {"name": "Power BI", "level": "expert", "years": 3},
+      {"name": "Tableau", "level": "intermediate", "years": 2},
+      {"name": "Data Analysis", "level": "advanced", "years": 3},
+      {"name": "Python", "level": "intermediate", "years": 2},
+      {"name": "Pandas", "level": "intermediate", "years": 2}
+    ],
+    "raw_cv_text": "Họ và tên: Vũ Thu Trang\nEmail: vutrang.data@gmail.com\nVị trí: Data Analyst / BI Specialist\n\nKINH NGHIỆM:\n3 năm kinh nghiệm phân tích dữ liệu kinh doanh, trực quan hóa dashboard báo cáo trên Power BI và Tableau. Thành thạo truy vấn SQL phức tạp, phân tích dữ liệu với Python và thư viện Pandas."
+  },
+  {
+    "candidate_id": 6,
+    "full_name": "Đặng Quốc Bảo",
+    "email": "dangbao.fullstack@gmail.com",
+    "phone": "0909123987",
+    "desired_position": "Fullstack JavaScript Developer",
+    "desired_salary": 35000000,
+    "years_of_experience": 3,
+    "location": "Đà Nẵng",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Bách Khoa - ĐH Đà Nẵng",
+      "major": "Kỹ thuật Phần mềm"
+    },
+    "skills": [
+      {"name": "Node.js", "level": "advanced", "years": 3},
+      {"name": "Express.js", "level": "advanced", "years": 3},
+      {"name": "React", "level": "advanced", "years": 3},
+      {"name": "JavaScript", "level": "expert", "years": 3},
+      {"name": "TypeScript", "level": "intermediate", "years": 2},
+      {"name": "MongoDB", "level": "advanced", "years": 3},
+      {"name": "Docker", "level": "intermediate", "years": 2}
+    ],
+    "raw_cv_text": "Họ và tên: Đặng Quốc Bảo\nEmail: dangbao.fullstack@gmail.com\nVị trí: Fullstack JavaScript Developer\n\nTÓM TẮT:\nLập trình viên Fullstack với 3 năm kinh nghiệm trong hệ sinh thái JavaScript (MERN Stack: MongoDB, Express, React, Node.js). Có kinh nghiệm đóng gói Docker và deploy hệ thống cloud."
+  },
+  {
+    "candidate_id": 7,
+    "full_name": "Hoàng Minh Tuấn",
+    "email": "tuanhoang.java@gmail.com",
+    "phone": "0961234888",
+    "desired_position": "Senior Java Backend Engineer",
+    "desired_salary": 45000000,
+    "years_of_experience": 5,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Kỹ sư",
+      "institution": "Học viện Công nghệ Bưu chính Viễn thông",
+      "major": "Công nghệ Phần mềm"
+    },
+    "skills": [
+      {"name": "Java", "level": "expert", "years": 5},
+      {"name": "Spring Boot", "level": "expert", "years": 5},
+      {"name": "Microservices", "level": "advanced", "years": 4},
+      {"name": "MySQL", "level": "advanced", "years": 4},
+      {"name": "Redis", "level": "intermediate", "years": 3},
+      {"name": "Docker", "level": "intermediate", "years": 3},
+      {"name": "REST API", "level": "expert", "years": 5}
+    ],
+    "raw_cv_text": "Họ và tên: Hoàng Minh Tuấn\nEmail: tuanhoang.java@gmail.com\nVị trí: Senior Java Backend Engineer\n\nKINH NGHIỆM:\n5 năm làm việc chuyên sâu với Java và Spring Boot, xây dựng kiến trúc Microservices chịu tải cao, tích hợp MySQL, Redis Cache và message broker. Tốt nghiệp Kỹ sư Học viện PTIT."
+  },
+  {
+    "candidate_id": 8,
+    "full_name": "Bùi Văn Thành",
+    "email": "thanhbui.mobile@gmail.com",
+    "phone": "0915678123",
+    "desired_position": "Mobile Developer (Flutter / React Native)",
+    "desired_salary": 32000000,
+    "years_of_experience": 3,
+    "location": "TP. Hồ Chí Minh",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Công nghệ Thông tin - ĐHQG TP.HCM",
+      "major": "Khoa học Máy tính"
+    },
+    "skills": [
+      {"name": "Flutter", "level": "advanced", "years": 3},
+      {"name": "React Native", "level": "intermediate", "years": 2},
+      {"name": "Android", "level": "intermediate", "years": 2},
+      {"name": "JavaScript", "level": "intermediate", "years": 2},
+      {"name": "REST API", "level": "advanced", "years": 3}
+    ],
+    "raw_cv_text": "Họ và tên: Bùi Văn Thành\nEmail: thanhbui.mobile@gmail.com\nVị trí: Mobile Developer\n\n3 năm kinh nghiệm phát triển ứng dụng di động đa nền tảng với Flutter và React Native. Đã publish 4 ứng dụng lên Google Play Store và Apple App Store."
+  },
+  {
+    "candidate_id": 9,
+    "full_name": "Ngô Phương Thảo",
+    "email": "thaongo.qa@gmail.com",
+    "phone": "0981999222",
+    "desired_position": "QA Automation Engineer",
+    "desired_salary": 30000000,
+    "years_of_experience": 4,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Sư phạm Hà Nội",
+      "major": "Tin học Ứng dụng"
+    },
+    "skills": [
+      {"name": "Automation Testing", "level": "expert", "years": 4},
+      {"name": "Unit Testing", "level": "advanced", "years": 4},
+      {"name": "Python", "level": "intermediate", "years": 3},
+      {"name": "CI/CD", "level": "intermediate", "years": 2},
+      {"name": "Git", "level": "advanced", "years": 4}
+    ],
+    "raw_cv_text": "Họ và tên: Ngô Phương Thảo\nEmail: thaongo.qa@gmail.com\nVị trí: QA Automation Engineer\n\n4 năm kinh nghiệm kiểm thử tự động (Automation Testing) với Selenium, Pytest, xây dựng test framework cho Web và API. Tích hợp kiểm thử tự động vào quy trình CI/CD."
+  },
+  {
+    "candidate_id": 10,
+    "full_name": "Lê Diệu Linh",
+    "email": "dieulinh.design@gmail.com",
+    "phone": "0934567890",
+    "desired_position": "UI/UX Designer",
+    "desired_salary": 28000000,
+    "years_of_experience": 3,
+    "location": "TP. Hồ Chí Minh",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Kiến trúc TP.HCM",
+      "major": "Thiết kế Đồ họa"
+    },
+    "skills": [
+      {"name": "Figma", "level": "expert", "years": 3},
+      {"name": "HTML/CSS", "level": "intermediate", "years": 2},
+      {"name": "Agile/Scrum", "level": "intermediate", "years": 2},
+      {"name": "Teamwork", "level": "expert", "years": 3}
+    ],
+    "raw_cv_text": "Họ và tên: Lê Diệu Linh\nEmail: dieulinh.design@gmail.com\nVị trí: UI/UX Designer\n\n3 năm kinh nghiệm thiết kế UI/UX trên Figma cho các sản phẩm SaaS và Mobile App. Am hiểu sâu sắc về design system, wireframing, prototyping và user research."
+  },
+  {
+    "candidate_id": 11,
+    "full_name": "Đỗ Quang Huy",
+    "email": "quanghuy.junior@gmail.com",
+    "phone": "0903334455",
+    "desired_position": "Junior Python Developer",
+    "desired_salary": 14000000,
+    "years_of_experience": 1,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Thủy Lợi",
+      "major": "Công nghệ Thông tin"
+    },
+    "skills": [
+      {"name": "Python", "level": "intermediate", "years": 1},
+      {"name": "Django", "level": "beginner", "years": 1},
+      {"name": "SQL", "level": "intermediate", "years": 1},
+      {"name": "Git", "level": "intermediate", "years": 1},
+      {"name": "REST API", "level": "beginner", "years": 1}
+    ],
+    "raw_cv_text": "Họ và tên: Đỗ Quang Huy\nEmail: quanghuy.junior@gmail.com\nVị trí: Junior Python Developer\n\nMới tốt nghiệp cử nhân CNTT, có 1 năm kinh nghiệm làm đồ án và thực tập với Python và Django. Ham học hỏi, nắm vững tư duy logic và cấu trúc dữ liệu."
+  },
+  {
+    "candidate_id": 12,
+    "full_name": "Nguyễn Trọng Nghĩa",
+    "email": "nghia.dotnet@gmail.com",
+    "phone": "0971234999",
+    "desired_position": "Senior .NET Core Developer",
+    "desired_salary": 46000000,
+    "years_of_experience": 5,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Kỹ sư",
+      "institution": "Đại học Công nghiệp Hà Nội",
+      "major": "Công nghệ Phần mềm"
+    },
+    "skills": [
+      {"name": "C#", "level": "expert", "years": 5},
+      {"name": "ASP.NET", "level": "expert", "years": 5},
+      {"name": "SQL Server", "level": "advanced", "years": 5},
+      {"name": "Azure", "level": "intermediate", "years": 3},
+      {"name": "Microservices", "level": "advanced", "years": 3},
+      {"name": "Docker", "level": "intermediate", "years": 2}
+    ],
+    "raw_cv_text": "Họ và tên: Nguyễn Trọng Nghĩa\nEmail: nghia.dotnet@gmail.com\nVị trí: Senior .NET Core Developer\n\n5 năm kinh nghiệm phát triển phần mềm doanh nghiệp bằng C#, ASP.NET Core, Microsoft SQL Server và triển khai dịch vụ Azure Cloud."
+  },
+  {
+    "candidate_id": 13,
+    "full_name": "Trịnh Công Sơn",
+    "email": "son.golang@gmail.com",
+    "phone": "0918765432",
+    "desired_position": "Senior Golang Backend Engineer",
+    "desired_salary": 50000000,
+    "years_of_experience": 4,
+    "location": "TP. Hồ Chí Minh",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Sư phạm Kỹ thuật TP.HCM",
+      "major": "Kỹ thuật Máy tính"
+    },
+    "skills": [
+      {"name": "Go", "level": "expert", "years": 4},
+      {"name": "Microservices", "level": "advanced", "years": 4},
+      {"name": "Kubernetes", "level": "intermediate", "years": 2},
+      {"name": "PostgreSQL", "level": "advanced", "years": 3},
+      {"name": "Docker", "level": "advanced", "years": 3},
+      {"name": "Redis", "level": "advanced", "years": 3}
+    ],
+    "raw_cv_text": "Họ và tên: Trịnh Công Sơn\nEmail: son.golang@gmail.com\nVị trí: Senior Golang Backend Engineer\n\n4 năm kinh nghiệm lập trình Go (Golang), xây dựng backend microservices phân tán chịu tải hàng triệu request mỗi phút với Redis và PostgreSQL."
+  },
+  {
+    "candidate_id": 14,
+    "full_name": "Dương Thùy Linh",
+    "email": "linhduong.ds@gmail.com",
+    "phone": "0982345671",
+    "desired_position": "Data Scientist & NLP Specialist",
+    "desired_salary": 60000000,
+    "years_of_experience": 5,
+    "location": "Hà Nội",
+    "education": {
+      "degree": "Tiến sĩ",
+      "institution": "Đại học Bách Khoa Hà Nội",
+      "major": "Khoa học Dữ liệu"
+    },
+    "skills": [
+      {"name": "Python", "level": "expert", "years": 5},
+      {"name": "Machine Learning", "level": "expert", "years": 5},
+      {"name": "Deep Learning", "level": "expert", "years": 5},
+      {"name": "NLP", "level": "expert", "years": 5},
+      {"name": "PyTorch", "level": "advanced", "years": 4},
+      {"name": "Data Analysis", "level": "expert", "years": 5},
+      {"name": "SQL", "level": "advanced", "years": 4}
+    ],
+    "raw_cv_text": "Họ và tên: Dương Thùy Linh\nEmail: linhduong.ds@gmail.com\nVị trí: Data Scientist & NLP Specialist\n\nTiến sĩ Khoa học Dữ liệu với 5 năm kinh nghiệm nghiên cứu mô hình ngôn ngữ lớn (LLM, NLP) và các giải pháp Deep Learning, Machine Learning ứng dụng thực tế."
+  },
+  {
+    "candidate_id": 15,
+    "full_name": "Phan Hữu Thắng",
+    "email": "thang.vuejs@gmail.com",
+    "phone": "0908889911",
+    "desired_position": "Frontend Vue.js Developer",
+    "desired_salary": 28000000,
+    "years_of_experience": 3,
+    "location": "Đà Nẵng",
+    "education": {
+      "degree": "Cử nhân",
+      "institution": "Đại học Công nghệ Thông tin & Truyền thông Việt - Hàn",
+      "major": "Công nghệ Thông tin"
+    },
+    "skills": [
+      {"name": "Vue.js", "level": "expert", "years": 3},
+      {"name": "JavaScript", "level": "advanced", "years": 3},
+      {"name": "TypeScript", "level": "intermediate", "years": 2},
+      {"name": "Tailwind CSS", "level": "advanced", "years": 3},
+      {"name": "HTML/CSS", "level": "expert", "years": 3},
+      {"name": "REST API", "level": "intermediate", "years": 3}
+    ],
+    "raw_cv_text": "Họ và tên: Phan Hữu Thắng\nEmail: thang.vuejs@gmail.com\nVị trí: Frontend Vue.js Developer\n\n3 năm kinh nghiệm lập trình giao diện người dùng với Vue.js (Vue 3, Pinia, NuxtJS), TypeScript và Tailwind CSS. Tối ưu performance trang web."
+  }
+]
+

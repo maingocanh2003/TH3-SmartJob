@@ -1,0 +1,345 @@
+{
+  "skills": [
+    {
+      "name": "Python",
+      "category": "Programming Language",
+      "aliases": ["python", "python3", "python 3", "py", "pythonic"]
+    },
+    {
+      "name": "JavaScript",
+      "category": "Programming Language",
+      "aliases": ["javascript", "js", "ecmascript", "es6", "es2015", "esnext"]
+    },
+    {
+      "name": "TypeScript",
+      "category": "Programming Language",
+      "aliases": ["typescript", "ts"]
+    },
+    {
+      "name": "Java",
+      "category": "Programming Language",
+      "aliases": ["java", "core java", "java 8", "java 11", "java 17", "java 21"]
+    },
+    {
+      "name": "C#",
+      "category": "Programming Language",
+      "aliases": ["c#", "csharp", "c sharp", ".net c#"]
+    },
+    {
+      "name": "C++",
+      "category": "Programming Language",
+      "aliases": ["c++", "cpp"]
+    },
+    {
+      "name": "PHP",
+      "category": "Programming Language",
+      "aliases": ["php", "php7", "php8"]
+    },
+    {
+      "name": "Go",
+      "category": "Programming Language",
+      "aliases": ["go", "golang", "go language"]
+    },
+    {
+      "name": "Rust",
+      "category": "Programming Language",
+      "aliases": ["rust", "rustlang"]
+    },
+    {
+      "name": "Kotlin",
+      "category": "Programming Language",
+      "aliases": ["kotlin"]
+    },
+    {
+      "name": "Swift",
+      "category": "Programming Language",
+      "aliases": ["swift", "swiftui"]
+    },
+    {
+      "name": "HTML/CSS",
+      "category": "Frontend Development",
+      "aliases": ["html", "html5", "css", "css3", "html/css", "html5/css3", "sass", "scss", "less"]
+    },
+    {
+      "name": "React",
+      "category": "Frontend Development",
+      "aliases": ["react", "reactjs", "react.js", "react framework", "react hook", "react hooks"]
+    },
+    {
+      "name": "Vue.js",
+      "category": "Frontend Development",
+      "aliases": ["vue", "vuejs", "vue.js", "vue 3", "vue2", "vue3", "nuxt", "nuxtjs"]
+    },
+    {
+      "name": "Angular",
+      "category": "Frontend Development",
+      "aliases": ["angular", "angularjs", "angular 2+"]
+    },
+    {
+      "name": "Next.js",
+      "category": "Frontend Development",
+      "aliases": ["next", "nextjs", "next.js"]
+    },
+    {
+      "name": "Tailwind CSS",
+      "category": "Frontend Development",
+      "aliases": ["tailwind", "tailwindcss", "tailwind css"]
+    },
+    {
+      "name": "Redux",
+      "category": "Frontend Development",
+      "aliases": ["redux", "redux toolkit", "rtk"]
+    },
+    {
+      "name": "Django",
+      "category": "Backend Framework",
+      "aliases": ["django", "django framework", "django rest", "drf", "django rest framework"]
+    },
+    {
+      "name": "Flask",
+      "category": "Backend Framework",
+      "aliases": ["flask", "flask framework"]
+    },
+    {
+      "name": "FastAPI",
+      "category": "Backend Framework",
+      "aliases": ["fastapi", "fast api"]
+    },
+    {
+      "name": "Spring Boot",
+      "category": "Backend Framework",
+      "aliases": ["spring", "spring boot", "springboot", "spring framework", "spring mvc"]
+    },
+    {
+      "name": "Node.js",
+      "category": "Backend Framework",
+      "aliases": ["node", "nodejs", "node.js"]
+    },
+    {
+      "name": "Express.js",
+      "category": "Backend Framework",
+      "aliases": ["express", "expressjs", "express.js"]
+    },
+    {
+      "name": "NestJS",
+      "category": "Backend Framework",
+      "aliases": ["nest", "nestjs", "nest.js"]
+    },
+    {
+      "name": "ASP.NET",
+      "category": "Backend Framework",
+      "aliases": ["asp.net", "asp.net core", ".net core", "dotnet core", ".net"]
+    },
+    {
+      "name": "Laravel",
+      "category": "Backend Framework",
+      "aliases": ["laravel", "laravel framework"]
+    },
+    {
+      "name": "PostgreSQL",
+      "category": "Database",
+      "aliases": ["postgres", "postgresql", "psql", "postgre"]
+    },
+    {
+      "name": "MySQL",
+      "category": "Database",
+      "aliases": ["mysql", "my-sql"]
+    },
+    {
+      "name": "MongoDB",
+      "category": "Database",
+      "aliases": ["mongo", "mongodb", "mongo db"]
+    },
+    {
+      "name": "Redis",
+      "category": "Database",
+      "aliases": ["redis", "redis cache"]
+    },
+    {
+      "name": "SQL Server",
+      "category": "Database",
+      "aliases": ["sql server", "mssql", "ms sql", "microsoft sql server"]
+    },
+    {
+      "name": "Oracle",
+      "category": "Database",
+      "aliases": ["oracle", "oracle db", "pl/sql"]
+    },
+    {
+      "name": "Elasticsearch",
+      "category": "Database",
+      "aliases": ["elasticsearch", "elastic search", "elk"]
+    },
+    {
+      "name": "Docker",
+      "category": "DevOps & Cloud",
+      "aliases": ["docker", "docker container", "docker-compose", "containerization"]
+    },
+    {
+      "name": "Kubernetes",
+      "category": "DevOps & Cloud",
+      "aliases": ["kubernetes", "k8s"]
+    },
+    {
+      "name": "AWS",
+      "category": "DevOps & Cloud",
+      "aliases": ["aws", "amazon web services", "ec2", "s3", "lambda", "aws cloud"]
+    },
+    {
+      "name": "Azure",
+      "category": "DevOps & Cloud",
+      "aliases": ["azure", "microsoft azure", "azure cloud"]
+    },
+    {
+      "name": "Google Cloud",
+      "category": "DevOps & Cloud",
+      "aliases": ["gcp", "google cloud", "google cloud platform"]
+    },
+    {
+      "name": "CI/CD",
+      "category": "DevOps & Cloud",
+      "aliases": ["ci/cd", "ci-cd", "cicd", "continuous integration", "jenkins", "gitlab ci", "github actions"]
+    },
+    {
+      "name": "Linux",
+      "category": "DevOps & Cloud",
+      "aliases": ["linux", "ubuntu", "centos", "bash", "shell script"]
+    },
+    {
+      "name": "Terraform",
+      "category": "DevOps & Cloud",
+      "aliases": ["terraform", "iac", "infrastructure as code"]
+    },
+    {
+      "name": "Machine Learning",
+      "category": "AI & Data Science",
+      "aliases": ["machine learning", "ml", "học máy", "scikit-learn", "sklearn"]
+    },
+    {
+      "name": "Deep Learning",
+      "category": "AI & Data Science",
+      "aliases": ["deep learning", "dl", "học sâu", "neural networks", "mạng nơ-ron"]
+    },
+    {
+      "name": "PyTorch",
+      "category": "AI & Data Science",
+      "aliases": ["pytorch", "torch"]
+    },
+    {
+      "name": "TensorFlow",
+      "category": "AI & Data Science",
+      "aliases": ["tensorflow", "tf", "keras"]
+    },
+    {
+      "name": "NLP",
+      "category": "AI & Data Science",
+      "aliases": ["nlp", "natural language processing", "xử lý ngôn ngữ tự nhiên", "spacy", "huggingface", "llm", "large language model"]
+    },
+    {
+      "name": "Computer Vision",
+      "category": "AI & Data Science",
+      "aliases": ["computer vision", "cv", "thị giác máy tính", "opencv"]
+    },
+    {
+      "name": "Pandas",
+      "category": "AI & Data Science",
+      "aliases": ["pandas"]
+    },
+    {
+      "name": "Data Analysis",
+      "category": "AI & Data Science",
+      "aliases": ["data analysis", "phân tích dữ liệu", "data analytics", "eda"]
+    },
+    {
+      "name": "Power BI",
+      "category": "BI & Analytics",
+      "aliases": ["power bi", "powerbi", "dax"]
+    },
+    {
+      "name": "Tableau",
+      "category": "BI & Analytics",
+      "aliases": ["tableau"]
+    },
+    {
+      "name": "SQL",
+      "category": "Database",
+      "aliases": ["sql", "structured query language", "truy vấn sql"]
+    },
+    {
+      "name": "Git",
+      "category": "Software Engineering",
+      "aliases": ["git", "github", "gitlab", "version control"]
+    },
+    {
+      "name": "REST API",
+      "category": "Software Engineering",
+      "aliases": ["rest", "rest api", "restful", "restful api", "api integration"]
+    },
+    {
+      "name": "GraphQL",
+      "category": "Software Engineering",
+      "aliases": ["graphql", "graph ql"]
+    },
+    {
+      "name": "Microservices",
+      "category": "Software Engineering",
+      "aliases": ["microservices", "microservice", "kiến trúc vi dịch vụ"]
+    },
+    {
+      "name": "Unit Testing",
+      "category": "QA & Testing",
+      "aliases": ["unit test", "unit testing", "pytest", "jest", "junit", "tdd"]
+    },
+    {
+      "name": "Automation Testing",
+      "category": "QA & Testing",
+      "aliases": ["automation test", "automation testing", "selenium", "cypress", "playwright"]
+    },
+    {
+      "name": "React Native",
+      "category": "Mobile Development",
+      "aliases": ["react native", "react-native"]
+    },
+    {
+      "name": "Flutter",
+      "category": "Mobile Development",
+      "aliases": ["flutter", "dart"]
+    },
+    {
+      "name": "Android",
+      "category": "Mobile Development",
+      "aliases": ["android", "android development", "android sdk"]
+    },
+    {
+      "name": "iOS",
+      "category": "Mobile Development",
+      "aliases": ["ios", "ios development"]
+    },
+    {
+      "name": "Figma",
+      "category": "Design & UI/UX",
+      "aliases": ["figma", "ui/ux design", "ui design", "ux design", "thiết kế giao diện"]
+    },
+    {
+      "name": "Agile/Scrum",
+      "category": "Methodology",
+      "aliases": ["agile", "scrum", "kanban", "sprint"]
+    },
+    {
+      "name": "English",
+      "category": "Soft Skills & Languages",
+      "aliases": ["english", "tiếng anh", "toeic", "ielts", "tiếng anh giao tiếp"]
+    },
+    {
+      "name": "Problem Solving",
+      "category": "Soft Skills & Languages",
+      "aliases": ["problem solving", "giải quyết vấn đề", "tư duy logic"]
+    },
+    {
+      "name": "Teamwork",
+      "category": "Soft Skills & Languages",
+      "aliases": ["teamwork", "làm việc nhóm", "kỹ năng làm việc nhóm"]
+    }
+  ]
+}
+

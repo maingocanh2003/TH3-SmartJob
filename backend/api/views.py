@@ -18,7 +18,9 @@ from .serializers import (
     ApplicationSerializer, SavedJobSerializer, AiMatchResultSerializer
 )
 from .ai_matching_service import (
-    calculate_match, get_recommended_jobs_for_candidate, get_recommended_candidates_for_job
+    calculate_match, get_recommended_jobs_for_candidate, get_recommended_candidates_for_job,
+    extract_skills_service, parse_cv_service, stateless_recommend_jobs_for_cv_text,
+    get_ai_evaluation_metrics
 )
 
 
@@ -176,7 +178,11 @@ class CandidateViewSet(viewsets.ModelViewSet):
         """Lấy danh sách công việc gợi ý bởi AI cho ứng viên này"""
         candidate = self.get_object()
         limit = int(request.query_params.get('limit', 10))
-        recommendations = get_recommended_jobs_for_candidate(candidate, limit=limit)
+        min_score = float(request.query_params.get('min_score', 0.0))
+        location = request.query_params.get('location', None)
+        recommendations = get_recommended_jobs_for_candidate(
+            candidate, limit=limit, min_score=min_score, location=location
+        )
         return Response(recommendations)
 
 
@@ -257,7 +263,8 @@ class JobViewSet(viewsets.ModelViewSet):
         """Lấy danh sách ứng viên AI gợi ý cho tin tuyển dụng này"""
         job = self.get_object()
         limit = int(request.query_params.get('limit', 10))
-        recommendations = get_recommended_candidates_for_job(job, limit=limit)
+        min_score = float(request.query_params.get('min_score', 0.0))
+        recommendations = get_recommended_candidates_for_job(job, limit=limit, min_score=min_score)
         return Response(recommendations)
 
     @action(detail=True, methods=['post'])
@@ -371,28 +378,129 @@ class SavedJobViewSet(viewsets.ModelViewSet):
 
 
 # ==============================================================================
-# AI MATCHING VIEW
+# AI MATCHING VIEWS (CHECKLIST 02)
 # ==============================================================================
 
 class AIMatchingAPIView(APIView):
     """
-    Direct calculation API for AI Matching
+    Direct calculation API for AI Matching.
+    Supports either database IDs (candidate_id & job_id) or direct payload (cv_text & job_description).
     """
     def post(self, request):
         candidate_id = request.data.get('candidate_id')
         job_id = request.data.get('job_id')
+        cv_text = request.data.get('cv_text')
+        job_description = request.data.get('job_description')
 
-        if not candidate_id or not job_id:
-            return Response({'error': 'Cần truyền candidate_id và job_id.'}, status=status.HTTP_400_BAD_REQUEST)
+        # 1. Matching by Database IDs
+        if candidate_id and job_id:
+            try:
+                candidate = Candidates.objects.get(pk=candidate_id)
+                job = Jobs.objects.get(pk=job_id)
+            except (Candidates.DoesNotExist, Jobs.DoesNotExist):
+                return Response({'error': 'Ứng viên hoặc công việc không tồn tại.'}, status=status.HTTP_404_NOT_FOUND)
 
-        try:
-            candidate = Candidates.objects.get(pk=candidate_id)
-            job = Jobs.objects.get(pk=job_id)
-        except (Candidates.DoesNotExist, Jobs.DoesNotExist):
-            return Response({'error': 'Ứng viên hoặc công việc không tồn tại.'}, status=status.HTTP_404_NOT_FOUND)
+            match_data = calculate_match(candidate, job, save_to_db=True)
+            return Response(match_data)
 
-        match_data = calculate_match(candidate, job, save_to_db=True)
-        return Response(match_data)
+        # 2. Matching by Raw Unstructured Text (CV Text + Job Description)
+        elif cv_text and job_description:
+            parsed_cand = parse_cv_service(cv_text)
+            parsed_skills = extract_skills_service(job_description)
+            job_payload = {
+                'job_title': request.data.get('job_title', 'Vị trí tuyển dụng'),
+                'job_description': job_description,
+                'requirements': request.data.get('requirements', ''),
+                'years_of_experience_required': request.data.get('years_of_experience_required', 0),
+                'salary_min': request.data.get('salary_min'),
+                'salary_max': request.data.get('salary_max'),
+                'required_skills': parsed_skills
+            }
+            from ai_matching.matching_engine import calculate_matching_score
+            match_data = calculate_matching_score(parsed_cand, job_payload)
+            return Response(match_data)
+
+        return Response(
+            {'error': 'Cần truyền (candidate_id và job_id) HOẶC (cv_text và job_description).'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ExtractSkillsAPIView(APIView):
+    """
+    Extracts and normalizes skills from free-form text (CV or Job Description).
+    """
+    def post(self, request):
+        text = request.data.get('text', '')
+        if not text:
+            return Response({'error': 'Tham số "text" không được để trống.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        skills = extract_skills_service(text)
+        return Response({
+            'total_skills_found': len(skills),
+            'skills': skills
+        })
+
+
+class ParseCVAPIView(APIView):
+    """
+    Parses unstructured CV text into a structured candidate profile.
+    """
+    def post(self, request):
+        cv_text = request.data.get('cv_text', '')
+        if not cv_text:
+            return Response({'error': 'Tham số "cv_text" không được để trống.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile = parse_cv_service(cv_text)
+        return Response(profile)
+
+
+class RecommendJobsAPIView(APIView):
+    """
+    Recommends ranked jobs for a candidate either by candidate_id or by raw CV text.
+    """
+    def post(self, request):
+        candidate_id = request.data.get('candidate_id')
+        cv_text = request.data.get('cv_text')
+        limit = int(request.data.get('limit', 10))
+        min_score = float(request.data.get('min_score', 0.0))
+        location = request.data.get('location')
+
+        if candidate_id:
+            try:
+                candidate = Candidates.objects.get(pk=candidate_id)
+            except Candidates.DoesNotExist:
+                return Response({'error': 'Ứng viên không tồn tại.'}, status=status.HTTP_404_NOT_FOUND)
+
+            recs = get_recommended_jobs_for_candidate(
+                candidate, limit=limit, min_score=min_score, location=location
+            )
+            return Response({
+                'candidate_id': candidate_id,
+                'candidate_name': candidate.full_name,
+                'recommendations_count': len(recs),
+                'recommendations': recs
+            })
+
+        elif cv_text:
+            result = stateless_recommend_jobs_for_cv_text(
+                cv_text=cv_text, limit=limit, min_score=min_score
+            )
+            return Response(result)
+
+        return Response(
+            {'error': 'Cần truyền "candidate_id" hoặc "cv_text".'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class AIEvaluationAPIView(APIView):
+    """
+    Executes benchmark evaluation on the test dataset and returns Precision@K, Recall@K, NDCG@K, MRR, MAP.
+    """
+    def get(self, request):
+        metrics_data = get_ai_evaluation_metrics()
+        return Response(metrics_data)
 
 
 # ==============================================================================

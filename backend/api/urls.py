@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     AuthViewSet, SkillViewSet, CandidateViewSet,
     CompanyViewSet, JobViewSet, ApplicationViewSet,
-    SavedJobViewSet, AIMatchingAPIView, BIDashboardViewSet
+    SavedJobViewSet, AIMatchingAPIView, BIDashboardViewSet,
+    ExtractSkillsAPIView, ParseCVAPIView, RecommendJobsAPIView, AIEvaluationAPIView
 )
 
 router = DefaultRouter()
@@ -19,4 +20,8 @@ router.register(r'bi', BIDashboardViewSet, basename='bi')
 urlpatterns = [
     path('', include(router.urls)),
     path('ai/match/', AIMatchingAPIView.as_view(), name='ai-match'),
+    path('ai/extract-skills/', ExtractSkillsAPIView.as_view(), name='ai-extract-skills'),
+    path('ai/parse-cv/', ParseCVAPIView.as_view(), name='ai-parse-cv'),
+    path('ai/recommend-jobs/', RecommendJobsAPIView.as_view(), name='ai-recommend-jobs'),
+    path('ai/evaluation/', AIEvaluationAPIView.as_view(), name='ai-evaluation'),
 ]
