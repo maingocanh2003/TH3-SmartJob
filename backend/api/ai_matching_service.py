@@ -184,7 +184,7 @@ def get_recommended_candidates_for_job(
     min_score: float = 0.0
 ) -> List[Dict[str, Any]]:
     """
-    Rank and return top matching candidates for a job posting.
+    Rank and return top matching candidates for a job opening.
     """
     candidates = Candidates.objects.all().select_related('user')
     job_dict = job_to_dict(job)

@@ -13,9 +13,13 @@ TH3-SmartJob/
 │   ├── architecture.md              # Kiến trúc hệ thống
 │   ├── database-design.md           # Thiết kế CSDL chi tiết (✅ Hoàn thành)
 │   ├── database-schema.sql          # SQL script khởi tạo DB (✅ Hoàn thành)
+│   ├── seed-data.sql                # SQL script nạp dữ liệu ban đầu
 │   ├── SETUP_DATABASE.md            # Hướng dẫn setup cho team (✅ Hoàn thành)
-│   └── CHECKLIST_1_REPORT.md        # Báo cáo hoàn thành (✅ Hoàn thành)
+│   ├── CHECKLIST_1_REPORT.md        # Báo cáo hoàn thành Checklist 1 (✅ Hoàn thành)
+│   ├── CHECKLIST_2_AI_REPORT.md     # Báo cáo hoàn thành Checklist 2 AI/ML (✅ Hoàn thành)
+│   └── AI_MATCHING_GUIDE.md         # Hướng dẫn chi tiết sử dụng & API AI/ML (✅ Hoàn thành)
 ├── .env                             # Config database (không commit)
+├── .env.example                     # Mẫu cấu hình môi trường
 ├── .gitignore                       # Git ignore rules
 ├── test_db_connection.py            # Script test database
 ├── run_ai_evaluation.py             # Script đánh giá chất lượng AI Matching
@@ -35,10 +39,25 @@ TH3-SmartJob/
 ```
 
 ## ✅ Checklist 1: Thiết kế cơ sở dữ liệu (Hoàn thành)
-- [x] Thiết kế 13 bảng CSDL, quan hệ, indexes, triggers (`docs/database-schema.sql`)
-- [x] Báo cáo Checklist 1: `docs/CHECKLIST_1_REPORT.md`
+
+### Những gì đã hoàn thành:
+
+- [x] **Phân tích yêu cầu hệ thống** - `docs/requirements.md`
+- [x] **Thiết kế kiến trúc** - `docs/architecture.md`
+- [x] **Thiết kế CSDL chi tiết** - `docs/database-design.md`
+  - 13 bảng với quan hệ đầy đủ
+  - Sơ đồ ERD
+  - 40+ indexes
+  - 6 triggers/functions
+  - 74 kỹ năng mẫu
+- [x] **SQL Schema** - `docs/database-schema.sql`
+- [x] **Hướng dẫn Setup** - `docs/SETUP_DATABASE.md`
+- [x] **Báo cáo Checklist 1** - `docs/CHECKLIST_1_REPORT.md`
 
 ## ✅ Checklist 2: AI/ML Matching & Recommendation (Hoàn thành)
+
+### Những gì đã hoàn thành:
+
 - [x] **Xây dựng bộ dữ liệu mẫu về CV và tin tuyển dụng:** 15 hồ sơ ứng viên, 15 tin tuyển dụng mẫu đa ngành nghề và ma trận benchmark 225 cặp (`ai_matching/data/`).
 - [x] **Trích xuất & Chuẩn hóa kỹ năng:** Bóc tách thực thể kỹ năng, cấp độ thành thạo, kinh nghiệm từ văn bản CV/JD với từ điển hơn 200 từ đồng nghĩa song ngữ Việt - Anh.
 - [x] **Thuật toán Matching Score đa tiêu chí:** Kết hợp 5 trọng số: Kỹ năng (50%), Ngữ nghĩa TF-IDF & Cosine (20%), Kinh nghiệm (15%), Lương (10%), Học vấn (5%) kèm cơ chế diễn giải tự nhiên (Explainability).
@@ -92,6 +111,18 @@ SELECT COUNT(*) FROM Skills;  -- 74 skills
 python test_db_connection.py
 ```
 
+### 4. Nạp dữ liệu mẫu AI/ML và chạy kiểm thử
+```bash
+# Nạp 15 CVs, 15 Jobs và tính toán precomputed match results
+python ai_matching/seed_ai_data.py
+
+# Đánh giá chất lượng gợi ý (Precision@K, Recall@K, NDCG@K, MRR, MAP)
+python run_ai_evaluation.py
+
+# Chạy test suite kiểm thử API AI/ML
+python backend/test_ai_api.py
+```
+
 ## Tài liệu
 
 - 📄 [Yêu cầu nghiệp vụ](docs/requirements.md)
@@ -107,10 +138,10 @@ python test_db_connection.py
 ## Công nghệ
 
 - PostgreSQL 12+
-- Python/Django (sắp triển khai)
+- Python/Django
+- Django REST Framework
 - Apache Superset (sắp triển khai)
 
 ## License
 
 Dự án học tập - Môn Hệ thống Kiến trúc Dữ liệu và Thông minh
-
