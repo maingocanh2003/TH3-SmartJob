@@ -1,0 +1,202 @@
+project: TH3-SmartJob
+checklist: "03 - BI Dashboard phân tích thị trường lao động"
+database:
+  display_name: SmartJob PostgreSQL
+  sqlalchemy_uri_template: postgresql+psycopg2://smartjob_user:<DB_PASSWORD>@localhost:5433/smartjob_db
+  expose_in_sqllab: true
+
+datasets:
+  - name: bi.vw_job_market_fact
+    type: physical_view
+    columns:
+      - job_id
+      - job_title
+      - industry
+      - position_level
+      - region
+      - employment_type
+      - job_status
+      - created_at
+      - application_deadline
+      - salary_min
+      - salary_max
+      - salary_mid
+      - application_count
+      - interviewed_count
+      - hired_count
+      - skill_requirement_count
+      - view_count
+    temporal_column: created_at
+    metrics:
+      - name: total_jobs
+        expression: COUNT_DISTINCT(job_id)
+      - name: total_views
+        expression: SUM(view_count)
+      - name: total_applications
+        expression: SUM(application_count)
+
+  - name: bi.vw_job_postings_by_industry
+    type: physical_view
+    columns:
+      [industry, total_jobs, active_jobs, first_posted_at, latest_posted_at]
+    metrics:
+      - name: total_jobs
+        expression: SUM(total_jobs)
+
+  - name: bi.vw_skill_demand
+    type: physical_view
+    columns:
+      [
+        skill_id,
+        skill_name,
+        skill_category,
+        jobs_requiring_skill,
+        jobs_mandatory_skill,
+        avg_skill_weight,
+      ]
+
+  - name: bi.vw_avg_salary_by_industry_position
+    type: physical_view
+    columns:
+      - industry
+      - position_level
+      - total_jobs
+      - avg_salary_min
+      - avg_salary_max
+      - avg_salary_mid
+      - min_salary_observed
+      - max_salary_observed
+
+  - name: bi.vw_recruitment_funnel
+    type: physical_view
+    columns:
+      - total_applications
+      - reviewed_or_higher
+      - interviewed
+      - hired_success
+      - reviewed_rate_pct
+      - interview_rate_pct
+      - hiring_success_rate_pct
+
+  - name: bi.vw_dashboard_kpis
+    type: physical_view
+    columns:
+      - total_job_postings
+      - total_candidates
+      - total_applications
+      - total_applied_candidates
+      - successful_applications
+      - hiring_rate_pct
+
+dashboard:
+  name: SmartJob - Labor Market BI Dashboard
+  layout:
+    row_1:
+      - kpi_total_job_postings
+      - kpi_total_candidates
+      - kpi_total_applications
+      - kpi_hiring_rate
+    row_2:
+      - chart_job_postings_by_industry
+      - chart_skill_demand
+    row_3:
+      - chart_salary_by_industry_position
+      - chart_recruitment_funnel
+
+filters:
+  dataset: bi.vw_job_market_fact
+  native_filters:
+    - name: industry_filter
+      label: Ngành nghề
+      column: industry
+      applies_to:
+        - chart_job_postings_by_industry
+        - chart_salary_by_industry_position
+        - chart_skill_demand
+        - chart_recruitment_funnel
+    - name: position_filter
+      label: Vị trí công việc
+      column: position_level
+      applies_to:
+        - chart_salary_by_industry_position
+        - chart_recruitment_funnel
+    - name: region_filter
+      label: Khu vực
+      column: region
+      applies_to:
+        - chart_job_postings_by_industry
+        - chart_recruitment_funnel
+    - name: time_filter
+      label: Thời gian đăng tuyển
+      column: created_at
+      filter_type: time_range
+      applies_to:
+        - chart_job_postings_by_industry
+        - chart_salary_by_industry_position
+        - chart_recruitment_funnel
+    - name: salary_filter
+      label: Mức lương
+      column: salary_mid
+      filter_type: range
+      applies_to:
+        - chart_salary_by_industry_position
+        - chart_recruitment_funnel
+
+charts:
+  - id: chart_job_postings_by_industry
+    title: Số lượng tin tuyển dụng theo ngành nghề
+    dataset: bi.vw_job_postings_by_industry
+    viz_type: bar
+    x_axis: industry
+    metrics: [total_jobs]
+    sort_desc: true
+
+  - id: chart_skill_demand
+    title: Nhu cầu kỹ năng của doanh nghiệp (Top 15)
+    dataset: bi.vw_skill_demand
+    viz_type: bar
+    x_axis: skill_name
+    metrics: [jobs_requiring_skill]
+    row_limit: 15
+    sort_desc: true
+
+  - id: chart_salary_by_industry_position
+    title: Mức lương trung bình theo ngành nghề và vị trí
+    dataset: bi.vw_avg_salary_by_industry_position
+    viz_type: heatmap
+    groupby: [industry, position_level]
+    metric: avg_salary_mid
+
+  - id: chart_recruitment_funnel
+    title: Tỷ lệ ứng tuyển - phỏng vấn - tuyển dụng thành công
+    dataset: bi.vw_recruitment_funnel
+    viz_type: funnel
+    stages:
+      - total_applications
+      - reviewed_or_higher
+      - interviewed
+      - hired_success
+
+  - id: kpi_total_job_postings
+    title: Tổng số tin tuyển dụng
+    dataset: bi.vw_dashboard_kpis
+    viz_type: big_number_total
+    metric: total_job_postings
+
+  - id: kpi_total_candidates
+    title: Tổng ứng viên
+    dataset: bi.vw_dashboard_kpis
+    viz_type: big_number_total
+    metric: total_candidates
+
+  - id: kpi_total_applications
+    title: Tổng lượt ứng tuyển
+    dataset: bi.vw_dashboard_kpis
+    viz_type: big_number_total
+    metric: total_applications
+
+  - id: kpi_hiring_rate
+    title: Tỷ lệ tuyển dụng thành công (%)
+    dataset: bi.vw_dashboard_kpis
+    viz_type: big_number_total
+    metric: hiring_rate_pct
