@@ -147,6 +147,7 @@ class JobSerializer(serializers.ModelSerializer):
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='application_id', read_only=True)
     job_title = serializers.CharField(source='job.job_title', read_only=True)
     company_name = serializers.CharField(source='job.company.company_name', read_only=True)
     candidate_name = serializers.CharField(source='candidate.full_name', read_only=True)
@@ -156,7 +157,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Applications
         fields = [
-            'application_id', 'job', 'job_title', 'company_name',
+            'application_id', 'id', 'job', 'job_title', 'company_name',
             'candidate', 'candidate_name', 'candidate_phone', 'candidate_cv',
             'cover_letter', 'status', 'applied_at', 'reviewed_at', 'notes',
             'created_at', 'updated_at'

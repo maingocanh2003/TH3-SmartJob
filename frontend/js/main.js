@@ -2,7 +2,14 @@
 // SmartJob - Main Page Logic (index.html)
 // =============================================
 
-const JOB_TYPES = { full_time: 'Toàn thời gian', part_time: 'Bán thời gian', contract: 'Hợp đồng', internship: 'Thực tập' };
+const JOB_TYPES = {
+  full_time: 'Toàn thời gian',
+  'full-time': 'Toàn thời gian',
+  part_time: 'Bán thời gian',
+  'part-time': 'Bán thời gian',
+  contract: 'Hợp đồng',
+  internship: 'Thực tập'
+};
 const EXP_LABELS = { entry: 'Mới tốt nghiệp', junior: 'Dưới 2 năm', mid: '2-5 năm', senior: '5+ năm', manager: 'Quản lý' };
 
 let currentPage = 1;
@@ -10,23 +17,33 @@ let totalJobs = 0;
 const PAGE_SIZE = 6;
 
 function formatSalary(min, max) {
-  if (!min && !max) return 'Thỏa thuận';
-  const fmt = v => v >= 1e6 ? (v / 1e6).toFixed(0) + 'M' : v.toLocaleString('vi-VN');
-  if (min && max) return `${fmt(min)} - ${fmt(max)} VNĐ`;
-  if (min) return `Từ ${fmt(min)} VNĐ`;
-  return `Đến ${fmt(max)} VNĐ`;
+  const numMin = min !== null && min !== undefined ? Number(min) : null;
+  const numMax = max !== null && max !== undefined ? Number(max) : null;
+  if (!numMin && !numMax) return 'Thỏa thuận';
+  const fmt = v => v >= 1e6 ? (v / 1e6).toFixed(0) + ' triệu' : v.toLocaleString('vi-VN');
+  if (numMin && numMax) return `${fmt(numMin)} - ${fmt(numMax)} VNĐ`;
+  if (numMin) return `Từ ${fmt(numMin)} VNĐ`;
+  return `Đến ${fmt(numMax)} VNĐ`;
 }
 
 function getJobBadgeClass(type) {
+  const norm = (type || '').replace('-', '_');
   const map = { full_time: 'bg-blue-100 text-blue-700', part_time: 'bg-green-100 text-green-700', contract: 'bg-orange-100 text-orange-700', internship: 'bg-purple-100 text-purple-700' };
-  return map[type] || 'bg-gray-100 text-gray-700';
+  return map[norm] || 'bg-gray-100 text-gray-700';
 }
 
 function buildJobCard(job) {
+  const id = job.id ?? job.job_id;
+  const title = job.title ?? job.job_title ?? 'Việc làm';
   const company = job.company_detail || {};
-  const logoLetter = (company.name || job.company_name || 'J')[0].toUpperCase();
+  const companyName = company.name || job.company_name || 'Công ty';
+  const logoLetter = (companyName || 'J')[0].toUpperCase();
   const colors = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500'];
-  const color = colors[job.id % colors.length];
+  const color = colors[(id || 0) % colors.length];
+  const rawType = job.job_type ?? job.employment_type ?? '';
+  const typeLabel = JOB_TYPES[rawType] || JOB_TYPES[rawType.replace('-', '_')] || rawType;
+  const skills = job.skills_required ?? job.skills ?? [];
+  const deadline = job.deadline ?? job.application_deadline;
 
   return `
   <div class="job-card bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col gap-4">
@@ -34,11 +51,11 @@ function buildJobCard(job) {
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0">${logoLetter}</div>
         <div>
-          <h3 class="font-semibold text-gray-800 text-sm leading-tight line-clamp-2">${job.title}</h3>
-          <p class="text-gray-500 text-xs mt-0.5">${company.name || job.company_name || 'Công ty'}</p>
+          <h3 class="font-semibold text-gray-800 text-sm leading-tight line-clamp-2">${title}</h3>
+          <p class="text-gray-500 text-xs mt-0.5">${companyName}</p>
         </div>
       </div>
-      <span class="text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${getJobBadgeClass(job.job_type)}">${JOB_TYPES[job.job_type] || job.job_type || ''}</span>
+      <span class="text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${getJobBadgeClass(rawType)}">${typeLabel}</span>
     </div>
     <div class="flex flex-wrap gap-2 text-xs text-gray-500">
       <span class="flex items-center gap-1">
@@ -50,14 +67,14 @@ function buildJobCard(job) {
         ${formatSalary(job.salary_min, job.salary_max)}
       </span>
     </div>
-    ${job.skills_required && job.skills_required.length ? `
+    ${skills && skills.length ? `
     <div class="flex flex-wrap gap-1.5">
-      ${job.skills_required.slice(0, 3).map(s => `<span class="skill-badge">${s.name || s}</span>`).join('')}
-      ${job.skills_required.length > 3 ? `<span class="text-xs text-gray-400">+${job.skills_required.length - 3}</span>` : ''}
+      ${skills.slice(0, 3).map(s => `<span class="skill-badge">${typeof s === 'string' ? s : (s.skill_name || s.name || '')}</span>`).join('')}
+      ${skills.length > 3 ? `<span class="text-xs text-gray-400">+${skills.length - 3}</span>` : ''}
     </div>` : ''}
     <div class="flex items-center justify-between mt-auto pt-2 border-t border-gray-50">
-      <span class="text-xs text-gray-400">${job.deadline ? 'HSD: ' + new Date(job.deadline).toLocaleDateString('vi-VN') : ''}</span>
-      <a href="job-detail.html?id=${job.id}" class="text-sm font-semibold text-blue-600 hover:text-blue-700 transition flex items-center gap-1">
+      <span class="text-xs text-gray-400">${deadline ? 'HSD: ' + new Date(deadline).toLocaleDateString('vi-VN') : ''}</span>
+      <a href="job-detail.html?id=${id}" class="text-sm font-semibold text-blue-600 hover:text-blue-700 transition flex items-center gap-1">
         Xem chi tiết
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
       </a>

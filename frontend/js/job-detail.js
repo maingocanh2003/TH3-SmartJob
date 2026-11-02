@@ -2,16 +2,25 @@
 // SmartJob - Job Detail + AI Matching
 // =============================================
 
-const JOB_TYPES = { full_time: 'Toàn thời gian', part_time: 'Bán thời gian', contract: 'Hợp đồng', internship: 'Thực tập' };
+const JOB_TYPES = {
+  full_time: 'Toàn thời gian',
+  'full-time': 'Toàn thời gian',
+  part_time: 'Bán thời gian',
+  'part-time': 'Bán thời gian',
+  contract: 'Hợp đồng',
+  internship: 'Thực tập'
+};
 const EXP_LABELS = { entry: 'Mới tốt nghiệp', junior: 'Dưới 2 năm', mid: '2-5 năm', senior: '5+ năm', manager: 'Quản lý' };
 const LEVEL_LABELS = { junior: 'Junior', mid: 'Mid-level', senior: 'Senior', lead: 'Team Lead', manager: 'Manager' };
 
 function formatSalary(min, max) {
-  if (!min && !max) return 'Thỏa thuận';
-  const fmt = v => v >= 1e6 ? (v / 1e6).toFixed(0) + 'M' : v.toLocaleString('vi-VN');
-  if (min && max) return `${fmt(min)} - ${fmt(max)} VNĐ`;
-  if (min) return `Từ ${fmt(min)} VNĐ`;
-  return `Đến ${fmt(max)} VNĐ`;
+  const numMin = min !== null && min !== undefined ? Number(min) : null;
+  const numMax = max !== null && max !== undefined ? Number(max) : null;
+  if (!numMin && !numMax) return 'Thỏa thuận';
+  const fmt = v => v >= 1e6 ? (v / 1e6).toFixed(0) + ' triệu' : v.toLocaleString('vi-VN');
+  if (numMin && numMax) return `${fmt(numMin)} - ${fmt(numMax)} VNĐ`;
+  if (numMin) return `Từ ${fmt(numMin)} VNĐ`;
+  return `Đến ${fmt(numMax)} VNĐ`;
 }
 
 function getJobId() {
@@ -23,31 +32,39 @@ let jobData = null;
 function renderJob(job) {
   jobData = job;
   const company = job.company_detail ?? {};
+  const title = job.title ?? job.job_title ?? 'Chi tiết tuyển dụng';
+  const rawType = job.job_type ?? job.employment_type ?? '';
+  const typeLabel = JOB_TYPES[rawType] || JOB_TYPES[rawType.replace('-', '_')] || rawType;
+  const companyName = company.name || job.company_name || '';
 
-  document.title = `${job.title} - SmartJob`;
+  document.title = `${title} - SmartJob`;
   document.getElementById('job-loading').classList.add('hidden');
   document.getElementById('job-content').classList.remove('hidden');
 
-  document.getElementById('company-logo').textContent = (company.name || job.title || 'J')[0].toUpperCase();
-  document.getElementById('job-title').textContent = job.title;
-  document.getElementById('job-company').textContent = company.name || job.company_name || '';
+  document.getElementById('company-logo').textContent = (companyName || title || 'J')[0].toUpperCase();
+  document.getElementById('job-title').textContent = title;
+  document.getElementById('job-company').textContent = companyName;
 
   const typeBadge = document.getElementById('job-type-badge');
-  typeBadge.textContent = JOB_TYPES[job.job_type] || job.job_type || '';
+  typeBadge.textContent = typeLabel;
 
   const statusBadge = document.getElementById('job-status-badge');
   statusBadge.textContent = job.status === 'active' ? 'Đang tuyển' : 'Đã đóng';
   statusBadge.className = `text-xs px-3 py-1 rounded-full font-medium mt-1 ${job.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
 
-  document.getElementById('job-location').insertAdjacentText('beforeend', job.location || 'Không xác định');
-  document.getElementById('job-salary').insertAdjacentText('beforeend', formatSalary(job.salary_min, job.salary_max));
-  document.getElementById('job-exp').insertAdjacentText('beforeend', EXP_LABELS[job.experience_required] || job.experience_required || 'Không yêu cầu');
+  document.getElementById('job-location').textContent = job.location || 'Không xác định';
+  document.getElementById('job-salary').textContent = formatSalary(job.salary_min, job.salary_max);
+  
+  const expVal = job.experience_required ?? job.years_of_experience_required;
+  const expText = typeof expVal === 'number' ? `${expVal} năm kinh nghiệm` : (EXP_LABELS[expVal] || expVal || 'Không yêu cầu');
+  document.getElementById('job-exp').textContent = expText;
 
-  if (job.deadline) {
-    document.getElementById('job-deadline').insertAdjacentText('beforeend', 'HSD: ' + new Date(job.deadline).toLocaleDateString('vi-VN'));
+  const deadline = job.deadline ?? job.application_deadline;
+  if (deadline) {
+    document.getElementById('job-deadline').textContent = 'HSD: ' + new Date(deadline).toLocaleDateString('vi-VN');
   }
 
-  document.getElementById('job-description').textContent = job.description || 'Không có mô tả';
+  document.getElementById('job-description').textContent = job.description ?? job.job_description ?? 'Không có mô tả';
   document.getElementById('job-requirements').textContent = job.requirements || 'Không có yêu cầu cụ thể';
 
   if (job.benefits) {
@@ -57,17 +74,18 @@ function renderJob(job) {
 
   // Skills
   const skillsEl = document.getElementById('job-skills');
-  const skills = job.skills_required ?? [];
+  const skills = job.skills_required ?? job.skills ?? [];
   skillsEl.innerHTML = skills.length
-    ? skills.map(s => `<span class="skill-badge">${s.name ?? s}</span>`).join('')
+    ? skills.map(s => `<span class="skill-badge">${typeof s === 'string' ? s : (s.skill_name || s.name || '')}</span>`).join('')
     : '<p class="text-sm text-gray-400">Không có yêu cầu kỹ năng cụ thể</p>';
 
   // Sidebar info
-  document.getElementById('info-type').textContent = JOB_TYPES[job.job_type] || job.job_type || '—';
-  document.getElementById('info-level').textContent = LEVEL_LABELS[job.level] || job.level || '—';
-  document.getElementById('info-slots').textContent = job.slots ? `${job.slots} người` : '—';
-  document.getElementById('info-deadline').textContent = job.deadline ? new Date(job.deadline).toLocaleDateString('vi-VN') : '—';
-  document.getElementById('info-industry').textContent = job.industry || company.industry || '—';
+  document.getElementById('info-type').textContent = typeLabel || '—';
+  const levelVal = job.level ?? job.position_level;
+  document.getElementById('info-level').textContent = LEVEL_LABELS[levelVal] || levelVal || '—';
+  document.getElementById('info-slots').textContent = job.slots ?? job.num_of_positions ? `${job.slots ?? job.num_of_positions} người` : '—';
+  document.getElementById('info-deadline').textContent = deadline ? new Date(deadline).toLocaleDateString('vi-VN') : '—';
+  document.getElementById('info-industry').textContent = job.industry || job.company_industry || company.industry || '—';
 
   // Apply section
   const user = getUser();
@@ -105,10 +123,11 @@ async function calculateMatchingScore() {
 
   try {
     const result = await apiPost('/ai/match/', { candidate_id: candidateId, job_id: parseInt(jobId) });
-    const score = result.match_score ?? result.score ?? 0;
-    const skillScore = result.skill_score ?? result.skill_match ?? Math.round(score * 0.8);
-    const expScore = result.experience_score ?? result.exp_match ?? Math.round(score * 1.1);
-    const salScore = result.salary_score ?? result.salary_match ?? Math.round(score * 0.9);
+    const score = Math.round(result.match_score ?? result.score ?? 0);
+    const breakdown = result.breakdown || {};
+    const skillScore = Math.round(breakdown.skill_match ?? result.skill_score ?? (score * 0.8));
+    const expScore = Math.round(breakdown.experience_match ?? result.experience_score ?? score);
+    const salScore = Math.round(breakdown.salary_match ?? result.salary_score ?? score);
 
     document.getElementById('matching-result').classList.remove('hidden');
     animateScore(score);
@@ -118,18 +137,19 @@ async function calculateMatchingScore() {
     document.getElementById('salary-score').textContent = Math.min(salScore, 100) + '%';
 
     setTimeout(() => {
-      document.getElementById('skill-bar').style.width = skillScore + '%';
+      document.getElementById('skill-bar').style.width = Math.min(skillScore, 100) + '%';
       document.getElementById('exp-bar').style.width = Math.min(expScore, 100) + '%';
       document.getElementById('salary-bar').style.width = Math.min(salScore, 100) + '%';
     }, 100);
 
     // Matched / missing skills
-    const matched = result.matched_skills ?? [];
-    const missing = result.missing_skills ?? [];
+    const details = result.details || {};
+    const matched = details.matched_skills ?? result.matched_skills ?? [];
+    const missing = details.missing_skills ?? result.missing_skills ?? [];
     if (matched.length || missing.length) {
       document.getElementById('skills-breakdown').innerHTML = `
-        ${matched.length ? `<p class="text-xs font-medium text-gray-700 mb-1">Kỹ năng phù hợp:</p><div class="flex flex-wrap gap-1.5">${matched.map(s => `<span class="skill-badge matched text-xs">${s}</span>`).join('')}</div>` : ''}
-        ${missing.length ? `<p class="text-xs font-medium text-gray-700 mt-3 mb-1">Kỹ năng còn thiếu:</p><div class="flex flex-wrap gap-1.5">${missing.map(s => `<span class="skill-badge missing text-xs">${s}</span>`).join('')}</div>` : ''}`;
+        ${matched.length ? `<p class="text-xs font-medium text-gray-700 mb-1">Kỹ năng phù hợp:</p><div class="flex flex-wrap gap-1.5">${matched.map(s => `<span class="skill-badge matched text-xs">${typeof s === 'string' ? s : s.skill_name}</span>`).join('')}</div>` : ''}
+        ${missing.length ? `<p class="text-xs font-medium text-gray-700 mt-3 mb-1">Kỹ năng còn thiếu:</p><div class="flex flex-wrap gap-1.5">${missing.map(s => `<span class="skill-badge missing text-xs">${typeof s === 'string' ? s : s.skill_name}</span>`).join('')}</div>` : ''}`;
     }
 
     btn.textContent = 'Tính lại';
