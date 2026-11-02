@@ -185,3 +185,29 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Custom Test Runner to create unmanaged tables in test database
+from django.test.runner import DiscoverRunner
+
+class ManagedModelTestRunner(DiscoverRunner):
+    def setup_databases(self, **kwargs):
+        config = super().setup_databases(**kwargs)
+        from django.apps import apps
+        from django.db import connection
+        ordered_model_names = [
+            'Users', 'Companies', 'Candidates', 'Skills',
+            'Education', 'Experience', 'Jobs', 'JobSkills',
+            'CandidateSkills', 'Applications', 'JobViews',
+            'SavedJobs', 'AiMatchResults'
+        ]
+        api_config = apps.get_app_config('api')
+        with connection.schema_editor() as editor:
+            for name in ordered_model_names:
+                try:
+                    m = api_config.get_model(name)
+                    editor.create_model(m)
+                except Exception:
+                    pass
+        return config
+
+TEST_RUNNER = 'smartjob_backend.settings.ManagedModelTestRunner'

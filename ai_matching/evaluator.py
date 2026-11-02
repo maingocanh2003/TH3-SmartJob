@@ -89,7 +89,7 @@ class RecommendationEvaluator:
         candidate_map = {str(c['candidate_id']): c for c in self.cvs}
         
         per_query_results = []
-        macro_metrics = {f'precision@{k}': [] for k in k_values}
+        macro_metrics: dict[str, list[float]] = {f'precision@{k}': [] for k in k_values}
         macro_metrics.update({f'recall@{k}': [] for k in k_values})
         macro_metrics.update({f'ndcg@{k}': [] for k in k_values})
         mrr_list = []
