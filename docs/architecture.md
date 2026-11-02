@@ -26,9 +26,10 @@
 - Lưu tài khoản, hồ sơ, kỹ năng, việc làm, đơn ứng tuyển và kết quả ghép nối.
 
 ### BI
-- Tổng hợp dữ liệu tuyển dụng.
-- Tạo chỉ số và biểu đồ.
-- Hiển thị xu hướng ngành nghề, kỹ năng và mức lương.
+- Frontend dashboard (`frontend/bi-dashboard.html`) hiển thị KPI, nhu cầu kỹ năng,
+  xu hướng lương và phễu tuyển dụng.
+- Django REST API tổng hợp số liệu từ PostgreSQL; frontend không truy cập database trực tiếp.
+- Apache Superset có thể tích hợp thêm khi cần dashboard chia sẻ hoặc phân tích nâng cao.
 
 ## 2. Luồng dữ liệu
 1. Người dùng thao tác trên frontend.
@@ -38,6 +39,10 @@
 5. Khi cần gợi ý, backend gọi module AI Matching.
 6. Kết quả ghép nối được trả về frontend và có thể lưu để phân tích.
 7. BI tổng hợp dữ liệu nghiệp vụ để tạo dashboard.
+
+Dashboard hiện tại đọc các endpoint `/api/bi/overview/`,
+`/api/bi/skills_demand/`, `/api/bi/salary_trends/` và
+`/api/bi/conversion_funnel/`.
 
 ## 3. Nguyên tắc tích hợp
 - Database là nguồn dữ liệu nghiệp vụ chính.

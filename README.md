@@ -34,8 +34,12 @@ TH3-SmartJob/
 │   ├── evaluator.py                 # Bộ đánh giá Precision@K, Recall@K, NDCG@K
 │   ├── seed_ai_data.py              # Script nạp dữ liệu mẫu vào PostgreSQL
 │   └── data/                        # Dataset mẫu CV, Job, Benchmark nhãn chuẩn
-├── frontend/                        # Giao diện người dùng (Sắp triển khai)
-└── bi_dashboard/                    # Dashboard BI (Sắp triển khai)
+├── frontend/                        # Giao diện tìm việc, hồ sơ, tuyển dụng và BI
+│   ├── index.html                   # Tìm kiếm và khám phá việc làm
+│   ├── candidate-profile.html       # Hồ sơ ứng viên và gợi ý AI
+│   ├── employer-dashboard.html      # Quản lý tin và đơn ứng tuyển
+│   └── bi-dashboard.html            # Phân tích thị trường tuyển dụng
+└── start.ps1 / start.bat            # Script khởi động trên Windows
 ```
 
 ## ✅ Checklist 1: Thiết kế cơ sở dữ liệu (Hoàn thành)
@@ -65,6 +69,13 @@ TH3-SmartJob/
 - [x] **Tích hợp hệ thống REST API:** Cung cấp đầy đủ các API cho frontend (`/api/ai/match/`, `/api/ai/extract-skills/`, `/api/ai/parse-cv/`, `/api/ai/recommend-jobs/`, `/api/ai/evaluation/`).
 - [x] **Đánh giá sơ bộ chất lượng gợi ý:** Precision@1 = 100%, Recall@3 = 100%, NDCG@1 = 100%, NDCG@3 = 95.86%, MRR = 1.0, MAP = 0.9889.
 - [x] **Báo cáo & Hướng dẫn sử dụng:** `docs/CHECKLIST_2_AI_REPORT.md` và `docs/AI_MATCHING_GUIDE.md`.
+
+## ✅ Checklist 3–4: Frontend và Dashboard BI
+
+- [x] **Giao diện ứng viên:** Tìm việc, xem chi tiết, tính AI Matching Score, quản lý hồ sơ/kỹ năng và theo dõi đơn.
+- [x] **Giao diện nhà tuyển dụng:** Đăng tin, xem đơn ứng tuyển, cập nhật trạng thái và xem gợi ý ứng viên.
+- [x] **Dashboard BI:** KPI tổng quan, nhu cầu kỹ năng, xu hướng lương và phễu chuyển đổi lấy từ API backend.
+- [x] **Tài liệu dashboard:** `docs/BI_DASHBOARD_GUIDE.md`.
 
 ## Thiết kế Database
 
@@ -113,6 +124,9 @@ python test_db_connection.py
 
 ### 4. Nạp dữ liệu mẫu AI/ML và chạy kiểm thử
 ```bash
+# Nạp công ty, tin tuyển dụng và tài khoản ứng viên mẫu
+python backend/manage.py seed_data
+
 # Nạp 15 CVs, 15 Jobs và tính toán precomputed match results
 python ai_matching/seed_ai_data.py
 
@@ -121,6 +135,36 @@ python run_ai_evaluation.py
 
 # Chạy test suite kiểm thử API AI/ML
 python backend/test_ai_api.py
+```
+
+Tài khoản demo sau khi chạy `seed_data`:
+
+- Ứng viên: `nguyen.vana@gmail.com` / `123456`
+- Nhà tuyển dụng: `hr@fpt.com` / `123456`
+
+Tạo tài khoản admin riêng bằng lệnh ở bước chạy ứng dụng bên dưới. Không có mật khẩu admin mặc định.
+
+### 5. Chạy ứng dụng
+
+Khởi động backend từ thư mục gốc:
+
+```bash
+python -m pip install -r backend/requirements.txt
+python backend/manage.py runserver
+```
+
+Phục vụ frontend bằng static web server trong terminal khác:
+
+```bash
+python -m http.server 5500 --directory frontend
+```
+
+Mở `http://localhost:5500/` để dùng ứng dụng; dashboard BI ở `http://localhost:5500/bi-dashboard.html`. Không mở HTML trực tiếp bằng `file://`.
+
+Tạo tài khoản quản trị SmartJob (nhập mật khẩu ẩn tại terminal; không có mật khẩu admin mặc định):
+
+```bash
+python backend/manage.py create_smartjob_admin --email admin@example.com
 ```
 
 ## Tài liệu
@@ -134,13 +178,15 @@ python backend/test_ai_api.py
 - 📊 [Báo cáo Checklist 1: CSDL](docs/CHECKLIST_1_REPORT.md)
 - 🧠 [Báo cáo Checklist 2: AI/ML Matching](docs/CHECKLIST_2_AI_REPORT.md) ⭐
 - 📖 [Hướng dẫn cài đặt & API AI/ML](docs/AI_MATCHING_GUIDE.md) ⭐
+- 📈 [Hướng dẫn Dashboard BI](docs/BI_DASHBOARD_GUIDE.md)
 
 ## Công nghệ
 
 - PostgreSQL 12+
 - Python/Django
 - Django REST Framework
-- Apache Superset (sắp triển khai)
+- Dashboard BI HTML/JavaScript tích hợp REST API (đã triển khai)
+- Apache Superset (tùy chọn mở rộng cho triển khai/chia sẻ dashboard)
 
 ## License
 

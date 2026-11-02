@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Báo cáo thị trường việc làm SmartJob từ dữ liệu tuyển dụng thực tế."/>
+  <title>Phân tích thị trường - SmartJob</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <nav class="navbar-blur sticky top-0 z-40 border-b border-gray-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <a href="index.html" class="flex items-center gap-2" aria-label="SmartJob - Trang chủ">
+        <div class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white font-bold">S</div>
+        <span class="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SmartJob</span>
+      </a>
+      <div class="flex items-center gap-5 text-sm font-medium">
+        <a href="index.html" class="text-gray-600 hover:text-blue-600 transition">Tìm việc</a>
+        <a href="bi-dashboard.html" class="text-blue-600" aria-current="page">Thị trường</a>
+        <div data-nav-login>
+          <a href="login.html" class="text-gray-600 hover:text-blue-600 transition">Đăng nhập</a>
+        </div>
+        <div data-nav-user class="hidden items-center gap-3">
+          <span class="hidden sm:inline text-gray-500">Xin chào, <span data-nav-username class="font-semibold text-blue-600"></span></span>
+          <a href="candidate-profile.html" class="text-gray-600 hover:text-blue-600 transition">Hồ sơ</a>
+          <button data-logout class="text-gray-600 hover:text-red-600 transition">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+      <div>
+        <p class="text-sm font-semibold text-blue-600 mb-2">SMARTJOB INSIGHTS</p>
+        <h1 class="text-3xl font-bold text-gray-900">Toàn cảnh thị trường tuyển dụng</h1>
+        <p class="text-gray-500 mt-2">Phân tích tin tuyển dụng, kỹ năng, mức lương và hiệu quả chuyển đổi.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <p id="dashboard-updated" class="text-xs text-gray-400" aria-live="polite">Đang tải dữ liệu…</p>
+        <button id="dashboard-refresh" type="button" class="px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm font-semibold text-gray-700 hover:border-blue-300 hover:text-blue-600 transition disabled:opacity-50">
+          Làm mới
+        </button>
+      </div>
+    </header>
+
+    <div id="dashboard-error" class="hidden mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert"></div>
+
+    <section aria-label="Chỉ số tổng quan" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+      <article class="dashboard-kpi">
+        <p class="dashboard-kpi-label">Tổng tin tuyển dụng</p>
+        <p id="kpi-total-jobs" class="dashboard-kpi-value">—</p>
+      </article>
+      <article class="dashboard-kpi">
+        <p class="dashboard-kpi-label">Đang tuyển</p>
+        <p id="kpi-active-jobs" class="dashboard-kpi-value text-green-600">—</p>
+      </article>
+      <article class="dashboard-kpi">
+        <p class="dashboard-kpi-label">Ứng viên</p>
+        <p id="kpi-candidates" class="dashboard-kpi-value text-purple-600">—</p>
+      </article>
+      <article class="dashboard-kpi">
+        <p class="dashboard-kpi-label">Doanh nghiệp</p>
+        <p id="kpi-companies" class="dashboard-kpi-value text-blue-600">—</p>
+      </article>
+      <article class="dashboard-kpi">
+        <p class="dashboard-kpi-label">Đơn ứng tuyển</p>
+        <p id="kpi-applications" class="dashboard-kpi-value text-orange-600">—</p>
+      </article>
+      <article class="dashboard-kpi">
+        <p class="dashboard-kpi-label">Lượt xem việc làm</p>
+        <p id="kpi-views" class="dashboard-kpi-value text-teal-600">—</p>
+      </article>
+    </section>
+
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+      <article class="dashboard-panel">
+        <div class="dashboard-panel-heading">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Kỹ năng được tuyển dụng nhiều</h2>
+            <p class="text-sm text-gray-500 mt-1">Số tin tuyển dụng yêu cầu từng kỹ năng</p>
+          </div>
+        </div>
+        <div id="skills-chart" class="dashboard-chart" aria-live="polite">
+          <p class="dashboard-empty">Đang tải dữ liệu kỹ năng…</p>
+        </div>
+      </article>
+
+      <article class="dashboard-panel">
+        <div class="dashboard-panel-heading">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Mức lương theo ngành</h2>
+            <p class="text-sm text-gray-500 mt-1">Khoảng lương trung bình của các tin có khai báo lương</p>
+          </div>
+        </div>
+        <div id="industry-salary-chart" class="dashboard-chart" aria-live="polite">
+          <p class="dashboard-empty">Đang tải dữ liệu lương…</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <article class="dashboard-panel">
+        <div class="dashboard-panel-heading">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Mức lương theo cấp bậc</h2>
+            <p class="text-sm text-gray-500 mt-1">So sánh khoảng lương trung bình theo vị trí</p>
+          </div>
+        </div>
+        <div id="level-salary-chart" class="dashboard-chart" aria-live="polite">
+          <p class="dashboard-empty">Đang tải dữ liệu cấp bậc…</p>
+        </div>
+      </article>
+
+      <article class="dashboard-panel">
+        <div class="dashboard-panel-heading">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Phễu tuyển dụng</h2>
+            <p class="text-sm text-gray-500 mt-1">Từ lượt xem tin đến kết quả tuyển dụng</p>
+          </div>
+        </div>
+        <div id="funnel-chart" class="dashboard-chart" aria-live="polite">
+          <p class="dashboard-empty">Đang tải dữ liệu chuyển đổi…</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <div class="conversion-card">
+            <p class="text-xs text-gray-500">Lượt xem → Nộp đơn</p>
+            <p id="conversion-view-application" class="text-xl font-bold text-blue-600 mt-1">—</p>
+          </div>
+          <div class="conversion-card">
+            <p class="text-xs text-gray-500">Nộp đơn → Trúng tuyển</p>
+            <p id="conversion-application-offer" class="text-xl font-bold text-green-600 mt-1">—</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <p class="text-xs text-gray-400 mt-6 text-right">Các chỉ số được tổng hợp từ dữ liệu hiện có trong hệ thống SmartJob.</p>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/bi-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+/* SmartJob - Custom CSS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* { font-family: 'Inter', sans-serif; }
+
+/* Gradient backgrounds */
+.gradient-primary { background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); }
+.gradient-hero { background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #4c1d95 100%); }
+
+/* Circular Progress Bar */
+.circular-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 140px;
+}
+.circle-bg { fill: none; stroke: #eee; stroke-width: 3.8; }
+.circle {
+  fill: none;
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+@keyframes progress {
+  0% { stroke-dasharray: 0 100; }
+}
+.percentage {
+  fill: #2563EB;
+  font-size: 0.55em;
+  text-anchor: middle;
+  font-weight: 700;
+}
+
+/* Card hover effects */
+.job-card { transition: transform .2s, box-shadow .2s; }
+.job-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(37,99,235,0.12); }
+
+/* Skill badges */
+.skill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.skill-badge.matched { background: #dcfce7; color: #166534; }
+.skill-badge.missing  { background: #fee2e2; color: #991b1b; }
+
+/* Navbar */
+.navbar-blur { backdrop-filter: blur(10px); background: rgba(255,255,255,0.95); }
+
+/* Progress bars */
+.progress-bar { transition: width 1s ease; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+
+/* Toast animation */
+.toast-enter { animation: slideIn .3s ease; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Table rows */
+tbody tr:hover { background: #f8fafc; }
+
+/* Funnel chart */
+.funnel-bar { transition: width 0.8s ease; }
+
+/* BI dashboard */
+.dashboard-kpi { background: #fff; border: 1px solid #f1f5f9; border-radius: 1rem; padding: 1.1rem; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
+.dashboard-kpi-label { color: #64748b; font-size: .75rem; line-height: 1.25rem; }
+.dashboard-kpi-value { color: #1e293b; font-size: 1.7rem; font-weight: 700; margin-top: .35rem; }
+.dashboard-panel { background: #fff; border: 1px solid #f1f5f9; border-radius: 1rem; padding: 1.4rem; box-shadow: 0 1px 2px rgba(15,23,42,.04); min-width: 0; }
+.dashboard-panel-heading { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+.dashboard-chart { display: flex; flex-direction: column; gap: 1rem; }
+.dashboard-empty, .dashboard-chart-error { color: #94a3b8; font-size: .875rem; padding: 1.5rem .25rem; text-align: center; }
+.dashboard-chart-error { color: #dc2626; }
+.chart-row { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(5rem, 2fr) auto; align-items: center; gap: .75rem; }
+.chart-row-label, .salary-row-heading { display: flex; justify-content: space-between; align-items: center; gap: .5rem; min-width: 0; }
+.chart-row-name { color: #334155; font-size: .82rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chart-row-detail, .salary-count { color: #94a3b8; font-size: .68rem; white-space: nowrap; }
+.chart-row-value { color: #475569; font-size: .78rem; font-weight: 700; text-align: right; white-space: nowrap; }
+.chart-track, .salary-track { background: #f1f5f9; border-radius: 9999px; height: .55rem; overflow: hidden; position: relative; }
+.chart-fill, .funnel-fill { border-radius: inherit; display: block; height: 100%; transition: width .45s ease; }
+.chart-fill-0, .funnel-fill-0 { background: #2563eb; }
+.chart-fill-1, .funnel-fill-1 { background: #7c3aed; }
+.chart-fill-2, .funnel-fill-2 { background: #0d9488; }
+.chart-fill-3, .funnel-fill-3 { background: #ea580c; }
+.chart-fill-4, .funnel-fill-4 { background: #db2777; }
+.salary-row { display: grid; gap: .5rem; }
+.salary-range { border-radius: 9999px; height: 100%; position: absolute; min-width: 0; }
+.salary-range-0 { background: #3b82f6; }
+.salary-range-1 { background: #8b5cf6; }
+.salary-range-2 { background: #14b8a6; }
+.salary-range-3 { background: #f97316; }
+.salary-range-4 { background: #ec4899; }
+.salary-row-value { color: #64748b; font-size: .72rem; }
+.funnel-row { display: grid; gap: .5rem; }
+.conversion-card { background: #f8fafc; border-radius: .75rem; padding: .8rem; }
+
+/* Mobile menu */
+#mobile-menu { transition: max-height .3s ease, opacity .3s; }
+
+/* Score ring colors */
+.score-green .circle { stroke: #16a34a; }
+.score-yellow .circle { stroke: #d97706; }
+.score-red .circle { stroke: #dc2626; }
+.score-green .percentage { fill: #16a34a; }
+.score-yellow .percentage { fill: #d97706; }
+.score-red .percentage { fill: #dc2626; }

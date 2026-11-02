@@ -228,3 +228,7 @@ class Users(models.Model):
     class Meta:
         managed = False
         db_table = 'users'
+
+    @property
+    def is_authenticated(self):
+        return True

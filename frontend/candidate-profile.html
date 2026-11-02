@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hồ Sơ Ứng Viên - SmartJob</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="navbar-blur sticky top-0 z-40 border-b border-gray-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+    <a href="index.html" class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      </div>
+      <span class="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SmartJob</span>
+    </a>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="index.html" class="text-gray-600 hover:text-blue-600 transition">Trang chủ</a>
+      <a href="bi-dashboard.html" class="text-gray-600 hover:text-blue-600 transition">Thị trường</a>
+      <span class="text-gray-600">Xin chào, <span data-nav-username class="font-semibold text-blue-600"></span></span>
+      <button data-logout class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition">Đăng xuất</button>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 py-10">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- LEFT: Profile card -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Avatar & Info -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
+        <div id="avatar-circle" class="w-24 h-24 gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+          <span id="avatar-letter" class="text-3xl font-bold text-white">U</span>
+        </div>
+        <h2 id="profile-name" class="text-xl font-bold text-gray-800">---</h2>
+        <p id="profile-position" class="text-gray-500 text-sm mt-1">---</p>
+        <div class="flex flex-col gap-2 mt-4 text-sm text-gray-600">
+          <div class="flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+            <span id="profile-location">---</span>
+          </div>
+          <div class="flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span id="profile-salary">---</span>
+          </div>
+          <div class="flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span id="profile-experience">---</span>
+          </div>
+        </div>
+        <button id="btn-edit-profile" class="mt-5 w-full px-4 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition">
+          Chỉnh sửa hồ sơ
+        </button>
+      </div>
+
+      <!-- Skills -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-gray-800">Kỹ năng của tôi</h3>
+          <button id="btn-add-skill" class="text-xs px-3 py-1.5 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Thêm
+          </button>
+        </div>
+        <div id="skills-list" class="flex flex-wrap gap-2">
+          <div class="animate-pulse bg-gray-100 h-7 w-20 rounded-full"></div>
+          <div class="animate-pulse bg-gray-100 h-7 w-16 rounded-full"></div>
+          <div class="animate-pulse bg-gray-100 h-7 w-24 rounded-full"></div>
+        </div>
+
+        <!-- Add skill modal-like panel -->
+        <div id="add-skill-panel" class="hidden mt-4 pt-4 border-t border-gray-100">
+          <label class="block text-xs font-medium text-gray-600 mb-2">Chọn kỹ năng để thêm</label>
+          <select id="skill-select" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Chọn kỹ năng --</option>
+          </select>
+          <div class="flex gap-2 mt-2">
+            <button id="btn-confirm-skill" class="flex-1 py-2 gradient-primary text-white rounded-lg text-sm font-medium">Thêm</button>
+            <button id="btn-cancel-skill" class="flex-1 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm">Hủy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Edit form + AI recommendations -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Edit form (collapsed by default) -->
+      <div id="edit-form-section" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h3 class="font-semibold text-gray-800 mb-5">Chỉnh sửa thông tin hồ sơ</h3>
+        <form id="form-edit-profile" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+              <input id="edit-name" type="text" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Vị trí mong muốn</label>
+              <input id="edit-position" type="text" placeholder="VD: Senior Python Developer" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
+              <input id="edit-location" type="text" placeholder="VD: Hà Nội" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Kinh nghiệm</label>
+              <select id="edit-experience" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="entry">Mới tốt nghiệp</option>
+                <option value="junior">Dưới 2 năm</option>
+                <option value="mid">2-5 năm</option>
+                <option value="senior">5+ năm</option>
+                <option value="manager">Quản lý</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Lương mong muốn (VNĐ)</label>
+              <input id="edit-salary-min" type="number" placeholder="VD: 15000000" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Giới thiệu bản thân</label>
+            <textarea id="edit-bio" rows="3" placeholder="Mô tả ngắn về bản thân, kinh nghiệm và mục tiêu nghề nghiệp..."
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+          </div>
+          <div id="edit-error" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
+          <div class="flex gap-3">
+            <button type="submit" class="px-6 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition">Lưu thay đổi</button>
+            <button type="button" id="btn-cancel-edit" class="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm hover:bg-gray-50 transition">Hủy</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- AI Job Recommendations -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h3 class="font-semibold text-gray-800">Việc Làm AI Gợi Ý Cho Bạn</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Dựa trên hồ sơ và kỹ năng của bạn</p>
+          </div>
+          <button id="btn-refresh-recs" class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Làm mới
+          </button>
+        </div>
+        <div id="recs-list" class="space-y-4">
+          <div class="animate-pulse space-y-3"><div class="h-20 bg-gray-100 rounded-xl"></div><div class="h-20 bg-gray-100 rounded-xl"></div><div class="h-20 bg-gray-100 rounded-xl"></div></div>
+        </div>
+      </div>
+
+      <!-- Applications history -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h3 class="font-semibold text-gray-800 mb-4">Đơn Ứng Tuyển Của Tôi</h3>
+        <div id="applications-list" class="space-y-3">
+          <div class="animate-pulse h-14 bg-gray-100 rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/candidate.js"></script>
+</body>
+</html>

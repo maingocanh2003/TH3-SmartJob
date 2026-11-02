@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Count, Avg, Q, F
 from django.contrib.auth.hashers import make_password, check_password
+from django.core import signing
 from django.utils import timezone
 
 from .models import (
@@ -43,7 +44,7 @@ class AuthViewSet(viewsets.ViewSet):
         if not email or not password:
             return Response({'error': 'Email và mật khẩu là bắt buộc.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user_type not in ('candidate', 'company', 'admin'):
+        if user_type not in ('candidate', 'company'):
             return Response({'error': 'Loại tài khoản không hợp lệ.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if Users.objects.filter(email=email).exists():
@@ -93,7 +94,7 @@ class AuthViewSet(viewsets.ViewSet):
             return Response({'error': 'Email hoặc mật khẩu không chính xác.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         # Verify password hash
-        if not check_password(password, user.password_hash) and user.password_hash != password:
+        if not check_password(password, user.password_hash):
             return Response({'error': 'Email hoặc mật khẩu không chính xác.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.is_active:
@@ -111,8 +112,9 @@ class AuthViewSet(viewsets.ViewSet):
 
         return Response({
             'message': 'Đăng nhập thành công!',
-            'user': UserSerializer(user).data,
-            'profile': profile_data
+            'token': signing.dumps(user.user_id, salt='smartjob.api.auth'),
+            **UserSerializer(user).data,
+            **profile_data,
         })
 
 

@@ -222,16 +222,27 @@ DB_USER=smartjob_user
 DB_PASSWORD=your_password_here     # ⚠️ Thay bằng password của bạn
 DB_HOST=localhost
 DB_PORT=5432
+SECRET_KEY=replace-with-a-unique-secret-key
 ```
 
 **Lưu ý:**
 - ✅ Mỗi thành viên có thể dùng username/password khác nhau
+- ✅ Tạo `SECRET_KEY` riêng bằng `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`
 - ✅ File `.env` đã có trong `.gitignore` - không lo bị commit nhầm
 - ✅ KHÔNG chia sẻ password trong chat/email
 
 ### 4.2. Test kết nối từ Python
 
-Tạo file test: `test_db_connection.py`
+Từ thư mục gốc dự án, cài các thư viện backend trong môi trường Python đang sử dụng
+và chạy script kiểm tra đã có sẵn (script đọc thông tin kết nối từ `.env`):
+
+```bash
+python -m pip install -r backend/requirements.txt
+python test_db_connection.py
+```
+
+Đoạn mã dưới đây là ví dụ kiểm tra kết nối độc lập, không cần tạo lại
+`test_db_connection.py`:
 
 ```python
 import psycopg2
@@ -268,11 +279,6 @@ for table in tables:
 cur.close()
 conn.close()
 print("\n🎉 Database sẵn sàng cho development!")
-```
-
-Chạy test:
-```bash
-python test_db_connection.py
 ```
 
 ---
