@@ -109,16 +109,26 @@ class JobSerializer(serializers.ModelSerializer):
     company_industry = serializers.CharField(source='company.industry', read_only=True)
     skills = serializers.SerializerMethodField()
     application_count = serializers.SerializerMethodField()
+    id = serializers.IntegerField(source='job_id', read_only=True)
+    title = serializers.CharField(source='job_title', read_only=True)
+    description = serializers.CharField(source='job_description', read_only=True)
+    job_type = serializers.CharField(source='employment_type', read_only=True)
+    level = serializers.CharField(source='position_level', read_only=True)
+    experience_required = serializers.IntegerField(source='years_of_experience_required', read_only=True)
+    deadline = serializers.DateTimeField(source='application_deadline', read_only=True)
+    skills_required = serializers.SerializerMethodField()
+    applications_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Jobs
         fields = [
-            'job_id', 'company', 'company_name', 'company_logo', 'company_industry',
-            'job_title', 'job_description', 'requirements', 'benefits',
-            'position_level', 'employment_type', 'num_of_positions',
+            'job_id', 'id', 'company', 'company_name', 'company_logo', 'company_industry',
+            'job_title', 'title', 'job_description', 'description', 'requirements', 'benefits',
+            'position_level', 'level', 'employment_type', 'job_type', 'num_of_positions',
             'salary_min', 'salary_max', 'salary_currency', 'location',
-            'years_of_experience_required', 'application_deadline', 'status',
-            'view_count', 'skills', 'application_count', 'created_at', 'updated_at'
+            'years_of_experience_required', 'experience_required', 'application_deadline', 'deadline',
+            'status', 'view_count', 'skills', 'skills_required',
+            'application_count', 'applications_count', 'created_at', 'updated_at'
         ]
         read_only_fields = ['job_id', 'view_count', 'created_at', 'updated_at']
 
@@ -126,8 +136,14 @@ class JobSerializer(serializers.ModelSerializer):
         job_skills = JobSkills.objects.filter(job=obj).select_related('skill')
         return JobSkillSerializer(job_skills, many=True).data
 
+    def get_skills_required(self, obj):
+        return self.get_skills(obj)
+
     def get_application_count(self, obj):
         return Applications.objects.filter(job=obj).count()
+
+    def get_applications_count(self, obj):
+        return self.get_application_count(obj)
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
