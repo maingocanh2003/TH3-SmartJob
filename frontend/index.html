@@ -31,7 +31,7 @@
         <span class="text-gray-600">Xin chào, <span data-nav-username class="font-semibold text-blue-600"></span></span>
         <a href="candidate-profile.html" class="text-gray-600 hover:text-blue-600 transition" id="nav-profile-link">Hồ sơ</a>
         <a href="employer-dashboard.html" class="text-gray-600 hover:text-blue-600 transition hidden" id="nav-dashboard-link">Dashboard</a>
-        <button data-logout class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition">Đăng xuất</button>
+        <button data-logout class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition" onclick="clearUser(); window.location.href='login.html';">Đăng xuất</button>
       </div>
     </div>
 
@@ -46,7 +46,7 @@
     <a href="login.html" class="block py-2 text-gray-600" data-nav-login>Đăng nhập / Đăng ký</a>
     <div data-nav-user class="hidden">
       <a href="candidate-profile.html" class="block py-2 text-gray-600">Hồ sơ</a>
-      <button data-logout class="block w-full text-left py-2 text-red-500">Đăng xuất</button>
+      <button data-logout class="block w-full text-left py-2 text-red-500" onclick="clearUser(); window.location.href='login.html';">Đăng xuất</button>
     </div>
   </div>
 </nav>
@@ -207,8 +207,8 @@
   </div>
 </footer>
 
-<script src="js/api.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/main.js"></script>
+<script src="js/api.js?v=20261104_03"></script>
+<script src="js/auth.js?v=20261104_03"></script>
+<script src="js/main.js?v=20261104_03"></script>
 </body>
 </html>
