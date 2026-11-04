@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hồ Sơ Ứng Viên - SmartJob</title>
+  <title>Hồ Sơ Ứng Viên & Tải Lên CV - SmartJob</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/style.css"/>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 text-gray-800">
 
 <!-- NAVBAR -->
 <nav class="navbar-blur sticky top-0 z-40 border-b border-gray-100 shadow-sm">
@@ -22,142 +22,229 @@
       <a href="index.html" class="text-gray-600 hover:text-blue-600 transition">Trang chủ</a>
       <a href="bi-dashboard.html" class="text-gray-600 hover:text-blue-600 transition">Thị trường</a>
       <span class="text-gray-600">Xin chào, <span data-nav-username class="font-semibold text-blue-600"></span></span>
-      <button data-logout class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition">Đăng xuất</button>
+      <button data-logout class="px-3.5 py-1.5 text-sm font-medium border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Đăng xuất
+      </button>
     </div>
   </div>
 </nav>
 
-<div class="max-w-7xl mx-auto px-4 py-10">
+<div class="max-w-7xl mx-auto px-4 py-8">
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    <!-- LEFT: Profile card -->
+    <!-- CỘT TRÁI: HỒ SƠ TỰ ĐỘNG TỪ CV -->
     <div class="lg:col-span-1 space-y-6">
-      <!-- Avatar & Info -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-        <div id="avatar-circle" class="w-24 h-24 gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+      <!-- Thẻ thông tin cá nhân -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center relative overflow-hidden">
+        <div class="absolute top-3 right-3">
+          <span id="cv-status-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Đồng bộ từ CV
+          </span>
+        </div>
+
+        <div id="avatar-circle" class="w-24 h-24 gradient-primary rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
           <span id="avatar-letter" class="text-3xl font-bold text-white">U</span>
         </div>
-        <h2 id="profile-name" class="text-xl font-bold text-gray-800">---</h2>
-        <p id="profile-position" class="text-gray-500 text-sm mt-1">---</p>
-        <div class="flex flex-col gap-2 mt-4 text-sm text-gray-600">
-          <div class="flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-            <span id="profile-location">---</span>
+        <h2 id="profile-name" class="text-xl font-bold text-gray-800">Đang tải hồ sơ...</h2>
+        <p id="profile-position" class="text-blue-600 font-medium text-sm mt-1">---</p>
+
+        <!-- Thông tin chi tiết trích xuất -->
+        <div class="divide-y divide-gray-100 mt-5 text-sm text-left">
+          <div class="py-2.5 flex items-center justify-between">
+            <span class="text-gray-400 text-xs flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              Địa điểm
+            </span>
+            <span id="profile-location" class="font-medium text-gray-700">---</span>
           </div>
-          <div class="flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span id="profile-salary">---</span>
+          <div class="py-2.5 flex items-center justify-between">
+            <span class="text-gray-400 text-xs flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              Kinh nghiệm
+            </span>
+            <span id="profile-experience" class="font-medium text-gray-700">---</span>
           </div>
-          <div class="flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <span id="profile-experience">---</span>
+          <div class="py-2.5 flex items-center justify-between">
+            <span class="text-gray-400 text-xs flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+              Học vấn
+            </span>
+            <span id="profile-education" class="font-medium text-gray-700">---</span>
+          </div>
+          <div class="py-2.5 flex items-center justify-between">
+            <span class="text-gray-400 text-xs flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Lương mong muốn
+            </span>
+            <span id="profile-salary" class="font-medium text-gray-700">---</span>
           </div>
         </div>
-        <button id="btn-edit-profile" class="mt-5 w-full px-4 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition">
-          Chỉnh sửa hồ sơ
-        </button>
+
+        <!-- Tóm tắt bản thân -->
+        <div class="mt-4 pt-4 border-t border-gray-100 text-left">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tóm tắt hồ sơ (Trích xuất AI)</p>
+          <p id="profile-bio" class="text-xs text-gray-600 leading-relaxed italic bg-gray-50 p-3 rounded-xl border border-gray-100">
+            Chưa có tóm tắt. Vui lòng tải lên file CV để AI trích xuất tự động.
+          </p>
+        </div>
+
+        <div id="cv-file-link-box" class="hidden mt-4 pt-3 border-t border-gray-100 text-xs text-left">
+          <span class="text-gray-400">File CV đã nạp:</span>
+          <a id="cv-file-link" href="#" target="_blank" class="block font-medium text-blue-600 hover:underline truncate mt-0.5">---</a>
+        </div>
       </div>
 
-      <!-- Skills -->
+      <!-- Kỹ năng trích xuất từ CV -->
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold text-gray-800">Kỹ năng của tôi</h3>
-          <button id="btn-add-skill" class="text-xs px-3 py-1.5 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Thêm
-          </button>
-        </div>
-        <div id="skills-list" class="flex flex-wrap gap-2">
-          <div class="animate-pulse bg-gray-100 h-7 w-20 rounded-full"></div>
-          <div class="animate-pulse bg-gray-100 h-7 w-16 rounded-full"></div>
-          <div class="animate-pulse bg-gray-100 h-7 w-24 rounded-full"></div>
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="font-semibold text-gray-800 text-sm">Kỹ Năng Trích Xuất</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Tự động nhận diện từ bản CV tải lên</p>
+          </div>
+          <span id="skills-count-badge" class="text-xs px-2.5 py-1 rounded-full font-semibold bg-blue-50 text-blue-600 border border-blue-100">0 kỹ năng</span>
         </div>
 
-        <!-- Add skill modal-like panel -->
-        <div id="add-skill-panel" class="hidden mt-4 pt-4 border-t border-gray-100">
-          <label class="block text-xs font-medium text-gray-600 mb-2">Chọn kỹ năng để thêm</label>
-          <select id="skill-select" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">-- Chọn kỹ năng --</option>
-          </select>
-          <div class="flex gap-2 mt-2">
-            <button id="btn-confirm-skill" class="flex-1 py-2 gradient-primary text-white rounded-lg text-sm font-medium">Thêm</button>
-            <button id="btn-cancel-skill" class="flex-1 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm">Hủy</button>
-          </div>
+        <div id="skills-list" class="flex flex-wrap gap-2 mt-3">
+          <p class="text-xs text-gray-400 py-3">Chưa có kỹ năng. Hãy tải lên CV của bạn!</p>
+        </div>
+
+        <!-- Ghi chú tự động -->
+        <div class="mt-4 p-3 bg-blue-50/60 rounded-xl border border-blue-100 text-xs text-blue-700 flex items-start gap-2">
+          <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Hồ sơ được quản lý hoàn toàn thông qua tệp CV. Để cập nhật kỹ năng hay kinh nghiệm, bạn chỉ cần tải lên phiên bản CV mới.</span>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Edit form + AI recommendations -->
+    <!-- CỘT PHẢI: KHU VỰC ĐĂNG TẢI CV & AI MATCHING -->
     <div class="lg:col-span-2 space-y-6">
-      <!-- Edit form (collapsed by default) -->
-      <div id="edit-form-section" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <h3 class="font-semibold text-gray-800 mb-5">Chỉnh sửa thông tin hồ sơ</h3>
-        <form id="form-edit-profile" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
-              <input id="edit-name" type="text" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Vị trí mong muốn</label>
-              <input id="edit-position" type="text" placeholder="VD: Senior Python Developer" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
-              <input id="edit-location" type="text" placeholder="VD: Hà Nội" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Kinh nghiệm</label>
-              <select id="edit-experience" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="entry">Mới tốt nghiệp</option>
-                <option value="junior">Dưới 2 năm</option>
-                <option value="mid">2-5 năm</option>
-                <option value="senior">5+ năm</option>
-                <option value="manager">Quản lý</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Lương mong muốn (VNĐ)</label>
-              <input id="edit-salary-min" type="number" placeholder="VD: 15000000" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Giới thiệu bản thân</label>
-            <textarea id="edit-bio" rows="3" placeholder="Mô tả ngắn về bản thân, kinh nghiệm và mục tiêu nghề nghiệp..."
-              class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
-          </div>
-          <div id="edit-error" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl"></div>
-          <div class="flex gap-3">
-            <button type="submit" class="px-6 py-2.5 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition">Lưu thay đổi</button>
-            <button type="button" id="btn-cancel-edit" class="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm hover:bg-gray-50 transition">Hủy</button>
-          </div>
-        </form>
-      </div>
 
-      <!-- AI Job Recommendations -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-5">
+      <!-- KHU VỰC 1: ĐĂNG TẢI HỒ SƠ CV -->
+      <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
           <div>
-            <h3 class="font-semibold text-gray-800">Việc Làm AI Gợi Ý Cho Bạn</h3>
-            <p class="text-xs text-gray-400 mt-0.5">Dựa trên hồ sơ và kỹ năng của bạn</p>
+            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
+              Đăng Tải Hồ Sơ CV & Trích Xuất AI
+            </h3>
+            <p class="text-xs text-gray-500 mt-1">Hệ thống AI sẽ tự động đọc hồ sơ, trích xuất kỹ năng và tính điểm tương thích với mọi việc làm.</p>
           </div>
-          <button id="btn-refresh-recs" class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Làm mới
+        </div>
+
+        <!-- DROP ZONE -->
+        <div class="mt-6">
+          <div id="drop-zone" class="border-2 border-dashed border-gray-300 hover:border-blue-500 bg-gray-50/60 hover:bg-blue-50/20 rounded-2xl p-8 text-center transition-all cursor-pointer">
+            <input type="file" id="cv-file-input" accept=".pdf,.docx,.txt,.md" class="hidden"/>
+            
+            <div id="drop-zone-prompt" class="space-y-3">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-700">Kéo và thả tệp CV của bạn vào đây, hoặc <span class="text-blue-600 hover:underline">duyệt từ máy tính</span></p>
+                <p class="text-xs text-gray-400 mt-1">Hỗ trợ định dạng: <strong>PDF, DOCX, TXT</strong> (Tối đa 10MB)</p>
+              </div>
+            </div>
+
+            <!-- Khi đã chọn file -->
+            <div id="drop-zone-selected" class="hidden space-y-3">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+              <div>
+                <p id="selected-file-name" class="text-sm font-bold text-gray-800 truncate max-w-md mx-auto">filename.pdf</p>
+                <p id="selected-file-size" class="text-xs text-gray-500 mt-0.5">0 KB</p>
+              </div>
+              <button type="button" id="btn-remove-file" class="text-xs text-red-500 hover:text-red-700 underline">Chọn file khác</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TÙY CHỌN DÙNG CV MẪU -->
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Hoặc trải nghiệm nhanh với CV mẫu có sẵn:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+            <button type="button" class="btn-sample-cv p-2.5 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50/40 text-left transition"
+              data-sample="backend">
+              <span class="font-semibold text-gray-800 block truncate">👨‍💻 Python Backend</span>
+              <span class="text-gray-400 text-[11px]">Django, PostgreSQL, Docker</span>
+            </button>
+            <button type="button" class="btn-sample-cv p-2.5 rounded-xl border border-gray-200 hover:border-purple-500 hover:bg-purple-50/40 text-left transition"
+              data-sample="ai">
+              <span class="font-semibold text-gray-800 block truncate">🤖 AI / Data Scientist</span>
+              <span class="text-gray-400 text-[11px]">PyTorch, NLP, ML, Python</span>
+            </button>
+            <button type="button" class="btn-sample-cv p-2.5 rounded-xl border border-gray-200 hover:border-green-500 hover:bg-green-50/40 text-left transition"
+              data-sample="frontend">
+              <span class="font-semibold text-gray-800 block truncate">🎨 Frontend React</span>
+              <span class="text-gray-400 text-[11px]">React, TypeScript, UI/UX</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- NÚT TIẾN HÀNH TẢI LÊN & TRÍCH XUẤT -->
+        <div class="mt-5 flex items-center justify-between gap-4">
+          <div id="upload-status-text" class="text-xs text-gray-500"></div>
+          <button type="button" id="btn-upload-cv"
+            class="px-6 py-3 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-95 transition shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Tải Lên & Trích Xuất AI</span>
           </button>
         </div>
-        <div id="recs-list" class="space-y-4">
-          <div class="animate-pulse space-y-3"><div class="h-20 bg-gray-100 rounded-xl"></div><div class="h-20 bg-gray-100 rounded-xl"></div><div class="h-20 bg-gray-100 rounded-xl"></div></div>
+
+        <!-- THÔNG BÁO TIẾN TRÌNH / THÀNH CÔNG -->
+        <div id="upload-progress-box" class="hidden mt-4 p-4 rounded-xl border bg-blue-50 border-blue-200 text-blue-800 text-sm flex items-center gap-3">
+          <svg class="animate-spin w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <span id="upload-progress-msg">Đang gửi CV lên máy chủ và phân tích trích xuất dữ liệu...</span>
+        </div>
+
+        <div id="upload-success-box" class="hidden mt-4 p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 text-sm flex items-start gap-3">
+          <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <p id="upload-success-title" class="font-semibold">Trích xuất hồ sơ thành công!</p>
+            <p id="upload-success-desc" class="text-xs text-emerald-700 mt-0.5"></p>
+          </div>
         </div>
       </div>
 
-      <!-- Applications history -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <h3 class="font-semibold text-gray-800 mb-4">Đơn Ứng Tuyển Của Tôi</h3>
-        <div id="applications-list" class="space-y-3">
-          <div class="animate-pulse h-14 bg-gray-100 rounded-xl"></div>
+      <!-- KHU VỰC 2: VIỆC LÀM PHÙ HỢP NHẤT DO AI GỢI Ý (AI MATCHING) -->
+      <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">2</span>
+              Việc Làm Phù Hợp Nhất (AI Matching Engine)
+            </h3>
+            <p class="text-xs text-gray-500 mt-1">Được tính toán tự động dựa trên độ tương đồng giữa CV của bạn và yêu cầu công việc</p>
+          </div>
+          <button id="btn-refresh-recs" class="text-xs px-3 py-1.5 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Tính lại
+          </button>
+        </div>
+
+        <!-- DANH SÁCH VIỆC LÀM AI GỢI Ý -->
+        <div id="recs-list" class="space-y-4 mt-6">
+          <div class="animate-pulse space-y-3">
+            <div class="h-28 bg-gray-100 rounded-2xl"></div>
+            <div class="h-28 bg-gray-100 rounded-2xl"></div>
+          </div>
         </div>
       </div>
+
+      <!-- KHU VỰC 3: ĐƠN ỨNG TUYỂN CỦA TÔI -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h3 class="font-bold text-gray-800 text-base mb-4 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">3</span>
+          Lịch Sử Đơn Ứng Tuyển
+        </h3>
+        <div id="applications-list" class="space-y-3">
+          <div class="animate-pulse h-16 bg-gray-100 rounded-xl"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

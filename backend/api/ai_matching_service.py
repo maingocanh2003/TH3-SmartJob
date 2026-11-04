@@ -236,3 +236,122 @@ def stateless_recommend_jobs_for_cv_text(
 def get_ai_evaluation_metrics() -> Dict[str, Any]:
     """Run evaluation and return Precision@K, Recall@K, NDCG@K, MRR."""
     return run_recommendation_evaluation()
+
+
+def extract_text_from_file(uploaded_file) -> str:
+    """Extract plain text from uploaded PDF, DOCX, or text file."""
+    name = (getattr(uploaded_file, 'name', '') or '').lower()
+    if hasattr(uploaded_file, 'read'):
+        content = uploaded_file.read()
+    else:
+        content = b''
+
+    if name.endswith('.pdf'):
+        try:
+            import io
+            import pypdf
+            reader = pypdf.PdfReader(io.BytesIO(content))
+            pages_text = [page.extract_text() or '' for page in reader.pages]
+            return '\n'.join(pages_text).strip()
+        except Exception as e:
+            raise ValueError(f'Không thể đọc nội dung file PDF: {e}')
+
+    elif name.endswith('.docx'):
+        try:
+            import io
+            import docx
+            doc = docx.Document(io.BytesIO(content))
+            paragraphs = [p.text for p in doc.paragraphs if p.text]
+            return '\n'.join(paragraphs).strip()
+        except Exception as e:
+            raise ValueError(f'Không thể đọc nội dung file DOCX: {e}')
+
+    else:
+        try:
+            return content.decode('utf-8').strip()
+        except UnicodeDecodeError:
+            return content.decode('latin-1', errors='replace').strip()
+
+
+def process_and_save_candidate_cv(
+    candidate: Candidates,
+    cv_text: str,
+    file_url: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Parses unstructured CV text, updates Candidate record, extracted skills,
+    education, and pre-calculates and persists ranked AI matching scores.
+    """
+    from .models import Skills
+
+    parsed = parse_cv_text(cv_text)
+
+    # 1. Update Candidate profile fields
+    full_name = parsed.get('full_name')
+    if full_name and candidate.full_name in ('Ứng viên', 'Ứng viên Tiềm năng', '', None):
+        candidate.full_name = full_name
+
+    phone = parsed.get('phone')
+    if phone and not candidate.phone:
+        candidate.phone = phone
+
+    desired_pos = parsed.get('desired_position')
+    if desired_pos:
+        candidate.desired_position = desired_pos
+
+    years = parsed.get('years_of_experience')
+    if years is not None and years > 0:
+        candidate.years_of_experience = years
+
+    summary = parsed.get('summary')
+    if summary:
+        candidate.summary = summary
+
+    if file_url:
+        candidate.cv_file_url = file_url
+
+    candidate.save()
+
+    # 2. Synchronize Skills
+    skills_cache = {s.skill_name.lower(): s for s in Skills.objects.all()}
+    extracted_skills = parsed.get('skills', [])
+    for s_info in extracted_skills:
+        s_name = s_info.get('skill_name', '').strip()
+        if not s_name:
+            continue
+        category = s_info.get('category', 'Technical')
+        skill_obj = skills_cache.get(s_name.lower())
+        if not skill_obj:
+            skill_obj, _ = Skills.objects.get_or_create(
+                skill_name=s_name,
+                defaults={'category': category, 'description': f'Kỹ năng {s_name}'}
+            )
+            skills_cache[s_name.lower()] = skill_obj
+
+        CandidateSkills.objects.update_or_create(
+            candidate=candidate,
+            skill=skill_obj,
+            defaults={
+                'proficiency_level': s_info.get('level', 'intermediate'),
+                'years_of_experience': s_info.get('years', max(candidate.years_of_experience or 1, 1))
+            }
+        )
+
+    # 3. Synchronize Education
+    edu_level = parsed.get('education_level', 'Bachelor')
+    Education.objects.update_or_create(
+        candidate=candidate,
+        institution_name='Học vấn từ CV',
+        defaults={
+            'degree': edu_level,
+            'major': candidate.desired_position or 'Công nghệ thông tin'
+        }
+    )
+
+    # 4. Automatically compute and persist AI Matching recommendations
+    recommendations = get_recommended_jobs_for_candidate(candidate, limit=10)
+
+    return {
+        'parsed': parsed,
+        'recommendations': recommendations
+    }

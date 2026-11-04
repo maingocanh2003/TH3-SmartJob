@@ -31,13 +31,19 @@ function getToken() {
 
 // ---- Fetch Wrapper ----
 async function _request(method, path, body = null, auth = true) {
-  const headers = { 'Content-Type': 'application/json' };
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  const headers = {};
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
   if (auth) {
     const token = getToken();
     if (token) headers['Authorization'] = `Token ${token}`;
   }
   const opts = { method, headers };
-  if (body !== null) opts.body = JSON.stringify(body);
+  if (body !== null) {
+    opts.body = isFormData ? body : JSON.stringify(body);
+  }
 
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
   const resp = await fetch(url, opts);
@@ -56,10 +62,11 @@ async function _request(method, path, body = null, auth = true) {
   return resp.json();
 }
 
-const apiGet    = (path, auth = true)         => _request('GET',    path, null, auth);
-const apiPost   = (path, body, auth = true)   => _request('POST',   path, body, auth);
-const apiPatch  = (path, body, auth = true)   => _request('PATCH',  path, body, auth);
-const apiDelete = (path, auth = true)         => _request('DELETE', path, null, auth);
+const apiGet    = (path, auth = true)             => _request('GET',    path, null, auth);
+const apiPost   = (path, body, auth = true)       => _request('POST',   path, body, auth);
+const apiPatch  = (path, body, auth = true)       => _request('PATCH',  path, body, auth);
+const apiDelete = (path, auth = true)             => _request('DELETE', path, null, auth);
+const apiUpload = (path, formData, auth = true)   => _request('POST',   path, formData, auth);
 
 // ---- Matching Score Color ----
 function scoreColor(score) {
@@ -101,9 +108,9 @@ function updateNavbar() {
 }
 
 function handleLogout(e) {
-  e && e.preventDefault();
+  if (e) e.preventDefault();
   clearUser();
-  window.location.href = '/frontend/login.html';
+  window.location.href = 'login.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {

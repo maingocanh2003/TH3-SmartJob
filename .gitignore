@@ -33,3 +33,5 @@ tmp/
 # Generated files
 coverage/
 .pytest_cache/
+
+backend/media/

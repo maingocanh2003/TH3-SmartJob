@@ -1,4 +1,6 @@
 from rest_framework import viewsets, status, filters
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -21,7 +23,7 @@ from .serializers import (
 from .ai_matching_service import (
     calculate_match, get_recommended_jobs_for_candidate, get_recommended_candidates_for_job,
     extract_skills_service, parse_cv_service, stateless_recommend_jobs_for_cv_text,
-    get_ai_evaluation_metrics
+    get_ai_evaluation_metrics, extract_text_from_file, process_and_save_candidate_cv
 )
 
 
@@ -186,6 +188,49 @@ class CandidateViewSet(viewsets.ModelViewSet):
             candidate, limit=limit, min_score=min_score, location=location
         )
         return Response(recommendations)
+
+    @action(detail=True, methods=['post'], url_path='upload-cv', parser_classes=[MultiPartParser, FormParser, JSONParser])
+    def upload_cv(self, request, pk=None):
+        candidate = self.get_object()
+        cv_file = request.FILES.get('cv_file')
+        cv_text = request.data.get('cv_text', '')
+        file_url = None
+
+        if cv_file:
+            cvs_dir = settings.MEDIA_ROOT / 'cvs'
+            cvs_dir.mkdir(parents=True, exist_ok=True)
+            safe_name = f"cv_{candidate.candidate_id}_{cv_file.name.replace(' ', '_')}"
+            dest_path = cvs_dir / safe_name
+            with open(dest_path, 'wb+') as dest:
+                for chunk in cv_file.chunks():
+                    dest.write(chunk)
+            file_url = f"/media/cvs/{safe_name}"
+
+            cv_file.seek(0)
+            try:
+                cv_text = extract_text_from_file(cv_file)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not cv_text or len(cv_text.strip()) < 10:
+            return Response(
+                {'error': 'Không tìm thấy nội dung CV hợp lệ từ file hoặc văn bản tải lên.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            result = process_and_save_candidate_cv(candidate, cv_text, file_url=file_url)
+            candidate.refresh_from_db()
+            skills_qs = CandidateSkills.objects.filter(candidate=candidate).select_related('skill')
+            return Response({
+                'message': 'Đã tải lên và tự động trích xuất hồ sơ ứng viên thành công!',
+                'candidate': CandidateSerializer(candidate).data,
+                'extracted_profile': result['parsed'],
+                'skills': CandidateSkillSerializer(skills_qs, many=True).data,
+                'recommendations': result['recommendations']
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': f'Lỗi khi xử lý hồ sơ: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ==============================================================================
@@ -446,12 +491,21 @@ class ExtractSkillsAPIView(APIView):
 
 class ParseCVAPIView(APIView):
     """
-    Parses unstructured CV text into a structured candidate profile.
+    Parses unstructured CV text or uploaded CV file into a structured candidate profile.
     """
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
     def post(self, request):
+        cv_file = request.FILES.get('cv_file')
         cv_text = request.data.get('cv_text', '')
+        if cv_file:
+            try:
+                cv_text = extract_text_from_file(cv_file)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         if not cv_text:
-            return Response({'error': 'Tham số "cv_text" không được để trống.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Tham số "cv_text" hoặc file "cv_file" không được để trống.'}, status=status.HTTP_400_BAD_REQUEST)
 
         profile = parse_cv_service(cv_text)
         return Response(profile)
@@ -459,11 +513,19 @@ class ParseCVAPIView(APIView):
 
 class RecommendJobsAPIView(APIView):
     """
-    Recommends ranked jobs for a candidate either by candidate_id or by raw CV text.
+    Recommends ranked jobs for a candidate either by candidate_id, raw CV text, or uploaded CV file.
     """
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
     def post(self, request):
         candidate_id = request.data.get('candidate_id')
+        cv_file = request.FILES.get('cv_file')
         cv_text = request.data.get('cv_text')
+        if cv_file:
+            try:
+                cv_text = extract_text_from_file(cv_file)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         limit = int(request.data.get('limit', 10))
         min_score = float(request.data.get('min_score', 0.0))
         location = request.data.get('location')
