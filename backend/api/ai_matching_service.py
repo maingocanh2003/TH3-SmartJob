@@ -3,6 +3,7 @@ AI Matching Service for SmartJob
 Integrates the advanced AI/ML Matching Package with Django Models & PostgreSQL.
 """
 
+import re
 from decimal import Decimal
 from pathlib import Path
 import sys
@@ -286,21 +287,25 @@ def process_and_save_candidate_cv(
 
     parsed = parse_cv_text(cv_text)
 
-    # 1. Update Candidate profile fields
+    # 1. Update Candidate profile fields from CV
     full_name = parsed.get('full_name')
-    if full_name and candidate.full_name in ('Ứng viên', 'Ứng viên Tiềm năng', '', None):
-        candidate.full_name = full_name
+    if full_name and len(full_name.strip()) >= 2 and full_name != 'Ứng viên Tiềm năng':
+        candidate.full_name = full_name.strip()
 
     phone = parsed.get('phone')
-    if phone and not candidate.phone:
+    if phone:
         candidate.phone = phone
+
+    location = parsed.get('location')
+    if location:
+        candidate.address = location
 
     desired_pos = parsed.get('desired_position')
     if desired_pos:
         candidate.desired_position = desired_pos
 
     years = parsed.get('years_of_experience')
-    if years is not None and years > 0:
+    if years is not None and years >= 0:
         candidate.years_of_experience = years
 
     summary = parsed.get('summary')
@@ -339,14 +344,32 @@ def process_and_save_candidate_cv(
 
     # 3. Synchronize Education
     edu_level = parsed.get('education_level', 'Bachelor')
-    Education.objects.update_or_create(
-        candidate=candidate,
-        institution_name='Học vấn từ CV',
-        defaults={
-            'degree': edu_level,
-            'major': candidate.desired_position or 'Công nghệ thông tin'
-        }
-    )
+    edu_detail = parsed.get('education_detail', '')
+    institution = 'Đại học'
+    major = candidate.desired_position or 'Công nghệ thông tin'
+
+    if edu_detail and '-' in edu_detail:
+        parts = edu_detail.split('-', 1)
+        major = parts[0].strip()
+        institution = re.sub(r'\(.*?\)', '', parts[1]).strip()
+    elif edu_detail:
+        major = edu_detail.strip()
+
+    edu_qs = Education.objects.filter(candidate=candidate)
+    if edu_qs.exists():
+        edu_obj = edu_qs.first()
+        edu_obj.degree = edu_level
+        edu_obj.institution_name = institution
+        edu_obj.major = major
+        edu_obj.save()
+        edu_qs.exclude(pk=edu_obj.pk).delete()
+    else:
+        Education.objects.create(
+            candidate=candidate,
+            degree=edu_level,
+            institution_name=institution,
+            major=major
+        )
 
     # 4. Automatically compute and persist AI Matching recommendations
     recommendations = get_recommended_jobs_for_candidate(candidate, limit=10)

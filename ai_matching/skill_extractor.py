@@ -175,20 +175,20 @@ class SkillExtractor:
 
     def parse_cv(self, cv_text: str) -> Dict[str, Any]:
         """
-        Comprehensive CV parsing: extracts name, email, phone, skills,
-        experience years, education, and candidate summary.
+        Comprehensive CV parsing: extracts contact info, position,
+        skills, experience, education, and normalized summary.
         """
         cleaned = clean_text(cv_text)
-        
-        # 1. Email extraction
+
+        # 1. Email heuristic
         email_match = re.search(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', cv_text)
         email = email_match.group(0) if email_match else ""
 
-        # 2. Phone extraction (supports VN format)
-        phone_match = re.search(r'(?:\+?84|0)(?:3|5|7|8|9)\d{8}\b', cv_text.replace(" ", "").replace("-", ""))
-        phone = phone_match.group(0) if phone_match else ""
+        # 2. Phone heuristic
+        phone_match = re.search(r'(?:\+?84|0)(?:\s*\d){9,10}', cv_text)
+        phone = re.sub(r'\s+', '', phone_match.group(0)) if phone_match else ""
 
-        # 3. Full name heuristic (first line or after "Họ và tên", "Name:")
+        # 3. Name heuristic (first line or after "Họ và tên", "Name:")
         name_match = re.search(r'(?:Họ và tên|Họ tên|Full name|Name)\s*[:\-]?\s*([^\r\n,;:]{2,35})', cv_text, re.IGNORECASE)
         if name_match:
             full_name = name_match.group(1).strip()
@@ -209,17 +209,49 @@ class SkillExtractor:
         # 6. Extract Experience
         exp_years = self.extract_experience_years(cv_text)
 
-        # 7. Extract Education
+        # 7. Extract Education & Education Detail
         edu_level = self.extract_education_level(cv_text)
+        edu_detail = ""
+        edu_match = re.search(r'(?:Học vấn|Trình độ|Bằng cấp|Education)\s*[:\-]?\s*([^\r\n]*)', cv_text, re.IGNORECASE)
+        if edu_match:
+            edu_line = edu_match.group(1).strip()
+            if not edu_line or len(edu_line) < 3:
+                after = cv_text[edu_match.end():]
+                for line in after.splitlines():
+                    l = line.strip()
+                    if l and not l.endswith(':'):
+                        edu_detail = l
+                        break
+            else:
+                edu_detail = edu_line
+
+        # 8. Extract Location / Address
+        location = ""
+        loc_match = re.search(r'(?:Địa chỉ|Nơi ở|Khu vực|Location|Address)\s*[:\-]?\s*([^\r\n]+)', cv_text, re.IGNORECASE)
+        if loc_match:
+            location = loc_match.group(1).strip()
+        else:
+            for pat, cname in [
+                (r'(?:Hà Nội|Ha Noi|Cầu Giấy|Ba Đình|Đống Đa|Hai Bà Trưng)', 'Hà Nội'),
+                (r'(?:TP\.?\s*Hồ Chí Minh|TP\.?\s*HCM|Hồ Chí Minh|Ho Chi Minh|Sài Gòn|Saigon|Quận 1|Quận 7)', 'TP. Hồ Chí Minh'),
+                (r'(?:Đà Nẵng|Da Nang|Hải Châu|Sơn Trà)', 'Đà Nẵng'),
+                (r'(?:Cần Thơ|Can Tho)', 'Cần Thơ'),
+                (r'(?:Hải Phòng|Hai Phong)', 'Hải Phòng'),
+            ]:
+                if re.search(pat, cv_text, re.IGNORECASE):
+                    location = cname
+                    break
 
         return {
             'full_name': full_name,
             'email': email,
             'phone': phone,
             'desired_position': desired_position,
+            'location': location,
             'skills': extracted_skills,
             'years_of_experience': exp_years,
             'education_level': edu_level,
+            'education_detail': edu_detail,
             'raw_text_length': len(cv_text),
             'summary': cleaned[:300] + ("..." if len(cleaned) > 300 else "")
         }

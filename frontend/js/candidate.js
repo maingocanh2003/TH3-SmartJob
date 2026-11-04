@@ -18,6 +18,7 @@ const SAMPLE_CVS = {
 Email: nguyen.vana@gmail.com
 Số điện thoại: 0912345678
 Vị trí ứng tuyển: Senior Python Backend Developer
+Địa chỉ: Cầu Giấy, Hà Nội
 Học vấn: Kỹ sư Công nghệ Thông tin - Đại học Bách Khoa Hà Nội (GPA 3.4/4.0)
 Kinh nghiệm: 5 năm kinh nghiệm lập trình backend. Thành thạo Python, Django, FastAPI, PostgreSQL, Docker, Kubernetes, Microservices và thiết kế kiến trúc RESTful API chịu tải cao.
 Mục tiêu nghề nghiệp: Phát triển các hệ thống phân tán hiệu năng cao trên nền tảng đám mây AWS.`,
@@ -26,6 +27,7 @@ Mục tiêu nghề nghiệp: Phát triển các hệ thống phân tán hiệu n
 Email: tran.thib@gmail.com
 Số điện thoại: 0987654321
 Vị trí ứng tuyển: AI / Machine Learning Engineer
+Địa chỉ: Quận 1, TP. Hồ Chí Minh
 Học vấn: Thạc sĩ Khoa học Máy tính - Đại học Quốc Gia TP. HCM
 Kinh nghiệm: 4 năm kinh nghiệm nghiên cứu và phát triển Machine Learning, Deep Learning, Natural Language Processing (NLP), Computer Vision với PyTorch, TensorFlow, Python, Docker và Data Analysis.
 Mục tiêu nghề nghiệp: Triển khai các giải pháp AI và hệ thống gợi ý (Recommendation Engine) thực tiễn.`,
@@ -34,6 +36,7 @@ Mục tiêu nghề nghiệp: Triển khai các giải pháp AI và hệ thống 
 Email: le.quocv@gmail.com
 Số điện thoại: 0905123456
 Vị trí ứng tuyển: Senior Frontend React Developer
+Địa chỉ: Hải Châu, Đà Nẵng
 Học vấn: Cử nhân Kỹ thuật Phần mềm - Đại học Bách Khoa Đà Nẵng
 Kinh nghiệm: 4 năm chuyên sâu xây dựng giao diện người dùng Web với JavaScript, TypeScript, React, Redux, HTML/CSS, Tailwind CSS và tối ưu hóa UI/UX Design, REST API.
 Mục tiêu nghề nghiệp: Xây dựng trải nghiệm người dùng mượt mà, trực quan và đạt chuẩn quốc tế.`
@@ -60,7 +63,37 @@ function formatSalary(min, max) {
   const fmt = v => (v >= 1e6 ? (v / 1e6).toFixed(0) + ' triệu' : v.toLocaleString('vi-VN'));
   if (numMin && numMax) return `${fmt(numMin)} - ${fmt(numMax)} VNĐ`;
   if (numMin) return `Từ ${fmt(numMin)} VNĐ`;
-  return `Đến ${fmt(numMax)} VNĐ`;
+  return `${fmt(numMax)} VNĐ`;
+}
+
+function formatEducation(degree, educations) {
+  const map = {
+    'Bachelor': 'Cử nhân / Đại học',
+    'Master': 'Thạc sĩ',
+    'Doctorate': 'Tiến sĩ',
+    'PhD': 'Tiến sĩ',
+    'Associate': 'Cao đẳng',
+    'HighSchool': 'Trung học phổ thông',
+  };
+
+  if (educations && educations.length > 0) {
+    const e = educations[0];
+    const d = map[e.degree] || e.degree || 'Cử nhân / Đại học';
+    const inst = e.institution_name && !['Học vấn từ CV', 'Đại học', 'None', ''].includes(e.institution_name)
+      ? e.institution_name.trim()
+      : '';
+    const major = e.major && !['Công nghệ thông tin', 'None', ''].includes(e.major)
+      ? e.major.trim()
+      : '';
+
+    if (inst && major) {
+      return `${major} · ${inst}`;
+    }
+    if (inst) return `${d} · ${inst}`;
+    if (major) return `${d} · ${major}`;
+    return d;
+  }
+  return map[degree] || degree || 'Đại học / Cử nhân';
 }
 
 function renderProfile(data) {
@@ -78,7 +111,7 @@ function renderProfile(data) {
 
   const salaryVal = data.desired_salary ?? data.expected_salary_max;
   const salaryEl = document.getElementById('profile-salary');
-  if (salaryEl) salaryEl.textContent = formatSalary(null, salaryVal);
+  if (salaryEl) salaryEl.textContent = formatSalary(data.expected_salary_min, salaryVal);
 
   const years = Number(data.years_of_experience);
   const expText = !isNaN(years) && years > 0 ? `${years} năm kinh nghiệm` : (data.years_of_experience == 0 ? 'Mới tốt nghiệp / Fresher' : 'Chưa cập nhật');
@@ -87,14 +120,16 @@ function renderProfile(data) {
 
   // Education
   const educations = data.educations || [];
-  let eduDegree = 'Đại học / Cử nhân';
-  if (educations.length > 0 && educations[0].degree) {
-    eduDegree = educations[0].degree;
-  } else if (data.education_level) {
-    eduDegree = data.education_level;
-  }
+  const eduText = formatEducation(data.education_level, educations);
   const eduEl = document.getElementById('profile-education');
-  if (eduEl) eduEl.textContent = eduDegree;
+  if (eduEl) {
+    eduEl.textContent = eduText;
+    eduEl.title = eduText;
+  }
+
+  // Update navbar username
+  const navUser = document.querySelector('[data-nav-username]');
+  if (navUser) navUser.textContent = name;
 
   // Bio / Summary
   const summary = data.summary || data.bio;
