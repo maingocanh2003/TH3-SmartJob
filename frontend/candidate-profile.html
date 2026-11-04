@@ -388,8 +388,18 @@
   </div>
 </div>
 
-<script src="js/api.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/candidate.js"></script>
+<!-- CÁC TRƯỜNG DỰ PHÒNG TƯƠNG THÍCH TRÁNH LỖI CACHE TRÌNH DUYỆT CŨ -->
+<div class="hidden" style="display:none!important;" aria-hidden="true">
+  <input id="edit-name" type="hidden"/>
+  <input id="edit-position" type="hidden"/>
+  <input id="edit-location" type="hidden"/>
+  <input id="edit-experience" type="hidden"/>
+  <input id="edit-salary-min" type="hidden"/>
+  <input id="edit-bio" type="hidden"/>
+</div>
+
+<script src="js/api.js?v=20261104_02"></script>
+<script src="js/auth.js?v=20261104_02"></script>
+<script src="js/candidate.js?v=20261104_02"></script>
 </body>
 </html>

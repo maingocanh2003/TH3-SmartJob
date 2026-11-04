@@ -67,16 +67,23 @@ function renderProfile(data) {
   if (!data) return;
   candidateData = data;
   const name = data.full_name || data.name || 'Ứng viên Tiềm năng';
-  document.getElementById('profile-name').textContent = name;
-  document.getElementById('profile-position').textContent = data.desired_position || data.job_title || 'Chưa xác định vị trí';
-  document.getElementById('profile-location').textContent = data.address || data.location || 'Hà Nội / Toàn quốc';
+  const nameEl = document.getElementById('profile-name');
+  if (nameEl) nameEl.textContent = name;
+
+  const posEl = document.getElementById('profile-position');
+  if (posEl) posEl.textContent = data.desired_position || data.job_title || 'Chưa xác định vị trí';
+
+  const locEl = document.getElementById('profile-location');
+  if (locEl) locEl.textContent = data.address || data.location || 'Hà Nội / Toàn quốc';
 
   const salaryVal = data.desired_salary ?? data.expected_salary_max;
-  document.getElementById('profile-salary').textContent = formatSalary(null, salaryVal);
+  const salaryEl = document.getElementById('profile-salary');
+  if (salaryEl) salaryEl.textContent = formatSalary(null, salaryVal);
 
   const years = Number(data.years_of_experience);
   const expText = !isNaN(years) && years > 0 ? `${years} năm kinh nghiệm` : (data.years_of_experience == 0 ? 'Mới tốt nghiệp / Fresher' : 'Chưa cập nhật');
-  document.getElementById('profile-experience').textContent = expText;
+  const expEl = document.getElementById('profile-experience');
+  if (expEl) expEl.textContent = expText;
 
   // Education
   const educations = data.educations || [];
@@ -86,16 +93,19 @@ function renderProfile(data) {
   } else if (data.education_level) {
     eduDegree = data.education_level;
   }
-  document.getElementById('profile-education').textContent = eduDegree;
+  const eduEl = document.getElementById('profile-education');
+  if (eduEl) eduEl.textContent = eduDegree;
 
   // Bio / Summary
   const summary = data.summary || data.bio;
-  if (summary) {
-    document.getElementById('profile-bio').textContent = `"${summary}"`;
+  const bioEl = document.getElementById('profile-bio');
+  if (bioEl && summary) {
+    bioEl.textContent = `"${summary}"`;
   }
 
   // Avatar initial
-  document.getElementById('avatar-letter').textContent = (name[0] || 'U').toUpperCase();
+  const avatarEl = document.getElementById('avatar-letter');
+  if (avatarEl) avatarEl.textContent = (name[0] || 'U').toUpperCase();
 
   // CV File link (Left column & Main Current CV Card)
   const cvUrl = data.cv_file_url;
