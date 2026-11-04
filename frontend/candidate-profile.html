@@ -121,111 +121,228 @@
     <!-- CỘT PHẢI: KHU VỰC ĐĂNG TẢI CV & AI MATCHING -->
     <div class="lg:col-span-2 space-y-6">
 
-      <!-- KHU VỰC 1: ĐĂNG TẢI HỒ SƠ CV -->
+      <!-- KHU VỰC 1: ĐĂNG TẢI HỒ SƠ CV & TRÍCH XUẤT AI -->
       <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+        <!-- TIÊU ĐỀ KHU VỰC -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-gray-100 gap-3">
           <div>
             <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-              <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
-              Đăng Tải Hồ Sơ CV & Trích Xuất AI
+              <span class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shadow-xs">1</span>
+              Tải Lên Hồ Sơ CV & Phân Tích Tự Động
             </h3>
-            <p class="text-xs text-gray-500 mt-1">Hệ thống AI sẽ tự động đọc hồ sơ, trích xuất kỹ năng và tính điểm tương thích với mọi việc làm.</p>
+            <p class="text-xs text-gray-500 mt-1">Hệ thống AI tự động đọc CV, bóc tách kỹ năng, kinh nghiệm và tính matching với toàn bộ việc làm.</p>
+          </div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 self-start sm:self-auto shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+            AI Matching Engine
+          </span>
+        </div>
+
+        <!-- THẺ THÔNG TIN CV HIỆN TẠI -->
+        <div id="current-cv-status-card" class="mt-5 p-4 rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/70 to-indigo-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-11 h-11 rounded-xl bg-white text-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-blue-100">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Hồ sơ CV hiện tại:</span>
+                <span id="current-cv-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">✓ Đang kích hoạt</span>
+              </div>
+              <p id="current-cv-name" class="font-bold text-gray-900 text-sm truncate block mt-0.5">Chưa có tệp CV</p>
+              <p id="current-cv-desc" class="text-xs text-gray-500 mt-0.5">Tải lên tệp CV bên dưới để kích hoạt hồ sơ ứng viên thông minh.</p>
+            </div>
+          </div>
+          <div id="current-cv-actions" class="hidden flex items-center gap-2 flex-shrink-0">
+            <a id="btn-view-current-cv" href="#" target="_blank" class="px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition flex items-center gap-1.5 shadow-xs">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              Xem tệp CV
+            </a>
           </div>
         </div>
 
-        <!-- DROP ZONE -->
-        <div class="mt-6">
-          <div id="drop-zone" class="border-2 border-dashed border-gray-300 hover:border-blue-500 bg-gray-50/60 hover:bg-blue-50/20 rounded-2xl p-8 text-center transition-all cursor-pointer">
-            <input type="file" id="cv-file-input" accept=".pdf,.docx,.txt,.md" class="hidden"/>
+        <!-- KHU VỰC KÉO VÀ THẢ TỆP (DROP ZONE) -->
+        <div class="mt-5">
+          <div id="drop-zone" class="border-2 border-dashed border-gray-300 hover:border-blue-500 bg-gray-50/60 hover:bg-blue-50/25 rounded-2xl p-7 text-center transition-all cursor-pointer">
+            <input type="file" id="cv-file-input" accept=".pdf,.docx,.txt" class="hidden"/>
             
+            <!-- Trạng thái 1: Chưa chọn tệp -->
             <div id="drop-zone-prompt" class="space-y-3">
-              <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
               </div>
               <div>
-                <p class="text-sm font-semibold text-gray-700">Kéo và thả tệp CV của bạn vào đây, hoặc <span class="text-blue-600 hover:underline">duyệt từ máy tính</span></p>
-                <p class="text-xs text-gray-400 mt-1">Hỗ trợ định dạng: <strong>PDF, DOCX, TXT</strong> (Tối đa 10MB)</p>
+                <p class="text-sm font-bold text-gray-800">
+                  Kéo và thả tệp CV của bạn vào đây, hoặc <span class="text-blue-600 hover:underline">duyệt tệp từ máy tính</span>
+                </p>
+                <p class="text-xs text-gray-400 mt-1">Định dạng hỗ trợ: <strong class="text-gray-600">PDF, DOCX (Word), TXT</strong> • Kích thước tối đa 10MB</p>
+              </div>
+              <div class="flex items-center justify-center gap-2 pt-1">
+                <span class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-red-50 text-red-600 border border-red-100 flex items-center gap-1">📄 PDF</span>
+                <span class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-100 flex items-center gap-1">📝 DOCX</span>
+                <span class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-600 border border-gray-200 flex items-center gap-1">📋 TXT</span>
               </div>
             </div>
 
-            <!-- Khi đã chọn file -->
-            <div id="drop-zone-selected" class="hidden space-y-3">
-              <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <!-- Trạng thái 2: Đã chọn tệp từ máy tính -->
+            <div id="drop-zone-selected" class="hidden space-y-4 py-2">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
               </div>
               <div>
-                <p id="selected-file-name" class="text-sm font-bold text-gray-800 truncate max-w-md mx-auto">filename.pdf</p>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Tệp đã sẵn sàng tải lên
+                </span>
+                <p id="selected-file-name" class="text-base font-bold text-gray-900 truncate max-w-md mx-auto">filename.pdf</p>
                 <p id="selected-file-size" class="text-xs text-gray-500 mt-0.5">0 KB</p>
               </div>
-              <button type="button" id="btn-remove-file" class="text-xs text-red-500 hover:text-red-700 underline">Chọn file khác</button>
+
+              <!-- Nút hành động trực tiếp -->
+              <div class="flex items-center justify-center gap-3 pt-2">
+                <button type="button" id="btn-upload-direct" class="px-6 py-2.5 gradient-primary text-white rounded-xl text-sm font-bold hover:opacity-95 transition shadow-sm flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  <span>Bắt Đầu Tải Lên & Trích Xuất AI</span>
+                </button>
+                <button type="button" id="btn-remove-file" class="px-4 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-100 transition">
+                  Chọn tệp khác
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- TÙY CHỌN DÙNG CV MẪU -->
-        <div class="mt-4 pt-4 border-t border-gray-100">
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Hoặc trải nghiệm nhanh với CV mẫu có sẵn:</p>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-            <button type="button" class="btn-sample-cv p-2.5 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50/40 text-left transition"
-              data-sample="backend">
-              <span class="font-semibold text-gray-800 block truncate">👨‍💻 Python Backend</span>
-              <span class="text-gray-400 text-[11px]">Django, PostgreSQL, Docker</span>
-            </button>
-            <button type="button" class="btn-sample-cv p-2.5 rounded-xl border border-gray-200 hover:border-purple-500 hover:bg-purple-50/40 text-left transition"
-              data-sample="ai">
-              <span class="font-semibold text-gray-800 block truncate">🤖 AI / Data Scientist</span>
-              <span class="text-gray-400 text-[11px]">PyTorch, NLP, ML, Python</span>
-            </button>
-            <button type="button" class="btn-sample-cv p-2.5 rounded-xl border border-gray-200 hover:border-green-500 hover:bg-green-50/40 text-left transition"
-              data-sample="frontend">
-              <span class="font-semibold text-gray-800 block truncate">🎨 Frontend React</span>
-              <span class="text-gray-400 text-[11px]">React, TypeScript, UI/UX</span>
-            </button>
+        <!-- MẪU CV CÓ SẴN ĐỂ TRẢI NGHIỆM & TẢI VỀ MÁY -->
+        <div class="mt-6 pt-5 border-t border-gray-100">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-1">
+            <div>
+              <p class="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span>⚡ Bạn muốn thử nghiệm nhanh mà chưa có sẵn file CV?</span>
+              </p>
+              <p class="text-[11px] text-gray-400 mt-0.5">Bấm "Thử ngay" để nạp trực tiếp vào hệ thống hoặc tải tệp mẫu về máy để kéo-thả:</p>
+            </div>
           </div>
 
-          <!-- TẢI TỆP CV MẪU VỀ MÁY -->
-          <div class="mt-3.5 p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span class="text-gray-700 font-medium flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              Tải tệp CV mẫu về máy:
-            </span>
-            <div class="flex items-center gap-2 font-medium flex-wrap">
-              <a href="sample_cvs/CV_Nguyen_Van_An_Python_Backend.pdf" download class="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-red-600 hover:bg-red-50 hover:border-red-200 transition shadow-xs flex items-center gap-1">
-                📄 PDF mẫu
-              </a>
-              <a href="sample_cvs/CV_Nguyen_Van_An_Python_Backend.docx" download class="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-xs flex items-center gap-1">
-                📝 Word DOCX
-              </a>
-              <a href="sample_cvs/CV_Nguyen_Van_An_Python_Backend.txt" download class="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-100 hover:border-gray-300 transition shadow-xs flex items-center gap-1">
-                📋 TXT
-              </a>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- Mẫu 1: Backend -->
+            <div class="p-3.5 rounded-2xl border border-gray-200 bg-white hover:border-blue-400 hover:shadow-xs transition flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-gray-900">👨‍💻 Python Backend</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-100">3 năm KN</span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Django, PostgreSQL, Docker, Redis, RESTful API</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between gap-1 text-xs">
+                <button type="button" class="btn-sample-cv font-bold text-blue-600 hover:text-blue-800 transition flex items-center gap-1" data-sample="backend">
+                  <span>⚡ Thử ngay</span>
+                </button>
+                <div class="flex items-center gap-1 text-[11px]">
+                  <a href="sample_cvs/CV_Nguyen_Van_An_Python_Backend.pdf" download class="px-2 py-0.5 bg-gray-50 hover:bg-red-50 text-red-600 rounded-md border border-gray-200 font-medium transition">📄 PDF</a>
+                  <a href="sample_cvs/CV_Nguyen_Van_An_Python_Backend.docx" download class="px-2 py-0.5 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-md border border-gray-200 font-medium transition">📝 DOCX</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mẫu 2: AI / Data -->
+            <div class="p-3.5 rounded-2xl border border-gray-200 bg-white hover:border-purple-400 hover:shadow-xs transition flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-gray-900">🤖 AI / Data Scientist</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-semibold border border-purple-100">4 năm KN</span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">PyTorch, Machine Learning, Deep Learning, NLP, Python</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between gap-1 text-xs">
+                <button type="button" class="btn-sample-cv font-bold text-purple-600 hover:text-purple-800 transition flex items-center gap-1" data-sample="ai">
+                  <span>⚡ Thử ngay</span>
+                </button>
+                <div class="flex items-center gap-1 text-[11px]">
+                  <a href="sample_cvs/CV_Tran_Thi_Bich_AI_Data_Scientist.pdf" download class="px-2 py-0.5 bg-gray-50 hover:bg-red-50 text-red-600 rounded-md border border-gray-200 font-medium transition">📄 PDF</a>
+                  <a href="sample_cvs/CV_Tran_Thi_Bich_AI_Data_Scientist.docx" download class="px-2 py-0.5 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-md border border-gray-200 font-medium transition">📝 DOCX</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mẫu 3: Frontend -->
+            <div class="p-3.5 rounded-2xl border border-gray-200 bg-white hover:border-green-400 hover:shadow-xs transition flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-gray-900">🎨 Frontend React</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-semibold border border-green-100">4 năm KN</span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">React, TypeScript, Redux, Tailwind CSS, UI/UX Design</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between gap-1 text-xs">
+                <button type="button" class="btn-sample-cv font-bold text-green-600 hover:text-green-800 transition flex items-center gap-1" data-sample="frontend">
+                  <span>⚡ Thử ngay</span>
+                </button>
+                <div class="flex items-center gap-1 text-[11px]">
+                  <a href="sample_cvs/CV_Le_Quoc_Viet_Frontend_Developer.pdf" download class="px-2 py-0.5 bg-gray-50 hover:bg-red-50 text-red-600 rounded-md border border-gray-200 font-medium transition">📄 PDF</a>
+                  <a href="sample_cvs/CV_Le_Quoc_Viet_Frontend_Developer.docx" download class="px-2 py-0.5 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-md border border-gray-200 font-medium transition">📝 DOCX</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- NÚT TIẾN HÀNH TẢI LÊN & TRÍCH XUẤT -->
-        <div class="mt-5 flex items-center justify-between gap-4">
-          <div id="upload-status-text" class="text-xs text-gray-500"></div>
-          <button type="button" id="btn-upload-cv"
-            class="px-6 py-3 gradient-primary text-white rounded-xl text-sm font-semibold hover:opacity-95 transition shadow-sm flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            <span>Tải Lên & Trích Xuất AI</span>
-          </button>
-        </div>
-
-        <!-- THÔNG BÁO TIẾN TRÌNH / THÀNH CÔNG -->
-        <div id="upload-progress-box" class="hidden mt-4 p-4 rounded-xl border bg-blue-50 border-blue-200 text-blue-800 text-sm flex items-center gap-3">
-          <svg class="animate-spin w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-          <span id="upload-progress-msg">Đang gửi CV lên máy chủ và phân tích trích xuất dữ liệu...</span>
-        </div>
-
-        <div id="upload-success-box" class="hidden mt-4 p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 text-sm flex items-start gap-3">
-          <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <div>
-            <p id="upload-success-title" class="font-semibold">Trích xuất hồ sơ thành công!</p>
-            <p id="upload-success-desc" class="text-xs text-emerald-700 mt-0.5"></p>
+        <!-- TIẾN TRÌNH XỬ LÝ (LOADING) -->
+        <div id="upload-progress-box" class="hidden mt-5 p-4 rounded-2xl border bg-blue-50/80 border-blue-200 text-blue-900">
+          <div class="flex items-center gap-3.5">
+            <svg class="animate-spin w-6 h-6 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            <div>
+              <p class="font-bold text-xs uppercase tracking-wider text-blue-700">Đang phân tích hồ sơ bằng AI...</p>
+              <p id="upload-progress-msg" class="text-xs text-blue-800 mt-0.5">Máy chủ đang trích xuất dữ liệu, nhận diện kỹ năng và tính điểm tương thích với các việc làm.</p>
+            </div>
           </div>
         </div>
+
+        <!-- BẢNG KẾT QUẢ TRÍCH XUẤT AI CHI TIẾT -->
+        <div id="upload-success-box" class="hidden mt-5 p-5 rounded-2xl border bg-emerald-50/80 border-emerald-200 text-emerald-950 space-y-4 transition">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-base flex-shrink-0">
+                ✓
+              </div>
+              <div>
+                <p id="upload-success-title" class="font-bold text-sm text-emerald-900">Trích xuất hồ sơ bằng AI thành công!</p>
+                <p id="upload-success-desc" class="text-xs text-emerald-700 mt-0.5">Hồ sơ cá nhân và kỹ năng đã được cập nhật đồng bộ.</p>
+              </div>
+            </div>
+            <button type="button" id="btn-scroll-recs" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition flex items-center gap-1.5 shadow-xs self-start sm:self-auto">
+              <span>Xem việc làm phù hợp bên dưới</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </button>
+          </div>
+
+          <!-- 4 Khối thông số nhận diện -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div class="bg-white/90 p-3 rounded-xl border border-emerald-100">
+              <span class="text-gray-400 block text-[11px]">Vị trí nhận diện</span>
+              <span id="extracted-position" class="font-bold text-gray-800 truncate block mt-0.5">---</span>
+            </div>
+            <div class="bg-white/90 p-3 rounded-xl border border-emerald-100">
+              <span class="text-gray-400 block text-[11px]">Kinh nghiệm</span>
+              <span id="extracted-experience" class="font-bold text-gray-800 truncate block mt-0.5">---</span>
+            </div>
+            <div class="bg-white/90 p-3 rounded-xl border border-emerald-100">
+              <span class="text-gray-400 block text-[11px]">Học vấn</span>
+              <span id="extracted-education" class="font-bold text-gray-800 truncate block mt-0.5">---</span>
+            </div>
+            <div class="bg-white/90 p-3 rounded-xl border border-emerald-100">
+              <span class="text-gray-400 block text-[11px]">Kỹ năng bóc tách</span>
+              <span id="extracted-skills-count" class="font-bold text-emerald-700 truncate block mt-0.5">0 kỹ năng</span>
+            </div>
+          </div>
+
+          <!-- Danh sách nhãn kỹ năng nhận diện -->
+          <div id="extracted-skills-container" class="pt-3 border-t border-emerald-200/60">
+            <p class="text-[11px] font-semibold text-emerald-800 mb-1.5 flex items-center gap-1">
+              <span>🛠️ Kỹ năng nhận diện từ CV:</span>
+            </p>
+            <div id="extracted-skills-tags" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- KHU VỰC 2: VIỆC LÀM PHÙ HỢP NHẤT DO AI GỢI Ý (AI MATCHING) -->

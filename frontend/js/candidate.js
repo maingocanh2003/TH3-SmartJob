@@ -97,14 +97,37 @@ function renderProfile(data) {
   // Avatar initial
   document.getElementById('avatar-letter').textContent = (name[0] || 'U').toUpperCase();
 
-  // CV File link
-  if (data.cv_file_url) {
-    const box = document.getElementById('cv-file-link-box');
-    const link = document.getElementById('cv-file-link');
-    box.classList.remove('hidden');
-    link.href = data.cv_file_url.startsWith('http') ? data.cv_file_url : `http://localhost:8000${data.cv_file_url}`;
-    const filename = data.cv_file_url.split('/').pop();
-    link.textContent = decodeURIComponent(filename);
+  // CV File link (Left column & Main Current CV Card)
+  const cvUrl = data.cv_file_url;
+  const cvBox = document.getElementById('cv-file-link-box');
+  const cvLink = document.getElementById('cv-file-link');
+  const currentCvName = document.getElementById('current-cv-name');
+  const currentCvDesc = document.getElementById('current-cv-desc');
+  const currentCvBadge = document.getElementById('current-cv-badge');
+  const currentCvActions = document.getElementById('current-cv-actions');
+  const btnViewCurrentCv = document.getElementById('btn-view-current-cv');
+
+  if (cvUrl) {
+    const resolvedUrl = cvUrl.startsWith('http') ? cvUrl : `http://localhost:8000${cvUrl}`;
+    const filename = decodeURIComponent(cvUrl.split('/').pop());
+
+    if (cvBox) cvBox.classList.remove('hidden');
+    if (cvLink) {
+      cvLink.href = resolvedUrl;
+      cvLink.textContent = filename;
+    }
+
+    if (currentCvName) currentCvName.textContent = filename;
+    if (currentCvDesc) currentCvDesc.textContent = 'Hồ sơ đã được phân tích và đồng bộ kỹ năng với hệ thống AI matching.';
+    if (currentCvBadge) currentCvBadge.classList.remove('hidden');
+    if (currentCvActions) currentCvActions.classList.remove('hidden');
+    if (btnViewCurrentCv) btnViewCurrentCv.href = resolvedUrl;
+  } else {
+    if (cvBox) cvBox.classList.add('hidden');
+    if (currentCvName) currentCvName.textContent = 'Chưa có tệp CV';
+    if (currentCvDesc) currentCvDesc.textContent = 'Tải lên tệp CV bên dưới để kích hoạt hồ sơ ứng viên thông minh.';
+    if (currentCvBadge) currentCvBadge.classList.add('hidden');
+    if (currentCvActions) currentCvActions.classList.add('hidden');
   }
 }
 
@@ -341,14 +364,48 @@ async function handleUploadCV(textOverride = null) {
     progressBox.classList.add('hidden');
     btn.disabled = false;
 
-    // Hiển thị thông báo thành công
+    // Hiển thị thông báo & bảng kết quả trích xuất chi tiết
     const profile = resp.extracted_profile || {};
     const skills = resp.skills || [];
     const recs = resp.recommendations || [];
 
-    document.getElementById('upload-success-desc').textContent =
-      `Đã trích xuất ${skills.length} kỹ năng, số năm kinh nghiệm: ${profile.years_of_experience || 0} năm và tính điểm tương thích với ${recs.length} việc làm.`;
+    // Cập nhật các trường tóm tắt nhận diện
+    const posEl = document.getElementById('extracted-position');
+    const expEl = document.getElementById('extracted-experience');
+    const eduEl = document.getElementById('extracted-education');
+    const skillCountEl = document.getElementById('extracted-skills-count');
+    const skillTagsEl = document.getElementById('extracted-skills-tags');
+
+    if (posEl) posEl.textContent = profile.desired_position || profile.title || resp.candidate?.desired_position || 'Chuyên viên';
+    if (expEl) expEl.textContent = `${profile.years_of_experience ?? resp.candidate?.years_of_experience ?? 0} năm KN`;
+    if (eduEl) eduEl.textContent = profile.education_level || resp.candidate?.education_level || 'Đại học / Cử nhân';
+    if (skillCountEl) skillCountEl.textContent = `${skills.length} kỹ năng`;
+
+    if (skillTagsEl) {
+      if (skills.length > 0) {
+        skillTagsEl.innerHTML = skills.map(s => {
+          const sName = typeof s === 'string' ? s : (s.skill_name || s.name || s.skill || '');
+          return `<span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">${escapeHtml(sName)}</span>`;
+        }).join('');
+      } else {
+        skillTagsEl.innerHTML = '<span class="text-xs text-emerald-700">Chưa nhận diện thêm kỹ năng cụ thể</span>';
+      }
+    }
+
+    const successDescEl = document.getElementById('upload-success-desc');
+    if (successDescEl) {
+      successDescEl.textContent = `Hệ thống đã nhận diện ${skills.length} kỹ năng và tính điểm tương thích với ${recs.length} việc làm.`;
+    }
     successBox.classList.remove('hidden');
+
+    // Reset vùng chọn file
+    selectedFile = null;
+    const fileInp = document.getElementById('cv-file-input');
+    if (fileInp) fileInp.value = '';
+    const pView = document.getElementById('drop-zone-prompt');
+    const sView = document.getElementById('drop-zone-selected');
+    if (pView) pView.classList.remove('hidden');
+    if (sView) sView.classList.add('hidden');
 
     // Cập nhật lại giao diện hồ sơ
     renderProfile(resp.candidate);
@@ -357,8 +414,8 @@ async function handleUploadCV(textOverride = null) {
 
     showToast('Tải lên và trích xuất hồ sơ bằng AI thành công!', 'success');
 
-    // Cuộn nhẹ tới danh sách việc làm gợi ý
-    document.getElementById('recs-list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Cuộn nhẹ tới kết quả
+    successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (err) {
     progressBox.classList.add('hidden');
     btn.disabled = false;
@@ -445,9 +502,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Upload button
-  document.getElementById('btn-upload-cv').addEventListener('click', () => {
+  // Upload buttons
+  const btnDirect = document.getElementById('btn-upload-direct');
+  if (btnDirect) btnDirect.addEventListener('click', (e) => {
+    e.stopPropagation();
     handleUploadCV();
+  });
+
+  const btnUploadCv = document.getElementById('btn-upload-cv');
+  if (btnUploadCv) btnUploadCv.addEventListener('click', () => {
+    handleUploadCV();
+  });
+
+  const btnScrollRecs = document.getElementById('btn-scroll-recs');
+  if (btnScrollRecs) btnScrollRecs.addEventListener('click', () => {
+    const recsEl = document.getElementById('recs-list');
+    if (recsEl) recsEl.scrollIntoView({ behavior: 'smooth' });
   });
 
   // Refresh recommendations button
