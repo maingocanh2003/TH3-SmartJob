@@ -334,14 +334,41 @@ async function loadApplications() {
 }
 
 // ---- UPLOAD & TRÍCH XUẤT CV ----
-async function handleUploadCV(textOverride = null) {
+function setUploadLoading(isLoading, customMessage = null) {
   const progressBox = document.getElementById('upload-progress-box');
-  const successBox = document.getElementById('upload-success-box');
-  const btn = document.getElementById('btn-upload-cv');
+  const progressMsg = document.getElementById('upload-progress-msg');
+  const uploadBtns = document.querySelectorAll('#btn-upload-direct, #btn-upload-cv, .btn-sample-cv');
 
-  progressBox.classList.remove('hidden');
-  successBox.classList.add('hidden');
-  btn.disabled = true;
+  if (progressBox) {
+    if (isLoading) {
+      progressBox.classList.remove('hidden');
+      if (progressMsg && customMessage) progressMsg.textContent = customMessage;
+    } else {
+      progressBox.classList.add('hidden');
+    }
+  }
+
+  uploadBtns.forEach(b => {
+    if (b) b.disabled = isLoading;
+  });
+}
+
+async function handleUploadCV(textOverride = null) {
+  const successBox = document.getElementById('upload-success-box');
+  if (successBox) successBox.classList.add('hidden');
+
+  if (!candidateId) {
+    showToast('Không tìm thấy thông tin ứng viên. Vui lòng đăng nhập lại.', 'error');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  if (!textOverride && !selectedFile) {
+    showToast('Vui lòng chọn hoặc kéo thả tệp CV (PDF, DOCX, TXT) trước khi bấm tải lên.', 'warning');
+    return;
+  }
+
+  setUploadLoading(true, textOverride ? 'Đang nạp mẫu CV và phân tích kỹ năng bằng AI...' : 'Đang gửi tệp CV lên máy chủ và phân tích bằng AI...');
 
   try {
     let resp = null;
@@ -354,15 +381,11 @@ async function handleUploadCV(textOverride = null) {
       const fd = new FormData();
       fd.append('cv_file', selectedFile);
       resp = await apiUpload(`/candidates/${candidateId}/upload-cv/`, fd);
-    } else {
-      progressBox.classList.add('hidden');
-      btn.disabled = false;
-      showToast('Vui lòng kéo thả file CV hoặc chọn một CV mẫu để tiếp tục', 'warning');
-      return;
     }
 
-    progressBox.classList.add('hidden');
-    btn.disabled = false;
+    setUploadLoading(false);
+
+    if (!resp) throw new Error('Không nhận được phản hồi từ máy chủ.');
 
     // Hiển thị thông báo & bảng kết quả trích xuất chi tiết
     const profile = resp.extracted_profile || {};
@@ -385,7 +408,7 @@ async function handleUploadCV(textOverride = null) {
       if (skills.length > 0) {
         skillTagsEl.innerHTML = skills.map(s => {
           const sName = typeof s === 'string' ? s : (s.skill_name || s.name || s.skill || '');
-          return `<span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">${escapeHtml(sName)}</span>`;
+          return `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">${escapeHtml(sName)}</span>`;
         }).join('');
       } else {
         skillTagsEl.innerHTML = '<span class="text-xs text-emerald-700">Chưa nhận diện thêm kỹ năng cụ thể</span>';
@@ -396,7 +419,7 @@ async function handleUploadCV(textOverride = null) {
     if (successDescEl) {
       successDescEl.textContent = `Hệ thống đã nhận diện ${skills.length} kỹ năng và tính điểm tương thích với ${recs.length} việc làm.`;
     }
-    successBox.classList.remove('hidden');
+    if (successBox) successBox.classList.remove('hidden');
 
     // Reset vùng chọn file
     selectedFile = null;
@@ -408,17 +431,17 @@ async function handleUploadCV(textOverride = null) {
     if (sView) sView.classList.add('hidden');
 
     // Cập nhật lại giao diện hồ sơ
-    renderProfile(resp.candidate);
+    if (resp.candidate) renderProfile(resp.candidate);
     renderSkills(skills);
     renderRecommendations(recs);
 
     showToast('Tải lên và trích xuất hồ sơ bằng AI thành công!', 'success');
 
     // Cuộn nhẹ tới kết quả
-    successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (successBox) successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (err) {
-    progressBox.classList.add('hidden');
-    btn.disabled = false;
+    setUploadLoading(false);
+    console.error('Lỗi upload CV:', err);
     showToast('Lỗi trích xuất CV: ' + err.message, 'error');
   }
 }
@@ -441,87 +464,99 @@ document.addEventListener('DOMContentLoaded', async () => {
   const fileSizeEl = document.getElementById('selected-file-size');
   const removeBtn = document.getElementById('btn-remove-file');
 
-  dropZone.addEventListener('click', e => {
-    if (e.target !== removeBtn) fileInput.click();
-  });
-
-  ['dragenter', 'dragover'].forEach(name => {
-    dropZone.addEventListener(name, e => {
-      e.preventDefault();
-      dropZone.classList.add('border-blue-500', 'bg-blue-50/40');
+  if (dropZone && fileInput) {
+    dropZone.addEventListener('click', e => {
+      // Do not trigger fileInput if clicking inside buttons, links, or when a file is already selected
+      if (e.target.closest('button') || e.target.closest('a') || e.target.closest('#drop-zone-selected')) {
+        return;
+      }
+      fileInput.click();
     });
-  });
 
-  ['dragleave', 'drop'].forEach(name => {
-    dropZone.addEventListener(name, e => {
-      e.preventDefault();
-      dropZone.classList.remove('border-blue-500', 'bg-blue-50/40');
+    ['dragenter', 'dragover'].forEach(name => {
+      dropZone.addEventListener(name, e => {
+        e.preventDefault();
+        dropZone.classList.add('border-blue-500', 'bg-blue-50/40');
+      });
     });
-  });
 
-  dropZone.addEventListener('drop', e => {
-    const files = e.dataTransfer.files;
-    if (files.length) {
-      selectedFile = files[0];
-      displaySelectedFile(selectedFile);
+    ['dragleave', 'drop'].forEach(name => {
+      dropZone.addEventListener(name, e => {
+        e.preventDefault();
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50/40');
+      });
+    });
+
+    dropZone.addEventListener('drop', e => {
+      const files = e.dataTransfer && e.dataTransfer.files;
+      if (files && files.length) {
+        selectedFile = files[0];
+        displaySelectedFile(selectedFile);
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files.length) {
+        selectedFile = fileInput.files[0];
+        displaySelectedFile(selectedFile);
+      }
+    });
+
+    function displaySelectedFile(file) {
+      if (!file) return;
+      if (fileNameEl) fileNameEl.textContent = file.name;
+      const kb = (file.size / 1024).toFixed(1);
+      if (fileSizeEl) fileSizeEl.textContent = kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
+      if (promptView) promptView.classList.add('hidden');
+      if (selectedView) selectedView.classList.remove('hidden');
     }
-  });
 
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files.length) {
-      selectedFile = fileInput.files[0];
-      displaySelectedFile(selectedFile);
+    if (removeBtn) {
+      removeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        selectedFile = null;
+        fileInput.value = '';
+        if (promptView) promptView.classList.remove('hidden');
+        if (selectedView) selectedView.classList.add('hidden');
+        fileInput.click();
+      });
     }
-  });
-
-  function displaySelectedFile(file) {
-    fileNameEl.textContent = file.name;
-    const kb = (file.size / 1024).toFixed(1);
-    fileSizeEl.textContent = kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
-    promptView.classList.add('hidden');
-    selectedView.classList.remove('hidden');
   }
-
-  removeBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    selectedFile = null;
-    fileInput.value = '';
-    promptView.classList.remove('hidden');
-    selectedView.classList.add('hidden');
-  });
 
   // Sample CV buttons
   document.querySelectorAll('.btn-sample-cv').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const type = btn.dataset.sample;
       const cvText = SAMPLE_CVS[type];
       if (cvText) {
-        showToast(`Đã nạp mẫu CV ${type.toUpperCase()} - Đang trích xuất...`, 'info');
         handleUploadCV(cvText);
       }
     });
   });
 
-  // Upload buttons
-  const btnDirect = document.getElementById('btn-upload-direct');
-  if (btnDirect) btnDirect.addEventListener('click', (e) => {
-    e.stopPropagation();
-    handleUploadCV();
-  });
-
-  const btnUploadCv = document.getElementById('btn-upload-cv');
-  if (btnUploadCv) btnUploadCv.addEventListener('click', () => {
-    handleUploadCV();
+  // Upload buttons (wire all buttons that could trigger upload)
+  document.querySelectorAll('#btn-upload-direct, #btn-upload-cv').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleUploadCV();
+    });
   });
 
   const btnScrollRecs = document.getElementById('btn-scroll-recs');
-  if (btnScrollRecs) btnScrollRecs.addEventListener('click', () => {
+  if (btnScrollRecs) btnScrollRecs.addEventListener('click', (e) => {
+    e.preventDefault();
     const recsEl = document.getElementById('recs-list');
     if (recsEl) recsEl.scrollIntoView({ behavior: 'smooth' });
   });
 
   // Refresh recommendations button
-  document.getElementById('btn-refresh-recs').addEventListener('click', () => {
-    loadRecommendations();
-  });
+  const btnRefresh = document.getElementById('btn-refresh-recs');
+  if (btnRefresh) {
+    btnRefresh.addEventListener('click', () => {
+      loadRecommendations();
+    });
+  }
 });
