@@ -1,0 +1,25 @@
+HỌ VÀ TÊN: Lê Quốc Việt
+VỊ TRÍ ỨNG TUYỂN: Senior Frontend React Developer
+EMAIL: le.quocv@gmail.com
+SỐ ĐIỆN THOẠI: 0905123456
+ĐỊA CHỈ: Hải Châu, Đà Nẵng
+
+HỌC VẤN:
+Cử nhân Kỹ thuật Phần mềm - Đại học Bách Khoa Đà Nẵng (2019 - 2023, GPA 3.2/4.0)
+
+KINH NGHIỆM LÀM VIỆC:
+4 năm kinh nghiệm xây dựng ứng dụng Web
+
+TÓM TẮT BẢN THÂN:
+Frontend Developer chuyên sâu hệ sinh thái React và TypeScript. Đam mê thiết kế giao diện UI/UX trực quan, mượt mà, chuẩn Responsive và tối ưu Core Web Vitals cho các ứng dụng web phức tạp.
+
+KỸ NĂNG CHUYÊN MÔN:
+JavaScript, TypeScript, React, HTML/CSS, Tailwind CSS, Redux, UI/UX Design, REST API, Git, Webpack
+
+LỊCH SỬ CÔNG TÁC:
+
+- TechWave Studio (2023 - Nay) | Senior Frontend Developer
+  Chịu trách nhiệm kiến trúc Frontend Single Page Application (SPA) bằng ReactJS và TypeScript với 100.000 người dùng hàng ngày.
+
+- Viettel Solutions (2021 - 2023) | Frontend Developer
+  Xây dựng Dashboard phân tích số liệu BI và báo cáo trực quan cho hệ thống quản trị doanh nghiệp.

@@ -1,0 +1,25 @@
+HỌ VÀ TÊN: Nguyễn Văn An
+VỊ TRÍ ỨNG TUYỂN: Senior Python / Django Backend Developer
+EMAIL: nguyen.vana@gmail.com
+SỐ ĐIỆN THOẠI: 0912345678
+ĐỊA CHỈ: Cầu Giấy, Hà Nội
+
+HỌC VẤN:
+Kỹ sư Công nghệ Thông tin - Đại học Bách Khoa Hà Nội (2018 - 2023, GPA 3.4/4.0)
+
+KINH NGHIỆM LÀM VIỆC:
+5 năm kinh nghiệm phát triển phần mềm Backend
+
+TÓM TẮT BẢN THÂN:
+Lập trình viên Backend giàu kinh nghiệm thiết kế kiến trúc vi dịch vụ (Microservices), cơ sở dữ liệu PostgreSQL chịu tải cao và hệ thống RESTful API đạt chuẩn quốc tế. Đam mê tối ưu hóa hiệu năng và triển khai CI/CD trên nền tảng đám mây.
+
+KỸ NĂNG CHUYÊN MÔN:
+Python, Django, FastAPI, PostgreSQL, Docker, Kubernetes, Microservices, REST API, CI/CD, Git, Redis, Linux, AWS
+
+LỊCH SỬ CÔNG TÁC:
+
+- Công ty Công nghệ Alpha (2023 - Nay) | Senior Backend Engineer
+  Thiết kế kiến trúc hệ thống xử lý 50.000 requests/phút bằng Django và FastAPI. Quản trị cụm cơ sở dữ liệu PostgreSQL và cache Redis.
+
+- FPT Software (2021 - 2023) | Backend Developer
+  Phát triển REST API phục vụ khách hàng doanh nghiệp, đóng gói ứng dụng qua Docker và thiết lập pipeline CI/CD.

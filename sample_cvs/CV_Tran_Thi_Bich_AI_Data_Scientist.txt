@@ -1,0 +1,25 @@
+HỌ VÀ TÊN: Trần Thị Bích
+VỊ TRÍ ỨNG TUYỂN: AI / Machine Learning Engineer
+EMAIL: tran.thib@gmail.com
+SỐ ĐIỆN THOẠI: 0987654321
+ĐỊA CHỈ: Quận 1, TP. Hồ Chí Minh
+
+HỌC VẤN:
+Thạc sĩ Khoa học Máy tính - Đại học Quốc Gia TP. HCM (2019 - 2023, GPA 3.6/4.0)
+
+KINH NGHIỆM LÀM VIỆC:
+4 năm kinh nghiệm nghiên cứu và phát triển AI/ML
+
+TÓM TẮT BẢN THÂN:
+Chuyên gia AI/ML với thế mạnh về Xử lý ngôn ngữ tự nhiên (NLP), Hệ thống gợi ý (Recommendation Engine) và Deep Learning. Có năng lực triển khai mô hình từ khâu thử nghiệm (PyTorch, TensorFlow) đến môi trường sản xuất quy mô lớn.
+
+KỸ NĂNG CHUYÊN MÔN:
+Python, Machine Learning, Deep Learning, Natural Language Processing, Computer Vision, PyTorch, TensorFlow, Data Analysis, NLP, Docker, PostgreSQL, Git
+
+LỊCH SỬ CÔNG TÁC:
+
+- DataLab AI Studio (2023 - Nay) | Lead AI Engineer
+  Nghiên cứu và huấn luyện mô hình Recommendation System cho thương mại điện tử, tăng tỷ lệ chuyển đổi đơn hàng lên 28%.
+
+- VNG Corporation (2021 - 2023) | Machine Learning Specialist
+  Xây dựng mô hình phân loại dữ liệu văn bản tiếng Việt và phân tích cảm xúc khách hàng (Sentiment Analysis).
