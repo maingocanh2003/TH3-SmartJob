@@ -339,6 +339,26 @@
       "name": "Teamwork",
       "category": "Soft Skills & Languages",
       "aliases": ["teamwork", "làm việc nhóm", "kỹ năng làm việc nhóm"]
+    },
+    {
+      "name": "Manual Testing",
+      "category": "QA & Testing",
+      "aliases": ["manual test", "manual testing", "kiểm thử chức năng", "functional testing", "kiểm thử giao diện", "kiểm thử hồi quy", "kiểm thử uat", "test case"]
+    },
+    {
+      "name": "Postman / API Testing",
+      "category": "QA & Testing",
+      "aliases": ["postman", "api testing", "kiểm thử api", "rest api testing"]
+    },
+    {
+      "name": "Jira",
+      "category": "QA & Testing",
+      "aliases": ["jira", "testrail", "bug tracking"]
+    },
+    {
+      "name": "ISTQB",
+      "category": "QA & Testing",
+      "aliases": ["istqb", "istqb foundation"]
     }
   ]
 }

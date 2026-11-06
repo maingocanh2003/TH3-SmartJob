@@ -156,13 +156,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-refresh-analysis')?.addEventListener('click', () => loadAiAnalysis(true));
   document.getElementById('btn-refresh-apps')?.addEventListener('click', () => loadApplications(true));
 
-  // Tải đồng thời Hồ sơ cá nhân + Đơn ứng tuyển + Gợi ý việc làm + Phân tích AI
+  // Tải Hồ sơ cá nhân + Đơn ứng tuyển, sau đó tải Gợi ý việc làm & Phân tích AI
   await Promise.all([
     loadProfile(),
     loadApplications(),
   ]);
-  loadRecommendations();
-  loadAiAnalysis();
+  await loadRecommendations();
+  await loadAiAnalysis();
 
   if (['profile', 'recommendations', 'ai-analysis', 'applications'].includes(initialTab)) {
     switchCandidateTab(initialTab);
@@ -191,7 +191,7 @@ async function loadProfile() {
 function renderCandidateProfile(data) {
   const user = getUser();
   const fullName = data.full_name || user?.full_name || 'Ứng viên';
-  const position = data.current_position || 'Chưa cập nhật vị trí (Tải CV để trích xuất)';
+  const position = data.desired_position || data.current_position || 'Chưa cập nhật vị trí (Tải CV để trích xuất)';
   const email = data.email || user?.email || 'Chưa có email';
   const phone = data.phone || 'Chưa cập nhật SĐT';
   const location = data.address || 'Chưa cập nhật địa điểm';
@@ -199,9 +199,12 @@ function renderCandidateProfile(data) {
 
   // Học vấn
   let eduText = data.education_level || '';
-  if (Array.isArray(data.education) && data.education.length > 0) {
-    const e0 = data.education[0];
-    eduText = [e0.degree, e0.major, e0.school_name].filter(Boolean).join(' · ') || eduText;
+  const eduArr = Array.isArray(data.educations) && data.educations.length > 0
+    ? data.educations
+    : (Array.isArray(data.education) ? data.education : []);
+  if (eduArr.length > 0) {
+    const e0 = eduArr[0];
+    eduText = [e0.degree, e0.major, e0.institution_name || e0.school_name].filter(Boolean).join(' · ') || eduText;
   }
   if (!eduText) eduText = 'Chưa cập nhật học vấn (Tải CV để trích xuất)';
 
@@ -257,7 +260,7 @@ function renderCandidateProfile(data) {
     }
   } else {
     cvNameEl && (cvNameEl.textContent = 'Chưa tải lên tệp CV');
-    cvDescEl && (cvDescEl.textContent = 'Hãy tải lên tệp CV (PDF, DOCX, TXT) hoặc chọn CV mẫu bên dưới để AI trích xuất hồ sơ tự động.');
+    cvDescEl && (cvDescEl.textContent = 'Hãy tải lên tệp CV (PDF, DOCX, TXT) bên dưới để AI trích xuất hồ sơ tự động.');
     cvBadge?.classList.add('hidden');
     cvActions?.classList.add('hidden');
     cvLinkBox?.classList.add('hidden');
@@ -369,23 +372,6 @@ function initCvUploader() {
     await submitCvExtraction({ file: selectedCvFile });
     clearSelectedFile();
   });
-
-  // Các nút nạp CV mẫu nhanh
-  document.querySelectorAll('.btn-sample-cv').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const key = btn.dataset.sample;
-      const sampleText = SAMPLE_CVS[key];
-      if (!sampleText) return;
-      const fileNames = {
-        backend: 'CV_Nguyen_Van_An_Python_Backend.txt',
-        ai: 'CV_Tran_Thi_Bich_AI_Data_Scientist.txt',
-        frontend: 'CV_Le_Quoc_Viet_Frontend_Developer.txt',
-      };
-      const blob = new Blob([sampleText], { type: 'text/plain;charset=utf-8' });
-      const sampleFile = new File([blob], fileNames[key] || 'sample_cv.txt', { type: 'text/plain' });
-      await submitCvExtraction({ file: sampleFile, cvText: sampleText });
-    });
-  });
 }
 
 async function submitCvExtraction({ file = null, cvText = '' }) {
@@ -420,13 +406,11 @@ async function submitCvExtraction({ file = null, cvText = '' }) {
     }
 
     // Đồng bộ lại Gợi ý việc làm & Phân tích hồ sơ AI
-    await Promise.all([
-      loadRecommendations(),
-      loadAiAnalysis(),
-    ]);
+    await loadRecommendations();
+    await loadAiAnalysis();
 
-    const skillsCount = (res.extracted_profile?.skills || cand.skills || []).length;
-    const jobsMatched = (res.top_recommendations || []).length;
+    const skillsCount = (res.extracted_profile?.skills || res.skills || cand.skills || []).length;
+    const jobsMatched = (res.recommendations || res.top_recommendations || []).length;
     if (successDesc) {
       successDesc.textContent = `AI đã trích xuất ${skillsCount} kỹ năng chuyên môn, cập nhật thông tin cá nhân và tính toán điểm tương thích với ${jobsMatched} công việc đang tuyển.`;
     }
@@ -496,12 +480,14 @@ function renderRecommendationCard(r) {
   const location = r.location || r.city || 'Việt Nam';
   const empType = r.employment_type || 'full-time';
   const score = Math.round(Number(r.matching_score ?? r.overall_score ?? 0));
-  const skillScore = Math.round(Number(r.skill_match_score ?? r.skill_score ?? score));
-  const expScore = Math.round(Number(r.experience_match_score ?? r.experience_score ?? score));
-  const semanticScore = Math.round(Number(r.semantic_score ?? r.position_score ?? score));
+  const bd = r.score_breakdown || {};
+  const skillScore = Math.round(Number(bd.skill_match ?? r.skill_match_score ?? r.skill_score ?? score));
+  const expScore = Math.round(Number(bd.experience_match ?? r.experience_match_score ?? r.experience_score ?? score));
+  const semanticScore = Math.round(Number(bd.semantic_match ?? r.semantic_score ?? r.position_score ?? score));
 
-  const matchedSkills = Array.isArray(r.matched_skills) ? r.matched_skills : [];
-  const missingSkills = Array.isArray(r.missing_skills) ? r.missing_skills : [];
+  const normSkill = s => (typeof s === 'object' && s !== null) ? (s.skill_name || s.name || '') : String(s || '');
+  const matchedSkills = (Array.isArray(r.matched_skills) ? r.matched_skills : []).map(normSkill).filter(Boolean);
+  const missingSkills = (Array.isArray(r.missing_skills) ? r.missing_skills : []).map(normSkill).filter(Boolean);
 
   // Đề xuất cải thiện kỹ năng cụ thể cho từng thẻ công việc
   let improvementAdvice = '';
@@ -780,7 +766,10 @@ function renderAiAnalysis(data) {
             <span class="text-[11px] font-semibold text-blue-600">${names.length} kỹ năng</span>
           </div>
           <div class="flex flex-wrap gap-1.5">
-            ${names.map(n => `<span class="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-white border border-gray-200 text-gray-800">${escapeHtml(n)}</span>`).join('')}
+            ${names.map(n => {
+              const sLabel = (typeof n === 'object' && n !== null) ? (n.skill_name || n.name || '') : String(n || '');
+              return `<span class="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-white border border-gray-200 text-gray-800">${escapeHtml(sLabel)}</span>`;
+            }).join('')}
           </div>
         </div>
       `).join('');

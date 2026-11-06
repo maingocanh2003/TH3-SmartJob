@@ -41,11 +41,38 @@ DEGREE_PATTERNS = [
 ]
 
 
+_VN_ACCENTED_VOWELS = (
+    'ăâêôơưáàảãạắằẳẵặấầẩẫậéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ'
+    'ĂÂÊÔƠƯÁÀẢÃẠẮẰẲẴẶẤẦẨẪẬÉÈẺẼẸẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢÚÙỦŨỤỨỪỬỮỰÝỲỶỸỴ'
+)
+_ALL_VN_VOWELS = 'aăâeêioôơuưyAĂÂEÊIOÔƠUƯY' + _VN_ACCENTED_VOWELS
+
+
+def normalize_vietnamese_pdf_text(text: str) -> str:
+    """
+    Repair spaced Vietnamese diacritics produced by PDF font subsetting
+    (e.g. 'Nguy ễ n Lê Tú Anh' -> 'Nguyễn Lê Tú Anh', 'ki ể m th ử' -> 'kiểm thử').
+    """
+    if not text:
+        return ""
+    text = unicodedata.normalize('NFC', text)
+    text = text.replace('\u00a0', ' ')
+    # Join 'đ' / 'Đ' with a following vowel when separated by a single space
+    text = re.sub(rf'(?<=[đĐ]) (?=[{_ALL_VN_VOWELS}])', '', text)
+    # Join consonant/vowel cluster with a following accented Vietnamese vowel
+    text = re.sub(rf'(?<=[b-df-hj-np-tv-zB-DF-HJ-NP-TV-ZđĐuUoOiIưƯ]) (?=[{_VN_ACCENTED_VOWELS}])', '', text)
+    # Join accented Vietnamese vowel with a trailing final consonant (ng, nh, ch, c, m, n, p, t, i, u, o, y)
+    text = re.sub(rf'(?<=[{_VN_ACCENTED_VOWELS}]) (?=(?:ng|nh|ch|[cmnptiuoy])\b)', '', text)
+    # Collapse multiple spaces on the same line while preserving newlines
+    text = re.sub(r'[ \t]{2,}', ' ', text)
+    return text
+
+
 def clean_text(text: str) -> str:
     """Normalize text encoding and basic whitespace."""
     if not text:
         return ""
-    text = unicodedata.normalize('NFC', text)
+    text = normalize_vietnamese_pdf_text(text)
     # Replace multiple spaces, tabs, newlines with space while keeping basic punctuation
     text = re.sub(r'[\r\n\t]+', ' ', text)
     text = re.sub(r'\s{2,}', ' ', text)
@@ -178,7 +205,18 @@ class SkillExtractor:
         Comprehensive CV parsing: extracts contact info, position,
         skills, experience, education, and normalized summary.
         """
-        cleaned = clean_text(cv_text)
+        cv_text = normalize_vietnamese_pdf_text(cv_text)
+        # Strip TopCV / watermark lines for clean summary & header parsing
+        raw_lines = [
+            re.sub(r'^[\uf000-\uf8ff\u2600-\u27bf•·\-*]+\s*', '', ln).strip()
+            for ln in cv_text.splitlines()
+        ]
+        non_empty_lines = [
+            ln for ln in raw_lines
+            if ln and not re.match(r'^(?:©\s*)?(?:topcv\.vn|vietnamworks\.com|itviec\.com|curriculum\s+vitae|cv|resume|hồ\s+sơ)$', ln, re.IGNORECASE)
+        ]
+
+        cleaned = clean_text('\n'.join(non_empty_lines))
 
         # 1. Email heuristic
         email_match = re.search(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', cv_text)
@@ -188,20 +226,41 @@ class SkillExtractor:
         phone_match = re.search(r'(?:\+?84|0)(?:\s*\d){9,10}', cv_text)
         phone = re.sub(r'\s+', '', phone_match.group(0)) if phone_match else ""
 
-        # 3. Name heuristic (first line or after "Họ và tên", "Name:")
-        name_match = re.search(r'(?:Họ và tên|Họ tên|Full name|Name)\s*[:\-]?\s*([^\r\n,;:]{2,35})', cv_text, re.IGNORECASE)
+        # 3. Name & Desired Position heuristics
+        full_name = "Ứng viên Tiềm năng"
+        name_line_idx = -1
+        name_match = re.search(r'(?:Họ và tên|Họ tên|Full name|Name)\s*[:\-]\s*([^\r\n,;:]{2,40})', cv_text, re.IGNORECASE)
         if name_match:
             full_name = name_match.group(1).strip()
         else:
-            first_line = cv_text.strip().split('\n')[0].strip()
-            if 3 <= len(first_line) <= 35 and not any(kw in first_line.lower() for kw in ['cv', 'resume', 'curriculum', 'hồ sơ']):
-                full_name = first_line
-            else:
-                full_name = "Ứng viên Tiềm năng"
+            for idx, ln in enumerate(non_empty_lines[:6]):
+                if (
+                    2 <= len(ln) <= 42
+                    and '@' not in ln
+                    and not re.search(r'\d{3,}', ln)
+                    and not any(kw in ln.lower() for kw in ['topcv', 'curriculum', 'thông tin cá nhân', 'mục tiêu', 'kinh nghiệm', 'kỹ năng', 'học vấn'])
+                ):
+                    full_name = ln
+                    name_line_idx = idx
+                    break
 
         # 4. Desired Position heuristic
-        pos_match = re.search(r'(?:Vị trí ứng tuyển|Vị trí|Chức danh|Target Position|Desired Role|Objective)\s*[:\-]?\s*([^\n\r.]+)', cv_text, re.IGNORECASE)
-        desired_position = pos_match.group(1).strip() if pos_match else "Software Engineer"
+        desired_position = ""
+        pos_match = re.search(r'(?:Vị trí ứng tuyển|Vị trí|Chức danh|Target Position|Desired Role|Objective)\s*[:\-]\s*([^\n\r.]+)', cv_text, re.IGNORECASE)
+        if pos_match:
+            desired_position = pos_match.group(1).strip()
+        elif name_line_idx >= 0 and (name_line_idx + 1) < len(non_empty_lines):
+            next_ln = non_empty_lines[name_line_idx + 1]
+            if (
+                2 <= len(next_ln) <= 65
+                and '@' not in next_ln
+                and not re.search(r'\d{5,}', next_ln)
+                and not any(kw in next_ln.lower() for kw in ['email:', 'phone:', 'sđt:', 'thông tin cá nhân', 'mục tiêu nghề nghiệp', 'học vấn:', 'education:'])
+            ):
+                desired_position = next_ln
+
+        if not desired_position:
+            desired_position = "Software Engineer"
 
         # 5. Extract Skills
         extracted_skills = self.extract_skills(cv_text)
@@ -212,29 +271,36 @@ class SkillExtractor:
         # 7. Extract Education & Education Detail
         edu_level = self.extract_education_level(cv_text)
         edu_detail = ""
-        edu_match = re.search(r'(?:Học vấn|Trình độ|Bằng cấp|Education)\s*[:\-]?\s*([^\r\n]*)', cv_text, re.IGNORECASE)
+        edu_match = re.search(r'(?:^|\n)\s*(?:Học vấn|Trình độ học vấn|Bằng cấp|Education)\s*[:\-]?\s*([^\r\n]*)', cv_text, re.IGNORECASE)
         if edu_match:
             edu_line = edu_match.group(1).strip()
+            after_lines = [l.strip() for l in cv_text[edu_match.end():].splitlines() if l.strip()]
             if not edu_line or len(edu_line) < 3:
-                after = cv_text[edu_match.end():]
-                for line in after.splitlines():
-                    l = line.strip()
-                    if l and not l.endswith(':'):
-                        edu_detail = l
+                collected_edu = []
+                for l in after_lines[:3]:
+                    if any(sec in l.lower() for sec in ['hoạt động', 'chứng chỉ', 'dự án', 'kinh nghiệm', 'kỹ năng', 'sở thích', 'người tham chiếu']):
                         break
+                    if not l.lower().startswith('xếp loại') and not re.match(r'^\d{4}\s*[-–]\s*\d{4}$', l):
+                        clean_edu_ln = re.sub(r'[|·]?\s*(?:\d{1,2}/)?\d{4}\s*[-–]\s*(?:(?:\d{1,2}/)?\d{4}|nay|present|hiện tại)', '', l, flags=re.IGNORECASE).strip(' |·-')
+                        if clean_edu_ln:
+                            collected_edu.append(clean_edu_ln)
+                    if len(collected_edu) >= 2:
+                        break
+                if collected_edu:
+                    edu_detail = ' - '.join(collected_edu)
             else:
-                edu_detail = edu_line
+                edu_detail = re.sub(r'[|·]?\s*(?:\d{1,2}/)?\d{4}\s*[-–]\s*(?:(?:\d{1,2}/)?\d{4}|nay|present|hiện tại)', '', edu_line, flags=re.IGNORECASE).strip(' |·-')
 
         # 8. Extract Location / Address
         location = ""
-        loc_match = re.search(r'(?:Địa chỉ|Nơi ở|Khu vực|Location|Address)\s*[:\-]?\s*([^\r\n]+)', cv_text, re.IGNORECASE)
+        loc_match = re.search(r'(?:(?:Địa chỉ|Nơi ở|Khu vực|Location|Address)\s*[:\-]\s*|\uf3c5\s*)([^\r\n|]+)', cv_text, re.IGNORECASE)
         if loc_match:
             location = loc_match.group(1).strip()
         else:
             for pat, cname in [
-                (r'(?:Hà Nội|Ha Noi|Cầu Giấy|Ba Đình|Đống Đa|Hai Bà Trưng)', 'Hà Nội'),
-                (r'(?:TP\.?\s*Hồ Chí Minh|TP\.?\s*HCM|Hồ Chí Minh|Ho Chi Minh|Sài Gòn|Saigon|Quận 1|Quận 7)', 'TP. Hồ Chí Minh'),
-                (r'(?:Đà Nẵng|Da Nang|Hải Châu|Sơn Trà)', 'Đà Nẵng'),
+                (r'(?:Mễ Trì|Cầu Giấy|Ba Đình|Đống Đa|Hai Bà Trưng|Thanh Xuân|Hà Đông|Tây Hồ|Nam Từ Liêm|Hà Nội|Ha Noi)', 'Hà Nội'),
+                (r'(?:TP\.?\s*Hồ Chí Minh|TP\.?\s*HCM|Hồ Chí Minh|Ho Chi Minh|Sài Gòn|Saigon|Quận 1|Quận 3|Quận 7|Thủ Đức|Bình Thạnh|Tân Bình)', 'TP. Hồ Chí Minh'),
+                (r'(?:Đà Nẵng|Da Nang|Hải Châu|Sơn Trà|Ngũ Hành Sơn)', 'Đà Nẵng'),
                 (r'(?:Cần Thơ|Can Tho)', 'Cần Thơ'),
                 (r'(?:Hải Phòng|Hai Phong)', 'Hải Phòng'),
             ]:
@@ -253,7 +319,7 @@ class SkillExtractor:
             'education_level': edu_level,
             'education_detail': edu_detail,
             'raw_text_length': len(cv_text),
-            'summary': cleaned[:300] + ("..." if len(cleaned) > 300 else "")
+            'summary': cleaned[:320] + ("..." if len(cleaned) > 320 else "")
         }
 
     def parse_job_requirements(self, jd_text: str) -> Dict[str, Any]:

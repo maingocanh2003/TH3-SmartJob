@@ -88,6 +88,23 @@ def job_to_dict(job: Jobs) -> Dict[str, Any]:
     }
 
 
+def _upsert_ai_match_result(candidate: Candidates, job: Jobs, defaults: Dict[str, Any]) -> AiMatchResults:
+    """
+    Safely insert or update AiMatchResults without ever raising MultipleObjectsReturned
+    even under concurrent API requests.
+    """
+    qs = AiMatchResults.objects.filter(candidate=candidate, job=job).order_by('match_id')
+    first_obj = qs.first()
+    if first_obj:
+        for k, v in defaults.items():
+            setattr(first_obj, k, v)
+        first_obj.save()
+        # Clean up any duplicate rows created by concurrent requests
+        qs.exclude(pk=first_obj.pk).delete()
+        return first_obj
+    return AiMatchResults.objects.create(candidate=candidate, job=job, **defaults)
+
+
 def calculate_match(candidate: Candidates, job: Jobs, save_to_db: bool = True) -> Dict[str, Any]:
     """
     Calculate comprehensive matching score between a candidate and a job
@@ -118,7 +135,7 @@ def calculate_match(candidate: Candidates, job: Jobs, save_to_db: bool = True) -
     }
 
     if save_to_db:
-        match_obj, created = AiMatchResults.objects.update_or_create(
+        match_obj = _upsert_ai_match_result(
             candidate=candidate,
             job=job,
             defaults={
@@ -159,11 +176,11 @@ def get_recommended_jobs_for_candidate(
         location=location
     )
 
-    # Persist the top results to AiMatchResults
+    # Persist the top results to AiMatchResults safely
     for r in ranked:
         job_obj = active_jobs.filter(pk=r['job_id']).first()
         if job_obj:
-            AiMatchResults.objects.update_or_create(
+            _upsert_ai_match_result(
                 candidate=candidate,
                 job=job_obj,
                 defaults={
@@ -251,7 +268,11 @@ def extract_text_from_file(uploaded_file) -> str:
         try:
             import io
             import pypdf
-            reader = pypdf.PdfReader(io.BytesIO(content))
+            # Strip any leading whitespace/newlines before %PDF header (e.g. TopCV PDFs)
+            pdf_idx = content.find(b'%PDF')
+            if 0 < pdf_idx < 128:
+                content = content[pdf_idx:]
+            reader = pypdf.PdfReader(io.BytesIO(content), strict=False)
             pages_text = [page.extract_text() or '' for page in reader.pages]
             return '\n'.join(pages_text).strip()
         except Exception as e:
@@ -262,8 +283,13 @@ def extract_text_from_file(uploaded_file) -> str:
             import io
             import docx
             doc = docx.Document(io.BytesIO(content))
-            paragraphs = [p.text for p in doc.paragraphs if p.text]
-            return '\n'.join(paragraphs).strip()
+            parts = [p.text for p in doc.paragraphs if p.text and p.text.strip()]
+            for table in doc.tables:
+                for row in table.rows:
+                    row_txt = ' | '.join(cell.text.strip() for cell in row.cells if cell.text and cell.text.strip())
+                    if row_txt:
+                        parts.append(row_txt)
+            return '\n'.join(parts).strip()
         except Exception as e:
             raise ValueError(f'Không thể đọc nội dung file DOCX: {e}')
 
@@ -317,11 +343,12 @@ def process_and_save_candidate_cv(
 
     candidate.save()
 
-    # 2. Synchronize Skills
+    # 2. Synchronize Skills (replace previous CV skills with newly extracted skills)
+    CandidateSkills.objects.filter(candidate=candidate).delete()
     skills_cache = {s.skill_name.lower(): s for s in Skills.objects.all()}
     extracted_skills = parsed.get('skills', [])
     for s_info in extracted_skills:
-        s_name = s_info.get('skill_name', '').strip()
+        s_name = (s_info.get('skill_name') or s_info.get('name') or '').strip()
         if not s_name:
             continue
         category = s_info.get('category', 'Technical')
@@ -333,11 +360,12 @@ def process_and_save_candidate_cv(
             )
             skills_cache[s_name.lower()] = skill_obj
 
+        prof_level = s_info.get('proficiency_level') or s_info.get('level') or 'intermediate'
         CandidateSkills.objects.update_or_create(
             candidate=candidate,
             skill=skill_obj,
             defaults={
-                'proficiency_level': s_info.get('level', 'intermediate'),
+                'proficiency_level': prof_level,
                 'years_of_experience': s_info.get('years', max(candidate.years_of_experience or 1, 1))
             }
         )
@@ -348,27 +376,36 @@ def process_and_save_candidate_cv(
     institution = 'Đại học'
     major = candidate.desired_position or 'Công nghệ thông tin'
 
-    if edu_detail and '-' in edu_detail:
+    if edu_detail and ' - ' in edu_detail:
+        parts = edu_detail.split(' - ', 1)
+        p0, p1 = parts[0].strip(), parts[1].strip()
+        if any(k in p0.lower() for k in ['đại học', 'học viện', 'cao đẳng', 'trường', 'university', 'college', 'institute']):
+            institution = re.sub(r'\(.*?\)', '', p0).strip()
+            major = p1
+        else:
+            major = p0
+            institution = re.sub(r'\(.*?\)', '', p1).strip()
+    elif edu_detail and '-' in edu_detail:
         parts = edu_detail.split('-', 1)
         major = parts[0].strip()
         institution = re.sub(r'\(.*?\)', '', parts[1]).strip()
     elif edu_detail:
-        major = edu_detail.strip()
+        institution = edu_detail.strip()
 
     edu_qs = Education.objects.filter(candidate=candidate)
     if edu_qs.exists():
         edu_obj = edu_qs.first()
         edu_obj.degree = edu_level
-        edu_obj.institution_name = institution
-        edu_obj.major = major
+        edu_obj.institution_name = institution[:250]
+        edu_obj.major = major[:250]
         edu_obj.save()
         edu_qs.exclude(pk=edu_obj.pk).delete()
     else:
         Education.objects.create(
             candidate=candidate,
             degree=edu_level,
-            institution_name=institution,
-            major=major
+            institution_name=institution[:250],
+            major=major[:250]
         )
 
     # 4. Automatically compute and persist AI Matching recommendations

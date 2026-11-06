@@ -599,8 +599,9 @@ function renderCandidateProfiles() {
     const stage = getStageMeta(app.status);
     const aiScore = app.ai_match?.matching_score != null ? Math.round(app.ai_match.matching_score) : null;
     const skills = Array.isArray(app.candidate_skills) ? app.candidate_skills : [];
-    const matchedSkills = app.ai_match?.matched_skills || [];
-    const missingSkills = app.ai_match?.missing_skills || [];
+    const normSkill = s => (typeof s === 'object' && s !== null) ? (s.skill_name || s.name || '') : String(s || '');
+    const matchedSkills = (app.ai_match?.matched_skills || []).map(normSkill).filter(Boolean);
+    const missingSkills = (app.ai_match?.missing_skills || []).map(normSkill).filter(Boolean);
     const cvUrl = app.candidate_cv
       ? (app.candidate_cv.startsWith('http') ? app.candidate_cv : `http://localhost:8000${app.candidate_cv}`)
       : null;
@@ -700,8 +701,9 @@ function openCandidateDetailModal(app) {
   const body = document.getElementById('cand-modal-body');
   const skills = Array.isArray(app.candidate_skills) ? app.candidate_skills : [];
   const edu = Array.isArray(app.candidate_education) ? app.candidate_education : [];
-  const matched = app.ai_match?.matched_skills || [];
-  const missing = app.ai_match?.missing_skills || [];
+  const normSkill = s => (typeof s === 'object' && s !== null) ? (s.skill_name || s.name || '') : String(s || '');
+  const matched = (app.ai_match?.matched_skills || []).map(normSkill).filter(Boolean);
+  const missing = (app.ai_match?.missing_skills || []).map(normSkill).filter(Boolean);
   const score = app.ai_match?.matching_score != null ? Math.round(app.ai_match.matching_score) : 0;
 
   if (body) {
