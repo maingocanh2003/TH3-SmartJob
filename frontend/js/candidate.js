@@ -473,12 +473,28 @@ async function loadRecommendations(showNotification = false) {
   }
 }
 
+function toggleJdSection(jobId) {
+  const contentEl = document.getElementById(`jd-content-${jobId}`);
+  const btnTextEl = document.getElementById(`jd-toggle-text-${jobId}`);
+  if (!contentEl) return;
+  const isHidden = contentEl.classList.toggle('hidden');
+  if (btnTextEl) {
+    btnTextEl.textContent = isHidden ? 'Xem chi tiết JD ▾' : 'Thu gọn JD ▴';
+  }
+}
+window.toggleJdSection = toggleJdSection;
+
 function renderRecommendationCard(r) {
   const jobId = r.job_id;
   const title = r.job_title || r.title || `Công việc #${jobId}`;
   const company = r.company_name || 'Doanh nghiệp đối tác SmartJob';
   const location = r.location || r.city || 'Việt Nam';
   const empType = r.employment_type || 'full-time';
+  const posLevel = r.position_level || '';
+  const expReq = r.years_of_experience_required;
+  const jobDesc = (r.job_description || r.description || '').trim();
+  const jobReq = (r.requirements || '').trim();
+  const jobBenefits = (r.benefits || '').trim();
   const score = Math.round(Number(r.matching_score ?? r.overall_score ?? 0));
   const bd = r.score_breakdown || {};
   const skillScore = Math.round(Number(bd.skill_match ?? r.skill_match_score ?? r.skill_score ?? score));
@@ -486,16 +502,19 @@ function renderRecommendationCard(r) {
   const semanticScore = Math.round(Number(bd.semantic_match ?? r.semantic_score ?? r.position_score ?? score));
 
   const normSkill = s => (typeof s === 'object' && s !== null) ? (s.skill_name || s.name || '') : String(s || '');
-  const matchedSkills = (Array.isArray(r.matched_skills) ? r.matched_skills : []).map(normSkill).filter(Boolean);
-  const missingSkills = (Array.isArray(r.missing_skills) ? r.missing_skills : []).map(normSkill).filter(Boolean);
+  const matchedSkills = [...new Set((Array.isArray(r.matched_skills) ? r.matched_skills : []).map(normSkill).filter(Boolean))];
+  const missingSkills = [...new Set((Array.isArray(r.missing_skills) ? r.missing_skills : []).map(normSkill).filter(Boolean))];
 
-  // Đề xuất cải thiện kỹ năng cụ thể cho từng thẻ công việc
+  // Đề xuất cải thiện kỹ năng & tái cấu trúc Outline CV cụ thể cho từng thẻ công việc
   let improvementAdvice = '';
+  let outlineAdvice = '';
   if (missingSkills.length > 0) {
     const topMissing = missingSkills.slice(0, 4).join(', ');
     improvementAdvice = `Bổ sung hoặc làm nổi bật kinh nghiệm thực tế với <strong>${escapeHtml(topMissing)}</strong> trong CV để nâng điểm Matching từ <strong>${score}%</strong> lên trên <strong>${Math.min(98, score + missingSkills.length * 7)}%</strong>.`;
+    outlineAdvice = `Đưa mục <strong>Kỹ năng công nghệ (${escapeHtml(matchedSkills.slice(0, 3).concat(missingSkills.slice(0, 3)).join(', '))})</strong> lên ngay sau phần Tóm tắt mục tiêu và lồng ghép từ khóa của JD này vào phần mô tả các dự án thực tế.`;
   } else {
     improvementAdvice = `Hồ sơ CV của bạn đã đáp ứng đầy đủ các kỹ năng cốt lõi của vị trí này. Hãy nhấn <strong>Ứng tuyển ngay</strong> để gửi CV tới nhà tuyển dụng!`;
+    outlineAdvice = `Giữ bố cục CV chuẩn ATS: Tóm tắt chuyên môn → Kỹ năng cốt lõi → Dự án tiêu biểu có số liệu định lượng.`;
   }
 
   // Kiểm tra xem ứng viên đã ứng tuyển công việc này chưa
@@ -517,6 +536,8 @@ function renderRecommendationCard(r) {
         <div class="space-y-1">
           <div class="flex flex-wrap items-center gap-2">
             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100">${escapeHtml(empType)}</span>
+            ${posLevel ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-100">${escapeHtml(posLevel)}</span>` : ''}
+            ${expReq !== undefined && expReq !== null ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-700">⏱ Yêu cầu ${expReq}+ năm KN</span>` : ''}
             <span class="text-xs text-gray-400">•</span>
             <span class="text-xs font-semibold text-gray-600">📍 ${escapeHtml(location)}</span>
             ${r.salary_min || r.salary_max ? `<span class="text-xs text-gray-400">•</span><span class="text-xs font-bold text-emerald-700">💰 ${formatViSalary(r.salary_min, r.salary_max)}</span>` : ''}
@@ -533,6 +554,49 @@ function renderRecommendationCard(r) {
             <span class="text-[10px] font-bold uppercase tracking-wider block opacity-80">AI Matching</span>
             <span class="text-2xl font-black">${score}%</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Khối Mô tả công việc (Job Description) & Yêu cầu từ Nhà tuyển dụng -->
+      <div class="rounded-xl bg-slate-50/90 border border-slate-200/80 overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-100/80 border-b border-slate-200/70">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">📋</span>
+            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wide">Mô tả công việc & Yêu cầu từ Nhà tuyển dụng (JD)</span>
+          </div>
+          <button type="button" onclick="toggleJdSection(${jobId})" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition">
+            <span id="jd-toggle-text-${jobId}">Thu gọn JD ▴</span>
+          </button>
+        </div>
+        <div id="jd-content-${jobId}" class="p-4 space-y-3 text-xs text-gray-700 leading-relaxed">
+          ${jobDesc ? `
+            <div>
+              <p class="font-bold text-gray-900 mb-1 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                <span>Mô tả công việc (Job Description):</span>
+              </p>
+              <div class="pl-3 border-l-2 border-blue-200 whitespace-pre-line text-gray-700">${escapeHtml(jobDesc)}</div>
+            </div>
+          ` : ''}
+          ${jobReq ? `
+            <div>
+              <p class="font-bold text-gray-900 mb-1 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                <span>Yêu cầu ứng viên (Job Requirements):</span>
+              </p>
+              <div class="pl-3 border-l-2 border-indigo-200 whitespace-pre-line text-gray-700">${escapeHtml(jobReq)}</div>
+            </div>
+          ` : ''}
+          ${jobBenefits ? `
+            <div>
+              <p class="font-bold text-gray-900 mb-1 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                <span>Quyền lợi & Đãi ngộ:</span>
+              </p>
+              <div class="pl-3 border-l-2 border-emerald-200 whitespace-pre-line text-gray-600">${escapeHtml(jobBenefits)}</div>
+            </div>
+          ` : ''}
+          ${(!jobDesc && !jobReq) ? `<p class="italic text-gray-400">Nhà tuyển dụng đang cập nhật mô tả chi tiết cho vị trí này.</p>` : ''}
         </div>
       </div>
 
@@ -567,7 +631,7 @@ function renderRecommendationCard(r) {
         </div>
       </div>
 
-      <!-- Kỹ năng phù hợp & Phát hiện kỹ năng còn thiếu -->
+      <!-- Kỹ năng phù hợp & Phát hiện kỹ năng còn thiếu (Skill Gaps) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
           <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-2">
@@ -583,7 +647,7 @@ function renderRecommendationCard(r) {
 
         <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
           <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wider mb-2">
-            ⚠️ Phát hiện kỹ năng còn thiếu (${missingSkills.length})
+            ⚠️ Phát hiện kỹ năng còn thiếu - Skill Gaps (${missingSkills.length})
           </p>
           <div class="flex flex-wrap gap-1.5">
             ${missingSkills.length
@@ -594,13 +658,19 @@ function renderRecommendationCard(r) {
         </div>
       </div>
 
-      <!-- Đề xuất kỹ năng cần cải thiện & Nút Ứng Tuyển Ngay -->
+      <!-- Đề xuất kỹ năng cần cải thiện, Tái cấu trúc Outline CV & Nút Ứng Tuyển Ngay -->
       <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div class="flex items-start gap-2.5 text-xs text-gray-700 bg-indigo-50/60 border border-indigo-100 px-3.5 py-2.5 rounded-xl flex-1">
+        <div class="flex items-start gap-2.5 text-xs text-gray-700 bg-indigo-50/60 border border-indigo-100 px-3.5 py-2.5 rounded-xl flex-1 space-y-1">
           <span class="text-base leading-none mt-0.5">💡</span>
-          <div>
-            <span class="font-bold text-indigo-900">Đề xuất cải thiện từ AI: </span>
-            <span>${improvementAdvice}</span>
+          <div class="space-y-1">
+            <div>
+              <span class="font-bold text-indigo-900">Đề xuất khắc phục Skill Gaps từ AI: </span>
+              <span>${improvementAdvice}</span>
+            </div>
+            <div>
+              <span class="font-bold text-indigo-900">Đề xuất tái cấu trúc Outline CV: </span>
+              <span>${outlineAdvice}</span>
+            </div>
           </div>
         </div>
 
@@ -810,7 +880,7 @@ function renderAiAnalysis(data) {
             <span class="text-xs font-extrabold text-gray-900">${escapeHtml(s.title)}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${st.badge}">${st.label}</span>
           </div>
-          <p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(s.detail || s.description || '')}</p>
+          <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${escapeHtml(s.detail || s.description || '')}</p>
           ${s.impact ? `<p class="text-[11px] font-bold text-blue-700">🚀 Tác động: ${escapeHtml(s.impact)}</p>` : ''}
         </div>
       `;

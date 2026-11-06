@@ -71,7 +71,30 @@ class MatchingEngine:
                 'years': s.get('years', 1)
             }
 
-        job_skills = job_data.get('required_skills', []) or job_data.get('skills', [])
+        raw_job_skills = list(job_data.get('required_skills', []) or job_data.get('skills', []))
+        jd_text = (job_data.get('job_description', '') + ' ' + job_data.get('requirements', '')).strip()
+        if jd_text:
+            for ext in extract_skills_from_text(jd_text):
+                raw_job_skills.append({
+                    'name': ext.get('skill_name'),
+                    'level': ext.get('proficiency_level', 'intermediate'),
+                    'is_required': False,
+                    'weight': 0.8
+                })
+
+        # Deduplicate job skills by normalized canonical name
+        job_skills = []
+        seen_job_skill_keys = set()
+        for js in raw_job_skills:
+            r_name = js.get('name') or js.get('skill_name')
+            if not r_name:
+                continue
+            s_name = normalize_skill(r_name) or r_name
+            s_key = s_name.lower()
+            if s_key in seen_job_skill_keys:
+                continue
+            seen_job_skill_keys.add(s_key)
+            job_skills.append(js)
         
         matched_skills = []
         missing_skills = []

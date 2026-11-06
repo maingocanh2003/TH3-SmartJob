@@ -84,6 +84,8 @@ def job_to_dict(job: Jobs) -> Dict[str, Any]:
         'education_level_required': 'Bachelor',
         'job_description': job.job_description or '',
         'requirements': job.requirements or '',
+        'benefits': job.benefits or '',
+        'application_deadline': str(job.application_deadline) if job.application_deadline else '',
         'required_skills': req_skills
     }
 

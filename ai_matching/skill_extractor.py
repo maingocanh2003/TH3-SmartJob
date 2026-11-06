@@ -103,8 +103,10 @@ class SkillExtractor:
             # Escape regex characters except space
             escaped = re.escape(alias)
             
-            # Words with symbols need special boundary handling
-            if re.match(r'^[a-zA-Z0-9\s]+$', alias):
+            # Words with symbols or Vietnamese phrases needing lookaround boundary handling
+            if alias.lower() == 'học máy':
+                pattern = rf'(?<!khoa\s)(?:\b|(?<=\s)){escaped}(?:\b|(?=\s|[.,;:!?\)]))(?!\s+tính)'
+            elif re.match(r'^[a-zA-Z0-9\s]+$', alias):
                 pattern = rf'(?<![a-zA-Z0-9]){escaped}(?![a-zA-Z0-9])'
             else:
                 pattern = rf'(?:\b|(?<=\s)){escaped}(?:\b|(?=\s|[.,;:!?\)]))'
@@ -173,7 +175,7 @@ class SkillExtractor:
         patterns = [
             r'(\d+)\+?\s*(?:năm|nam|years?|yrs?)\s*(?:kinh nghiệm|kinh nghiem|experience|exp)',
             r'(?:kinh nghiệm|kinh nghiem|experience|exp)\s*(?:từ|khoảng|hơn|over|at least)?\s*(\d+)\+?\s*(?:năm|nam|years?|yrs?)',
-            r'(\d+)\+?\s*(?:năm|nam|years?|yrs?)\s*(?:làm việc|chuyên môn|in the field)',
+            r'(\d+)\+?\s*(?:năm|nam|years?|yrs?)\s*(?:làm việc|chuyên môn|trong nghề|lập trình|phát triển|in the field)',
         ]
 
         found_years = []
@@ -206,9 +208,9 @@ class SkillExtractor:
         skills, experience, education, and normalized summary.
         """
         cv_text = normalize_vietnamese_pdf_text(cv_text)
-        # Strip TopCV / watermark lines for clean summary & header parsing
+        # Strip TopCV / watermark lines & Private Use Area icons for clean summary & header parsing
         raw_lines = [
-            re.sub(r'^[\uf000-\uf8ff\u2600-\u27bf•·\-*]+\s*', '', ln).strip()
+            re.sub(r'^[\ue000-\uf8ff\u2600-\u27bf•·\-*⭐]+\s*', '', ln).strip()
             for ln in cv_text.splitlines()
         ]
         non_empty_lines = [
@@ -216,7 +218,8 @@ class SkillExtractor:
             if ln and not re.match(r'^(?:©\s*)?(?:topcv\.vn|vietnamworks\.com|itviec\.com|curriculum\s+vitae|cv|resume|hồ\s+sơ)$', ln, re.IGNORECASE)
         ]
 
-        cleaned = clean_text('\n'.join(non_empty_lines))
+        cleaned_lines_text = '\n'.join(non_empty_lines)
+        cleaned = clean_text(cleaned_lines_text)
 
         # 1. Email heuristic
         email_match = re.search(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', cv_text)
@@ -271,14 +274,14 @@ class SkillExtractor:
         # 7. Extract Education & Education Detail
         edu_level = self.extract_education_level(cv_text)
         edu_detail = ""
-        edu_match = re.search(r'(?:^|\n)\s*(?:Học vấn|Trình độ học vấn|Bằng cấp|Education)\s*[:\-]?\s*([^\r\n]*)', cv_text, re.IGNORECASE)
+        edu_match = re.search(r'(?:^|\n)\s*(?:Học vấn|Trình độ học vấn|Bằng cấp|Education)\s*[:\-]?\s*([^\r\n]*)', cleaned_lines_text, re.IGNORECASE)
         if edu_match:
             edu_line = edu_match.group(1).strip()
-            after_lines = [l.strip() for l in cv_text[edu_match.end():].splitlines() if l.strip()]
+            after_lines = [l.strip() for l in cleaned_lines_text[edu_match.end():].splitlines() if l.strip()]
             if not edu_line or len(edu_line) < 3:
                 collected_edu = []
                 for l in after_lines[:3]:
-                    if any(sec in l.lower() for sec in ['hoạt động', 'chứng chỉ', 'dự án', 'kinh nghiệm', 'kỹ năng', 'sở thích', 'người tham chiếu']):
+                    if any(sec in l.lower() for sec in ['hoạt động', 'chứng chỉ', 'dự án', 'kinh nghiệm', 'kỹ năng', 'sở thích', 'người tham chiếu', 'tốt nghiệp', 'đạt học bổng', 'đạt giải']):
                         break
                     if not l.lower().startswith('xếp loại') and not re.match(r'^\d{4}\s*[-–]\s*\d{4}$', l):
                         clean_edu_ln = re.sub(r'[|·]?\s*(?:\d{1,2}/)?\d{4}\s*[-–]\s*(?:(?:\d{1,2}/)?\d{4}|nay|present|hiện tại)', '', l, flags=re.IGNORECASE).strip(' |·-')
@@ -308,6 +311,18 @@ class SkillExtractor:
                     location = cname
                     break
 
+        # 9. Extract clean Objective / Summary
+        summary_text = cleaned[:320] + ("..." if len(cleaned) > 320 else "")
+        obj_match = re.search(
+            r'(?:Mục tiêu nghề nghiệp|Tóm tắt bản thân|Giới thiệu bản thân|Career Objective|Professional Summary)\s*[:\-]?\s*([\s\S]{20,600}?)(?=\n\s*(?:Kỹ năng|Học vấn|Kinh nghiệm|Sở thích|Dự án|Chứng chỉ|Hoạt động|Skills|Education|Experience)\b|$)',
+            cleaned_lines_text,
+            re.IGNORECASE
+        )
+        if obj_match:
+            obj_clean = clean_text(obj_match.group(1))
+            if len(obj_clean) >= 20:
+                summary_text = obj_clean[:360] + ("..." if len(obj_clean) > 360 else "")
+
         return {
             'full_name': full_name,
             'email': email,
@@ -319,7 +334,7 @@ class SkillExtractor:
             'education_level': edu_level,
             'education_detail': edu_detail,
             'raw_text_length': len(cv_text),
-            'summary': cleaned[:320] + ("..." if len(cleaned) > 320 else "")
+            'summary': summary_text
         }
 
     def parse_job_requirements(self, jd_text: str) -> Dict[str, Any]:

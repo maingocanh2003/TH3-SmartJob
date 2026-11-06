@@ -375,16 +375,34 @@ class CandidateViewSet(viewsets.ModelViewSet):
 
         avg_market_exp = Jobs.objects.filter(status='active').aggregate(avg=Avg('years_of_experience_required'))['avg'] or 2.5
 
-        # 4. Đề xuất cải thiện thông minh
+        # 4. Đề xuất cải thiện thông minh & Tái cấu trúc Outline CV
         suggestions = []
         if recommended_missing_skills:
             top_mis_names = ', '.join(x['skill_name'] for x in recommended_missing_skills[:4])
             suggestions.append({
                 'priority': 'high',
-                'category': 'Bổ sung Kỹ năng',
-                'title': f'Bổ sung các kỹ năng đang thiếu so với JD thị trường: {top_mis_names}',
-                'description': f'Phân tích AI trên các tin tuyển dụng phù hợp cho thấy nếu bạn bổ sung hoặc nêu rõ kinh nghiệm làm việc với {top_mis_names} trong CV, điểm Matching trung bình có thể tăng thêm 15% - 25%.'
+                'category': 'Khắc phục Skill Gaps',
+                'title': f'Khắc phục khoảng trống kỹ năng (Skill Gaps) so với JD mục tiêu: {top_mis_names}',
+                'description': f'Phân tích AI đối sánh CV với các JD trên hệ thống phát hiện thiếu hụt các kỹ năng trọng tâm ({top_mis_names}). Hãy bổ sung các kỹ năng này kèm minh chứng dự án thực tế để nâng điểm AI Matching thêm 15% - 25%.',
+                'impact': 'Tăng 15% - 25% điểm tương thích kỹ năng (Skill Match)'
             })
+
+        top_matched_str = ', '.join(x['skill_name'] for x in strong_matched_skills[:5]) or 'kỹ năng chuyên môn'
+        top_missing_str = ', '.join(x['skill_name'] for x in recommended_missing_skills[:4]) or 'TypeScript, REST API, Git, Docker'
+        suggestions.append({
+            'priority': 'high',
+            'category': 'Tái cấu trúc Outline CV',
+            'title': 'Đề xuất tái cấu trúc lại Outline CV chuẩn ATS để thu hút Nhà tuyển dụng',
+            'description': (
+                f'Cấu trúc lại bố cục (Outline) CV theo thứ tự ưu tiên của Nhà tuyển dụng & hệ thống AI:\n'
+                f'1. Header & Chức danh mục tiêu: Ghi rõ vị trí ứng tuyển cụ thể (VD: Senior Frontend / Fullstack Developer) thay vì ghi chung chung.\n'
+                f'2. Tóm tắt năng lực (Professional Summary): Tóm tắt {years} năm kinh nghiệm + thế mạnh cốt lõi ({top_matched_str}) trong 3 dòng đầu.\n'
+                f'3. Ma trận Kỹ năng chuyên môn (Technical Skills): Tách riêng mục Kỹ năng công nghệ (Ngôn ngữ, Framework, CSDL, Công cụ: {top_missing_str}) lên đầu CV, sửa lỗi chính tả từ khóa kỹ thuật thay vì để lẫn ở mục Chứng chỉ.\n'
+                f'4. Kinh nghiệm làm việc & Dự án (Work Experience): Trình bày theo mô hình STAR, gắn trực tiếp công nghệ sử dụng và số liệu kết quả đạt được vào từng dự án.\n'
+                f'5. Học vấn, Chứng chỉ & Giải thưởng: Đặt ở phần cuối CV gọn gàng, súc tích.'
+            ),
+            'impact': 'Tăng khả năng vượt qua vòng lọc CV tự động (ATS/AI) và gây ấn tượng với Nhà tuyển dụng trong 6 giây đầu tiên'
+        })
 
         if skill_count < 6:
             suggestions.append({
