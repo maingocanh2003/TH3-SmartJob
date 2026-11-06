@@ -59,9 +59,14 @@ class RankingEngine:
                 'application_deadline': job.get('application_deadline') or '',
                 'matching_score': score,
                 'overall_recommendation': match_result['overall_recommendation'],
+                'skill_coverage_percent': match_result.get('skill_coverage_percent', 0.0),
+                'matched_skills_count': match_result.get('matched_skills_count', 0),
+                'missing_skills_count': match_result.get('missing_skills_count', 0),
+                'total_required_skills_count': match_result.get('total_required_skills_count', 0),
                 'score_breakdown': match_result['score_breakdown'],
                 'matched_skills': match_result['matched_skills'],
                 'missing_skills': match_result['missing_skills'],
+                'skill_match_details': match_result.get('skill_match_details', []),
                 'bonus_skills': match_result['bonus_skills'],
                 'explanation': match_result['explanation']
             })
@@ -100,9 +105,14 @@ class RankingEngine:
                 'desired_salary': cand.get('desired_salary'),
                 'matching_score': score,
                 'overall_recommendation': match_result['overall_recommendation'],
+                'skill_coverage_percent': match_result.get('skill_coverage_percent', 0.0),
+                'matched_skills_count': match_result.get('matched_skills_count', 0),
+                'missing_skills_count': match_result.get('missing_skills_count', 0),
+                'total_required_skills_count': match_result.get('total_required_skills_count', 0),
                 'score_breakdown': match_result['score_breakdown'],
                 'matched_skills': match_result['matched_skills'],
                 'missing_skills': match_result['missing_skills'],
+                'skill_match_details': match_result.get('skill_match_details', []),
                 'bonus_skills': match_result['bonus_skills'],
                 'explanation': match_result['explanation']
             })

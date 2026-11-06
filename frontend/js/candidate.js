@@ -502,8 +502,56 @@ function renderRecommendationCard(r) {
   const semanticScore = Math.round(Number(bd.semantic_match ?? r.semantic_score ?? r.position_score ?? score));
 
   const normSkill = s => (typeof s === 'object' && s !== null) ? (s.skill_name || s.name || '') : String(s || '');
-  const matchedSkills = [...new Set((Array.isArray(r.matched_skills) ? r.matched_skills : []).map(normSkill).filter(Boolean))];
-  const missingSkills = [...new Set((Array.isArray(r.missing_skills) ? r.missing_skills : []).map(normSkill).filter(Boolean))];
+  const rawMatched = Array.isArray(r.matched_skills) ? r.matched_skills : [];
+  const rawMissing = Array.isArray(r.missing_skills) ? r.missing_skills : [];
+  const matchedSkills = [...new Set(rawMatched.map(normSkill).filter(Boolean))];
+  const missingSkills = [...new Set(rawMissing.map(normSkill).filter(Boolean))];
+
+  const matchedCount = matchedSkills.length;
+  const missingCount = missingSkills.length;
+  const totalReqSkills = matchedCount + missingCount;
+  const skillCoveragePct = totalReqSkills > 0
+    ? Math.round((matchedCount / totalReqSkills) * 100)
+    : Math.round(Number(r.skill_coverage_percent ?? skillScore));
+  const missingCoveragePct = totalReqSkills > 0 ? (100 - skillCoveragePct) : 0;
+  const sharePerSkillPct = totalReqSkills > 0 ? Number((100 / totalReqSkills).toFixed(1)) : 0;
+
+  // Xây dựng danh sách chi tiết từng kỹ năng kèm chỉ số % đối sánh CV vs Yêu cầu Nhà tuyển dụng
+  const levelViMap = {
+    beginner: 'Cơ bản',
+    intermediate: 'Trung bình - Khá',
+    advanced: 'Nâng cao',
+    expert: 'Chuyên gia',
+    none: 'Chưa có trong CV',
+  };
+  const skillComparisonItems = [
+    ...rawMatched.map(s => {
+      const name = normSkill(s);
+      const ratio = Math.round(Number(s?.match_ratio ?? 100));
+      const candLvl = levelViMap[(s?.candidate_level || 'intermediate').toLowerCase()] || 'Trung bình - Khá';
+      const reqLvl = levelViMap[(s?.required_level || 'intermediate').toLowerCase()] || 'Trung bình - Khá';
+      return {
+        name,
+        isMatched: true,
+        ratio,
+        candLvl,
+        reqLvl,
+        sharePct: s?.weight_share_pct ?? sharePerSkillPct,
+      };
+    }),
+    ...rawMissing.map(s => {
+      const name = normSkill(s);
+      const reqLvl = levelViMap[(s?.required_level || 'intermediate').toLowerCase()] || 'Trung bình - Khá';
+      return {
+        name,
+        isMatched: false,
+        ratio: 0,
+        candLvl: 'Chưa có trong CV',
+        reqLvl,
+        sharePct: s?.weight_share_pct ?? sharePerSkillPct,
+      };
+    }),
+  ].filter((item, idx, arr) => item.name && arr.findIndex(x => x.name.toLowerCase() === item.name.toLowerCase()) === idx);
 
   // Đề xuất cải thiện kỹ năng & tái cấu trúc Outline CV cụ thể cho từng thẻ công việc
   let improvementAdvice = '';
@@ -631,27 +679,101 @@ function renderRecommendationCard(r) {
         </div>
       </div>
 
+      <!-- Khối Chỉ số phần trăm Kỹ năng CV ứng viên so với Kỹ năng Nhà tuyển dụng yêu cầu -->
+      <div class="p-4 rounded-xl bg-blue-50/40 border border-blue-200/80 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <p class="text-xs font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+              <span>📊</span>
+              <span>Chỉ số % Kỹ năng CV ứng viên so với Kỹ năng Nhà tuyển dụng yêu cầu</span>
+            </p>
+            <p class="text-[11px] text-gray-600 mt-0.5">
+              CV của bạn đáp ứng <strong class="text-emerald-700">${matchedCount}/${totalReqSkills} kỹ năng (${skillCoveragePct}%)</strong> và còn thiếu <strong class="text-amber-700">${missingCount}/${totalReqSkills} kỹ năng (${missingCoveragePct}%)</strong> so với yêu cầu của Nhà tuyển dụng.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 self-start sm:self-center">
+            <span class="px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-black">
+              Đạt ${skillCoveragePct}% (${matchedCount}/${totalReqSkills} Skill)
+            </span>
+            <span class="px-3 py-1 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black">
+              Thiếu ${missingCoveragePct}% (${missingCount}/${totalReqSkills} Skill)
+            </span>
+          </div>
+        </div>
+
+        <!-- Thanh phần trăm tổng quát CV Skills vs Job Required Skills -->
+        <div class="space-y-1">
+          <div class="w-full h-3 bg-amber-200/80 rounded-full overflow-hidden flex border border-gray-200">
+            <div class="h-full bg-emerald-500 transition-all duration-500 flex items-center justify-center text-[9px] font-extrabold text-white" style="width:${skillCoveragePct}%">
+              ${skillCoveragePct >= 15 ? `${skillCoveragePct}% Đã có` : ''}
+            </div>
+            <div class="h-full bg-amber-400 transition-all duration-500 flex items-center justify-center text-[9px] font-extrabold text-amber-950" style="width:${missingCoveragePct}%">
+              ${missingCoveragePct >= 15 ? `${missingCoveragePct}% Còn thiếu` : ''}
+            </div>
+          </div>
+          <div class="flex justify-between text-[11px] font-semibold">
+            <span class="text-emerald-700">✓ Kỹ năng CV đáp ứng: ${skillCoveragePct}% (${matchedCount} kỹ năng)</span>
+            <span class="text-amber-800">⚠️ Kỹ năng còn thiếu (Skill Gaps): ${missingCoveragePct}% (${missingCount} kỹ năng)</span>
+          </div>
+        </div>
+
+        <!-- Bảng chi tiết % từng Skill của CV ứng viên so với Skill Nhà tuyển dụng yêu cầu -->
+        ${skillComparisonItems.length ? `
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 pt-1">
+            ${skillComparisonItems.map(item => `
+              <div class="p-2.5 rounded-xl bg-white border ${item.isMatched ? 'border-emerald-200' : 'border-amber-200'} space-y-1.5">
+                <div class="flex items-center justify-between gap-1.5">
+                  <span class="text-xs font-extrabold ${item.isMatched ? 'text-emerald-900' : 'text-amber-900'} truncate">
+                    ${item.isMatched ? '✓' : '⚠️'} ${escapeHtml(item.name)}
+                  </span>
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-black flex-shrink-0 ${item.isMatched ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}">
+                    ${item.ratio}%
+                  </span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full ${item.isMatched ? 'bg-emerald-500' : 'bg-amber-400'} rounded-full" style="width:${item.isMatched ? item.ratio : 6}%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-gray-500">
+                  <span>CV: <strong class="${item.isMatched ? 'text-emerald-700' : 'text-rose-600'}">${escapeHtml(item.candLvl)}</strong></span>
+                  <span>Tỷ trọng YC: <strong>${item.sharePct}%</strong></span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+
       <!-- Kỹ năng phù hợp & Phát hiện kỹ năng còn thiếu (Skill Gaps) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
-          <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-2">
-            ✓ Kỹ năng phù hợp trong CV (${matchedSkills.length})
-          </p>
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
+              ✓ Kỹ năng phù hợp trong CV (${matchedCount}/${totalReqSkills})
+            </p>
+            <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-extrabold">
+              Đạt ${skillCoveragePct}% yêu cầu
+            </span>
+          </div>
           <div class="flex flex-wrap gap-1.5">
-            ${matchedSkills.length
-              ? matchedSkills.map(s => `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-emerald-700 border border-emerald-200">✓ ${escapeHtml(s)}</span>`).join('')
+            ${skillComparisonItems.filter(i => i.isMatched).length
+              ? skillComparisonItems.filter(i => i.isMatched).map(i => `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-emerald-700 border border-emerald-200">✓ ${escapeHtml(i.name)} <span class="text-[10px] text-emerald-600 font-extrabold">(${i.ratio}% · +${i.sharePct}%)</span></span>`).join('')
               : `<span class="text-xs text-gray-500 italic">Hãy tải CV để AI đối chiếu kỹ năng</span>`
             }
           </div>
         </div>
 
         <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
-          <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wider mb-2">
-            ⚠️ Phát hiện kỹ năng còn thiếu - Skill Gaps (${missingSkills.length})
-          </p>
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wider">
+              ⚠️ Phát hiện kỹ năng còn thiếu - Skill Gaps (${missingCount}/${totalReqSkills})
+            </p>
+            <span class="px-2 py-0.5 rounded-md bg-amber-200/80 text-amber-900 text-[11px] font-extrabold">
+              Thiếu ${missingCoveragePct}% yêu cầu
+            </span>
+          </div>
           <div class="flex flex-wrap gap-1.5">
-            ${missingSkills.length
-              ? missingSkills.map(s => `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-amber-800 border border-amber-300">+ ${escapeHtml(s)}</span>`).join('')
+            ${skillComparisonItems.filter(i => !i.isMatched).length
+              ? skillComparisonItems.filter(i => !i.isMatched).map(i => `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-amber-800 border border-amber-300">+ ${escapeHtml(i.name)} <span class="text-[10px] text-rose-600 font-extrabold">(0% · -${i.sharePct}%)</span></span>`).join('')
               : `<span class="text-xs font-semibold text-emerald-700">🎉 Hồ sơ của bạn không thiếu kỹ năng yêu cầu nào!</span>`
             }
           </div>

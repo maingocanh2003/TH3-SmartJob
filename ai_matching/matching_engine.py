@@ -72,15 +72,6 @@ class MatchingEngine:
             }
 
         raw_job_skills = list(job_data.get('required_skills', []) or job_data.get('skills', []))
-        jd_text = (job_data.get('job_description', '') + ' ' + job_data.get('requirements', '')).strip()
-        if jd_text:
-            for ext in extract_skills_from_text(jd_text):
-                raw_job_skills.append({
-                    'name': ext.get('skill_name'),
-                    'level': ext.get('proficiency_level', 'intermediate'),
-                    'is_required': False,
-                    'weight': 0.8
-                })
 
         # Deduplicate job skills by normalized canonical name
         job_skills = []
@@ -95,27 +86,44 @@ class MatchingEngine:
                 continue
             seen_job_skill_keys.add(s_key)
             job_skills.append(js)
+
+        # Supplement from JD text if fewer than 6 structured skills so JD keywords are also compared
+        jd_text = (job_data.get('job_description', '') + ' ' + job_data.get('requirements', '')).strip()
+        if jd_text and len(job_skills) < 6:
+            skip_generic = {'teamwork', 'problem solving', 'english', 'manual testing'}
+            for ext in extract_skills_from_text(jd_text):
+                r_name = ext.get('skill_name')
+                if not r_name:
+                    continue
+                s_name = normalize_skill(r_name) or r_name
+                s_key = s_name.lower()
+                if s_key in seen_job_skill_keys or s_key in skip_generic:
+                    continue
+                seen_job_skill_keys.add(s_key)
+                job_skills.append({
+                    'name': s_name,
+                    'level': ext.get('proficiency_level', 'intermediate'),
+                    'is_required': True,
+                    'weight': 1.0
+                })
+                if len(job_skills) >= 6:
+                    break
         
         matched_skills = []
         missing_skills = []
         skill_details = []
         
-        total_job_skill_weight = Decimal('0.0')
-        earned_skill_weight = Decimal('0.0')
-        missing_mandatory_count = 0
+        total_req_skills = len(job_skills)
+        share_pct = round(100.0 / total_req_skills, 1) if total_req_skills > 0 else 0.0
 
         if job_skills:
+            total_ratio_sum = Decimal('0.0')
             for js in job_skills:
                 raw_name = js.get('name') or js.get('skill_name')
                 skill_name = normalize_skill(raw_name) or raw_name
                 req_level = (js.get('level') or js.get('required_level') or 'intermediate').lower()
                 req_level_num = PROFICIENCY_LEVELS.get(req_level, 2)
                 is_required = js.get('is_required', True)
-                base_weight = Decimal(str(js.get('weight', 1.0)))
-
-                if is_required:
-                    base_weight *= Decimal('1.5')  # Mandatory multiplier
-                total_job_skill_weight += base_weight
 
                 key = skill_name.lower()
                 if key in cand_skills_map:
@@ -127,53 +135,61 @@ class MatchingEngine:
                     else:
                         ratio = Decimal(str(cand_level_num)) / Decimal(str(req_level_num))
 
-                    earned = base_weight * ratio
-                    earned_skill_weight += earned
-
+                    total_ratio_sum += ratio * Decimal('100.0')
                     match_pct = float(round(ratio * 100, 1))
+                    earned_share = float(round(Decimal(str(share_pct)) * ratio, 1))
                     matched_skills.append({
                         'skill_name': skill_name,
                         'candidate_level': cand_info['level'],
                         'required_level': req_level,
                         'is_required': is_required,
-                        'match_ratio': match_pct
+                        'match_ratio': match_pct,
+                        'weight_share_pct': share_pct,
+                        'earned_share_pct': earned_share
                     })
                     skill_details.append({
                         'skill_name': skill_name,
                         'status': 'matched',
+                        'candidate_level': cand_info['level'],
+                        'required_level': req_level,
                         'is_required': is_required,
-                        'score': match_pct
+                        'score': match_pct,
+                        'match_ratio': match_pct,
+                        'weight_share_pct': share_pct,
+                        'earned_share_pct': earned_share
                     })
                 else:
-                    if is_required:
-                        missing_mandatory_count += 1
                     missing_skills.append({
                         'skill_name': skill_name,
+                        'candidate_level': 'none',
                         'required_level': req_level,
-                        'is_required': is_required
+                        'is_required': is_required,
+                        'match_ratio': 0.0,
+                        'weight_share_pct': share_pct,
+                        'earned_share_pct': 0.0
                     })
                     skill_details.append({
                         'skill_name': skill_name,
                         'status': 'missing',
+                        'candidate_level': 'none',
+                        'required_level': req_level,
                         'is_required': is_required,
-                        'score': 0.0
+                        'score': 0.0,
+                        'match_ratio': 0.0,
+                        'weight_share_pct': share_pct,
+                        'earned_share_pct': 0.0
                     })
 
-            raw_skill_score = (earned_skill_weight / total_job_skill_weight * Decimal('100.0')) if total_job_skill_weight > 0 else Decimal('100.0')
-            
-            # Penalty for missing mandatory skills: -10% per missing mandatory skill
-            mandatory_penalty = Decimal(str(missing_mandatory_count * 8.0))
-            skill_score = max(Decimal('0.0'), raw_skill_score - mandatory_penalty)
+            # True percentage of candidate CV skills vs employer required skills
+            skill_score = round(total_ratio_sum / Decimal(str(total_req_skills)), 1) if total_req_skills > 0 else Decimal('100.0')
+            skill_coverage_pct = float(round(len(matched_skills) / total_req_skills * 100.0, 1)) if total_req_skills > 0 else 100.0
 
-            # Bonus for candidate extra skills in relevant categories (up to +8%)
-            candidate_keys = set(cand_skills_map.keys())
             job_keys = { (normalize_skill(js.get('name') or js.get('skill_name')) or '').lower() for js in job_skills }
-            bonus_skills_list = []
-            for k, info in cand_skills_map.items():
-                if k not in job_keys:
-                    bonus_skills_list.append(info['canonical_name'])
-            bonus_score = min(Decimal('8.0'), Decimal(str(len(bonus_skills_list) * 1.5)))
-            skill_score = min(Decimal('100.0'), skill_score + bonus_score)
+            bonus_skills_list = [
+                info['canonical_name']
+                for k, info in cand_skills_map.items()
+                if k not in job_keys
+            ]
         else:
             # If job didn't specify structured skills, extract from description
             jd_text = (job_data.get('job_description', '') + ' ' + job_data.get('requirements', '')).strip()
@@ -181,6 +197,7 @@ class MatchingEngine:
             if extracted:
                 return self.calculate_match(candidate_data, {**job_data, 'required_skills': extracted})
             skill_score = Decimal('70.0')
+            skill_coverage_pct = 70.0
             bonus_skills_list = []
 
         # ======================================================================
@@ -299,8 +316,13 @@ class MatchingEngine:
         return {
             'matching_score': float(total_score),
             'overall_recommendation': recommendation,
+            'skill_coverage_percent': skill_coverage_pct,
+            'matched_skills_count': len(matched_skills),
+            'missing_skills_count': len(missing_skills),
+            'total_required_skills_count': len(job_skills),
             'score_breakdown': {
                 'skill_match': float(round(skill_score, 2)),
+                'skill_coverage_percent': skill_coverage_pct,
                 'semantic_match': float(round(semantic_score, 2)),
                 'experience_match': float(round(exp_score, 2)),
                 'salary_match': float(round(salary_score, 2)),
