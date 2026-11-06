@@ -136,34 +136,52 @@ WITH app_base AS (
         COUNT(*) AS total_applications,
         COUNT(DISTINCT candidate_id) AS total_applied_candidates,
         COUNT(*) FILTER (
+            WHERE LOWER(COALESCE(status, 'pending')) IN ('pending', 'reviewing', 'shortlisted')
+        ) AS pending_applications,
+        COUNT(*) FILTER (
             WHERE LOWER(COALESCE(status, '')) IN ('offered', 'hired', 'accepted')
         ) AS successful_applications
     FROM applications
 )
 SELECT
     (SELECT COUNT(*) FROM jobs) AS total_job_postings,
+    (SELECT COUNT(*) FROM jobs WHERE LOWER(COALESCE(status, '')) = 'active') AS active_job_postings,
     (SELECT COUNT(*) FROM candidates) AS total_candidates,
     app_base.total_applications,
+    app_base.pending_applications,
     app_base.total_applied_candidates,
     app_base.successful_applications,
     ROUND((app_base.successful_applications::numeric / NULLIF(app_base.total_applications, 0)) * 100.0, 2) AS hiring_rate_pct
 FROM app_base;
 
--- =====================================================
--- Canonical SQL snippets for Superset charts
--- =====================================================
+-- 7) Applications over time (for time-series chart in Superset & BI Dashboard)
+CREATE OR REPLACE VIEW bi.vw_applications_over_time AS
+SELECT
+    DATE_TRUNC('day', COALESCE(a.applied_at, a.created_at, CURRENT_TIMESTAMP))::date AS application_date,
+    COUNT(a.application_id) AS total_applications,
+    COUNT(a.application_id) FILTER (WHERE LOWER(COALESCE(a.status, 'pending')) = 'pending') AS pending_count,
+    COUNT(a.application_id) FILTER (WHERE LOWER(COALESCE(a.status, '')) IN ('reviewing', 'shortlisted')) AS reviewing_count,
+    COUNT(a.application_id) FILTER (WHERE LOWER(COALESCE(a.status, '')) = 'interviewed') AS interviewed_count,
+    COUNT(a.application_id) FILTER (WHERE LOWER(COALESCE(a.status, '')) IN ('offered', 'accepted', 'hired')) AS accepted_count,
+    COUNT(a.application_id) FILTER (WHERE LOWER(COALESCE(a.status, '')) = 'rejected') AS rejected_count
+FROM applications a
+GROUP BY DATE_TRUNC('day', COALESCE(a.applied_at, a.created_at, CURRENT_TIMESTAMP))::date
+ORDER BY application_date ASC;
 
--- A. Job postings by industry
--- SELECT industry, total_jobs FROM bi.vw_job_postings_by_industry ORDER BY total_jobs DESC;
-
--- B. Top demanded skills
--- SELECT skill_name, jobs_requiring_skill, jobs_mandatory_skill FROM bi.vw_skill_demand ORDER BY jobs_requiring_skill DESC LIMIT 20;
-
--- C. Salary trend by industry / position
--- SELECT industry, position_level, avg_salary_mid FROM bi.vw_avg_salary_by_industry_position ORDER BY avg_salary_mid DESC NULLS LAST;
-
--- D. Recruitment funnel rates
--- SELECT reviewed_rate_pct, interview_rate_pct, hiring_success_rate_pct FROM bi.vw_recruitment_funnel;
-
--- E. KPI cards
--- SELECT * FROM bi.vw_dashboard_kpis;
+-- 8) Applications by status breakdown
+CREATE OR REPLACE VIEW bi.vw_applications_by_status AS
+SELECT
+    CASE LOWER(COALESCE(a.status, 'pending'))
+        WHEN 'pending' THEN '1. Đã tiếp nhận'
+        WHEN 'reviewing' THEN '2. Đang xem xét'
+        WHEN 'shortlisted' THEN '2. Đang xem xét'
+        WHEN 'interviewed' THEN '3. Mời phỏng vấn'
+        WHEN 'offered' THEN '4. Trúng tuyển'
+        WHEN 'rejected' THEN '5. Từ chối'
+        ELSE 'Khác'
+    END AS status_label,
+    LOWER(COALESCE(a.status, 'pending')) AS status_code,
+    COUNT(a.application_id) AS application_count
+FROM applications a
+GROUP BY status_label, LOWER(COALESCE(a.status, 'pending'))
+ORDER BY status_label;

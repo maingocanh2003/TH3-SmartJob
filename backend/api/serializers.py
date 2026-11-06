@@ -7,6 +7,17 @@ from .models import (
 )
 
 
+STATUS_VI_MAP = {
+    'pending': 'Đã tiếp nhận',
+    'reviewing': 'Đang xem xét',
+    'shortlisted': 'Đang xem xét',
+    'interviewed': 'Mời phỏng vấn',
+    'offered': 'Trúng tuyển',
+    'rejected': 'Từ chối',
+    'withdrawn': 'Đã rút hồ sơ',
+}
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
@@ -15,10 +26,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SkillSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='skill_id', read_only=True)
+    name = serializers.CharField(source='skill_name', read_only=True)
+
     class Meta:
         model = Skills
-        fields = ['skill_id', 'skill_name', 'category', 'description', 'created_at']
-        read_only_fields = ['skill_id', 'created_at']
+        fields = ['skill_id', 'id', 'skill_name', 'name', 'category', 'description', 'created_at']
+        read_only_fields = ['skill_id', 'id', 'name', 'created_at']
 
 
 class CandidateSkillSerializer(serializers.ModelSerializer):
@@ -115,7 +129,7 @@ class JobSerializer(serializers.ModelSerializer):
     job_type = serializers.CharField(source='employment_type', read_only=True)
     level = serializers.CharField(source='position_level', read_only=True)
     experience_required = serializers.IntegerField(source='years_of_experience_required', read_only=True)
-    deadline = serializers.DateTimeField(source='application_deadline', read_only=True)
+    deadline = serializers.DateField(source='application_deadline', read_only=True)
     skills_required = serializers.SerializerMethodField()
     applications_count = serializers.SerializerMethodField()
 
@@ -149,20 +163,90 @@ class JobSerializer(serializers.ModelSerializer):
 class ApplicationSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='application_id', read_only=True)
     job_title = serializers.CharField(source='job.job_title', read_only=True)
+    job_location = serializers.CharField(source='job.location', read_only=True)
+    job_salary_min = serializers.DecimalField(source='job.salary_min', max_digits=10, decimal_places=2, read_only=True)
+    job_salary_max = serializers.DecimalField(source='job.salary_max', max_digits=10, decimal_places=2, read_only=True)
+    job_employment_type = serializers.CharField(source='job.employment_type', read_only=True)
+    company_id = serializers.IntegerField(source='job.company_id', read_only=True)
     company_name = serializers.CharField(source='job.company.company_name', read_only=True)
+
     candidate_name = serializers.CharField(source='candidate.full_name', read_only=True)
+    candidate_email = serializers.EmailField(source='candidate.user.email', read_only=True)
     candidate_phone = serializers.CharField(source='candidate.phone', read_only=True)
+    candidate_address = serializers.CharField(source='candidate.address', read_only=True)
+    candidate_position = serializers.CharField(source='candidate.desired_position', read_only=True)
+    candidate_experience = serializers.IntegerField(source='candidate.years_of_experience', read_only=True)
+    candidate_summary = serializers.CharField(source='candidate.summary', read_only=True)
     candidate_cv = serializers.CharField(source='candidate.cv_file_url', read_only=True)
+    candidate_skills = serializers.SerializerMethodField()
+    candidate_education = serializers.SerializerMethodField()
+
+    status_label = serializers.SerializerMethodField()
+    ai_match = serializers.SerializerMethodField()
 
     class Meta:
         model = Applications
         fields = [
-            'application_id', 'id', 'job', 'job_title', 'company_name',
-            'candidate', 'candidate_name', 'candidate_phone', 'candidate_cv',
-            'cover_letter', 'status', 'applied_at', 'reviewed_at', 'notes',
+            'application_id', 'id', 'job', 'job_title', 'job_location',
+            'job_salary_min', 'job_salary_max', 'job_employment_type',
+            'company_id', 'company_name',
+            'candidate', 'candidate_name', 'candidate_email', 'candidate_phone',
+            'candidate_address', 'candidate_position', 'candidate_experience',
+            'candidate_summary', 'candidate_cv', 'candidate_skills', 'candidate_education',
+            'cover_letter', 'status', 'status_label', 'ai_match',
+            'applied_at', 'reviewed_at', 'notes',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['application_id', 'applied_at', 'created_at', 'updated_at']
+
+    def get_status_label(self, obj):
+        st = (obj.status or 'pending').lower()
+        return STATUS_VI_MAP.get(st, obj.status)
+
+    def get_candidate_skills(self, obj):
+        if not obj.candidate_id:
+            return []
+        qs = CandidateSkills.objects.filter(candidate_id=obj.candidate_id).select_related('skill')
+        return [
+            {
+                'skill_name': cs.skill.skill_name,
+                'category': cs.skill.category,
+                'proficiency_level': cs.proficiency_level
+            }
+            for cs in qs
+        ]
+
+    def get_candidate_education(self, obj):
+        if not obj.candidate_id:
+            return 'Đại học / Cử nhân'
+        edu = Education.objects.filter(candidate_id=obj.candidate_id).order_by('-start_date').first()
+        if not edu:
+            return 'Đại học / Cử nhân'
+        deg_map = {
+            'Bachelor': 'Cử nhân',
+            'Master': 'Thạc sĩ',
+            'PhD': 'Tiến sĩ',
+            'Doctorate': 'Tiến sĩ',
+            'Associate': 'Cao đẳng',
+        }
+        deg = deg_map.get(edu.degree, edu.degree or 'Cử nhân')
+        parts = [p for p in [edu.major or deg, edu.institution_name] if p and p not in ('Học vấn từ CV', 'None')]
+        return ' · '.join(parts) if parts else deg
+
+    def get_ai_match(self, obj):
+        if not obj.candidate_id or not obj.job_id:
+            return None
+        match = AiMatchResults.objects.filter(candidate_id=obj.candidate_id, job_id=obj.job_id).first()
+        if match:
+            return {
+                'matching_score': float(match.matching_score),
+                'matched_skills': match.matched_skills or [],
+                'missing_skills': match.missing_skills or [],
+                'experience_match': float(match.experience_match or 0),
+                'education_match': float(match.education_match or 0),
+                'overall_recommendation': match.overall_recommendation or ''
+            }
+        return None
 
 
 class SavedJobSerializer(serializers.ModelSerializer):

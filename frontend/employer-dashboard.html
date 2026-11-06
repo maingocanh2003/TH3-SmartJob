@@ -3,251 +3,506 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard Nhà Tuyển Dụng - SmartJob</title>
+  <title>Cổng Nhà Tuyển Dụng & Dashboard BI - SmartJob</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/style.css"/>
 </head>
-<body class="bg-gray-50">
+<body class="bg-slate-50 text-gray-800 min-h-screen flex flex-col lg:flex-row">
 
-<nav class="navbar-blur sticky top-0 z-40 border-b border-gray-100 shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-    <a href="index.html" class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-      </div>
-      <span class="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SmartJob</span>
-    </a>
-    <div class="flex items-center gap-4 text-sm">
-      <a href="bi-dashboard.html" class="text-gray-600 hover:text-blue-600 transition">Báo cáo BI</a>
-      <span class="text-gray-500">Xin chào, <span data-nav-username class="text-blue-600 font-medium"></span></span>
-      <button data-logout class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50" onclick="clearUser(); window.location.href='login.html';">Đăng xuất</button>
-    </div>
-  </div>
-</nav>
-
-<div class="max-w-7xl mx-auto px-4 py-10">
-  <div class="flex items-center justify-between mb-8">
+  <!-- ==================== THANH MENU BÊN TRÁI (LEFT SIDEBAR) ==================== -->
+  <aside class="w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-gray-200 lg:min-h-screen lg:sticky lg:top-0 lg:h-screen flex flex-col justify-between z-30 shadow-xs">
     <div>
-      <h1 class="text-2xl font-bold text-gray-800">Dashboard Tuyển Dụng</h1>
-      <p class="text-gray-500 text-sm mt-1">Quản lý tin tuyển dụng và đơn ứng tuyển</p>
-    </div>
-    <a href="post-job.html" class="px-5 py-2.5 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition flex items-center gap-2">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-      Đăng tin mới
-    </a>
-  </div>
+      <!-- Logo & Portal Badge -->
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-sm">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <span class="font-extrabold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent block leading-none">SmartJob</span>
+            <span class="text-[10px] font-bold text-purple-600 uppercase tracking-wider">Cổng Nhà Tuyển Dụng</span>
+          </div>
+        </a>
+        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">HR / Công ty</span>
+      </div>
 
-  <!-- Stats -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <!-- Mini Company Identity Card -->
+      <div class="p-4 mx-3 mt-4 rounded-2xl bg-gradient-to-br from-purple-50/90 to-indigo-50/70 border border-purple-100 flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg flex-shrink-0 shadow-sm">
+          <span id="emp-avatar-letter">C</span>
         </div>
-        <div>
-          <div id="stat-total-jobs" class="text-2xl font-bold text-gray-800">—</div>
-          <div class="text-xs text-gray-500">Tổng tin đăng</div>
-        </div>
-      </div>
-    </div>
-    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-        <div>
-          <div id="stat-active-jobs" class="text-2xl font-bold text-gray-800">—</div>
-          <div class="text-xs text-gray-500">Đang tuyển</div>
+        <div class="min-w-0 flex-1">
+          <p id="emp-sidebar-name" data-nav-username class="font-bold text-sm text-gray-900 truncate">Nhà tuyển dụng</p>
+          <p id="emp-sidebar-industry" class="text-xs text-purple-700 font-medium truncate mt-0.5">Doanh nghiệp công nghệ</p>
+          <span class="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-semibold mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã xác thực doanh nghiệp
+          </span>
         </div>
       </div>
-    </div>
-    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-          <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        </div>
-        <div>
-          <div id="stat-total-apps" class="text-2xl font-bold text-gray-800">—</div>
-          <div class="text-xs text-gray-500">Tổng đơn nhận</div>
-        </div>
-      </div>
-    </div>
-    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-          <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-        <div>
-          <div id="stat-pending-apps" class="text-2xl font-bold text-gray-800">—</div>
-          <div class="text-xs text-gray-500">Chờ duyệt</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <!-- Job listings -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
-      <div class="flex items-center justify-between p-6 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-800">Tin Tuyển Dụng Của Bạn</h2>
-        <a href="post-job.html" class="text-sm text-blue-600 hover:underline">+ Thêm mới</a>
-      </div>
-      <div id="jobs-table" class="overflow-x-auto">
-        <div class="p-6 space-y-3">
-          <div class="animate-pulse h-12 bg-gray-100 rounded-xl"></div>
-          <div class="animate-pulse h-12 bg-gray-100 rounded-xl"></div>
-          <div class="animate-pulse h-12 bg-gray-100 rounded-xl"></div>
-        </div>
-      </div>
+      <!-- 4 Tabs Menu Điều Hướng Nhà Tuyển Dụng -->
+      <nav class="p-3 mt-2 space-y-1.5" aria-label="Menu nhà tuyển dụng">
+        <p class="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Quản trị tuyển dụng & BI</p>
+
+        <!-- Tab 1: Dashboard BI -->
+        <button type="button" data-emp-tab="bi" class="emp-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition bg-blue-600 text-white shadow-sm">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span>Dashboard BI</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-semibold">Superset</span>
+        </button>
+
+        <!-- Tab 2: Quản lý tin tuyển dụng -->
+        <button type="button" data-emp-tab="jobs" class="emp-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>Quản lý tin tuyển dụng</span>
+          </span>
+          <span id="emp-badge-jobs" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold">0</span>
+        </button>
+
+        <!-- Tab 3: Quản lý hồ sơ ứng viên -->
+        <button type="button" data-emp-tab="candidates" class="emp-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Quản lý hồ sơ ứng viên</span>
+          </span>
+          <span id="emp-badge-candidates" class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold">0</span>
+        </button>
+
+        <!-- Tab 4: Quản lý quy trình tuyển dụng -->
+        <button type="button" data-emp-tab="pipeline" class="emp-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            <span>Quản lý quy trình tuyển dụng</span>
+          </span>
+          <span id="emp-badge-pipeline" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">0</span>
+        </button>
+      </nav>
     </div>
 
-    <!-- Applications -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
-      <div class="flex items-center justify-between p-6 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-800">Đơn Ứng Tuyển Mới Nhất</h2>
-        <span class="text-xs text-gray-400">Cập nhật trạng thái trực tiếp</span>
-      </div>
-      <div id="apps-list" class="p-6 space-y-3">
-        <div class="animate-pulse h-16 bg-gray-100 rounded-xl"></div>
-        <div class="animate-pulse h-16 bg-gray-100 rounded-xl"></div>
-        <div class="animate-pulse h-16 bg-gray-100 rounded-xl"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recommended candidates (from a specific job) -->
-  <div id="recommended-section" class="hidden mt-8 bg-white rounded-2xl shadow-sm border border-gray-100">
-    <div class="flex items-center justify-between p-6 border-b border-gray-100">
-      <div>
-        <h2 class="font-semibold text-gray-800">Ứng Viên Được AI Gợi Ý</h2>
-        <p id="rec-job-title" class="text-xs text-gray-400 mt-0.5"></p>
-      </div>
-      <button id="btn-close-recs" class="text-gray-400 hover:text-gray-600">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    <!-- DƯỚI CÙNG: NÚT ĐĂNG XUẤT -->
+    <div class="p-4 border-t border-gray-100 bg-gray-50/50 space-y-2">
+      <a href="index.html" class="w-full px-3.5 py-2 text-xs font-semibold text-gray-600 hover:text-blue-600 rounded-xl hover:bg-white transition flex items-center justify-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Trang chủ tìm việc</span>
+      </a>
+      <button type="button" data-logout onclick="clearUser(); window.location.href='login.html';"
+        class="w-full px-4 py-3 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition flex items-center justify-center gap-2 shadow-2xs">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <span>Đăng xuất</span>
       </button>
     </div>
-    <div id="recs-grid" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-  </div>
-</div>
+  </aside>
 
-<script src="js/api.js?v=20261104_03"></script>
-<script src="js/auth.js?v=20261104_03"></script>
-<script>
-const STATUS_LABELS = { pending: 'Chờ duyệt', reviewed: 'Đã xem', accepted: 'Chấp nhận', rejected: 'Từ chối' };
-const STATUS_COLORS = { pending: 'bg-yellow-100 text-yellow-700', reviewed: 'bg-blue-100 text-blue-700', accepted: 'bg-green-100 text-green-700', rejected: 'bg-red-100 text-red-700' };
+  <!-- ==================== NỘI DUNG CHÍNH BÊN PHẢI (MAIN CONTENT) ==================== -->
+  <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
 
-async function loadDashboard() {
-  const user = getUser();
-  const companyId = user.company_id;
-  let jobs = [];
-  let apps = [];
+    <!-- ==================== TAB 1: DASHBOARD BI (KPIs + BIỂU ĐỒ THỜI GIAN + NHÚNG APACHE SUPERSET) ==================== -->
+    <section id="emp-panel-bi" class="emp-tab-panel space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tab 1 · Business Intelligence & Apache Superset</span>
+          <h1 class="text-2xl font-extrabold text-gray-900 mt-0.5">Dashboard BI Thống Kê Tuyển Dụng</h1>
+          <p class="text-xs text-gray-500 mt-1">Theo dõi thời gian thực các chỉ số KPI tuyển dụng, biểu đồ thống kê hồ sơ ứng tuyển theo thời gian và bảng điều khiển Apache Superset được nhúng trực tiếp.</p>
+        </div>
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+          <button type="button" id="btn-refresh-bi" class="px-4 py-2.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold hover:bg-blue-100 transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Làm mới số liệu BI</span>
+          </button>
+          <a id="btn-open-superset" href="http://localhost:8088/superset/dashboard/smartjob-bi/?standalone=true" target="_blank"
+            class="px-4 py-2.5 gradient-primary text-white rounded-xl text-xs font-bold hover:opacity-95 transition flex items-center gap-1.5 shadow-xs">
+            <span>Mở Superset toàn màn hình ↗</span>
+          </a>
+        </div>
+      </div>
 
-  // Load jobs
-  try {
-    const jData = await apiGet(companyId ? `/companies/${companyId}/jobs/` : `/jobs/`);
-    jobs = jData.results ?? jData;
-
-    document.getElementById('stat-total-jobs').textContent = jobs.length;
-    document.getElementById('stat-active-jobs').textContent = jobs.filter(j => j.status === 'active').length;
-
-    document.getElementById('jobs-table').innerHTML = jobs.length ? `
-      <div class="divide-y divide-gray-50">
-        ${jobs.map(j => `
-        <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition">
-          <div class="flex-1 min-w-0">
-            <p class="font-medium text-sm text-gray-800 truncate">${j.title}</p>
-            <p class="text-xs text-gray-400">${j.location || ''} · ${j.applications_count ?? 0} đơn</p>
+      <!-- 4 Thẻ Chỉ Số KPI Trọng Tâm -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1: Tổng số tin tuyển dụng đang hoạt động -->
+        <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100 flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Tin tuyển dụng đang hoạt động</span>
+            <p id="bi-kpi-active-jobs" class="text-3xl font-black text-blue-600 mt-2">0</p>
+            <p class="text-[11px] text-gray-500 mt-1">Tin đang mở nhận hồ sơ</p>
           </div>
-          <span class="text-xs px-2.5 py-1 rounded-full font-medium ${j.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">${j.status === 'active' ? 'Đang tuyển' : 'Đã đóng'}</span>
-          <button onclick="loadRecommended(${j.id}, '${j.title}')" class="text-xs px-3 py-1.5 text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition flex-shrink-0">AI gợi ý</button>
-          <a href="job-detail.html?id=${j.id}" class="text-xs px-3 py-1.5 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition flex-shrink-0">Xem</a>
-        </div>`).join('')}
-      </div>` :
-      '<div class="p-6 text-center text-gray-400"><p class="mb-4">Bạn chưa có tin tuyển dụng nào.</p><a href="post-job.html" class="text-blue-600 hover:underline">Đăng tin ngay</a></div>';
-  } catch (err) {
-    document.getElementById('jobs-table').innerHTML = `<div class="p-6 text-center text-red-400">Lỗi: ${err.message}</div>`;
-  }
-
-  // Load applications
-  try {
-    const aData = await apiGet('/applications/');
-    apps = aData.results ?? aData;
-
-    document.getElementById('stat-total-apps').textContent = apps.length;
-    document.getElementById('stat-pending-apps').textContent = apps.filter(a => a.status === 'pending').length;
-
-    document.getElementById('apps-list').innerHTML = apps.length ? apps.slice(0, 8).map(a => `
-      <div class="flex items-center gap-4 p-3 border border-gray-100 rounded-xl">
-        <div class="w-9 h-9 gradient-primary rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-          ${(a.candidate_name || a.candidate?.full_name || 'U')[0].toUpperCase()}
+          <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm text-gray-800 truncate">${a.candidate_name || a.candidate?.full_name || 'Ứng viên'}</p>
-          <p class="text-xs text-gray-400 truncate">${a.job_title || a.job?.title || 'Việc làm'}</p>
+
+        <!-- KPI 2: Tổng số hồ sơ ứng tuyển -->
+        <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100 flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Tổng số hồ sơ ứng tuyển</span>
+            <p id="bi-kpi-total-apps" class="text-3xl font-black text-purple-600 mt-2">0</p>
+            <p class="text-[11px] text-gray-500 mt-1">Hồ sơ CV đã tiếp nhận</p>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
         </div>
-        <select onchange="updateAppStatus(${a.id ?? a.application_id}, this.value)" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400">
-          ${Object.entries(STATUS_LABELS).map(([v, l]) => `<option value="${v}" ${a.status === v ? 'selected' : ''}>${l}</option>`).join('')}
-        </select>
-      </div>`).join('') :
-      '<p class="text-center text-gray-400 py-6 text-sm">Chưa có đơn ứng tuyển nào</p>';
-  } catch (err) {
-    document.getElementById('apps-list').innerHTML = `<p class="text-red-400 text-sm">Lỗi: ${err.message}</p>`;
-  }
-}
 
-async function updateAppStatus(appId, status) {
-  try {
-    await apiPatch(`/applications/${appId}/update_status/`, { status });
-    showToast('Cập nhật trạng thái thành công!', 'success');
-    // Update pending count
-    const aData = await apiGet('/applications/');
-    const apps = aData.results ?? aData;
-    document.getElementById('stat-pending-apps').textContent = apps.filter(a => a.status === 'pending').length;
-  } catch (err) { showToast('Lỗi cập nhật: ' + err.message, 'error'); }
-}
-
-async function loadRecommended(jobId, jobTitle) {
-  const sec = document.getElementById('recommended-section');
-  const grid = document.getElementById('recs-grid');
-  document.getElementById('rec-job-title').textContent = `Gợi ý cho: ${jobTitle}`;
-  sec.classList.remove('hidden');
-  grid.innerHTML = '<div class="animate-pulse h-20 bg-gray-100 rounded-xl col-span-2"></div>';
-  sec.scrollIntoView({ behavior: 'smooth' });
-
-  try {
-    const data = await apiGet(`/jobs/${jobId}/recommended_candidates/`);
-    const candidates = data.results ?? data;
-    if (!candidates.length) {
-      grid.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-8">Chưa có ứng viên phù hợp</p>';
-      return;
-    }
-    grid.innerHTML = candidates.slice(0, 6).map(c => {
-      const score = c.match_score ?? c.score ?? null;
-      const colors = score !== null ? scoreColor(score) : { text: 'text-gray-500', bg: 'bg-gray-100' };
-      return `
-      <div class="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-purple-200 transition">
-        <div class="w-10 h-10 gradient-primary rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-          ${(c.full_name || c.name || 'U')[0].toUpperCase()}
+        <!-- KPI 3: Số lượng ứng viên đang chờ xử lý -->
+        <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100 flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Ứng viên đang chờ xử lý</span>
+            <p id="bi-kpi-pending-apps" class="text-3xl font-black text-amber-600 mt-2">0</p>
+            <p class="text-[11px] text-gray-500 mt-1">Trạng thái: Đã tiếp nhận</p>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-medium text-sm text-gray-800">${c.full_name || c.name || 'Ứng viên'}</p>
-          <p class="text-xs text-gray-400">${c.desired_position || c.job_title || ''}</p>
-        </div>
-        ${score !== null ? `<div class="text-center flex-shrink-0"><div class="text-lg font-bold ${colors.text}">${score}%</div><div class="text-xs text-gray-400">Match</div></div>` : ''}
-      </div>`;
-    }).join('');
-  } catch (err) {
-    grid.innerHTML = `<p class="col-span-2 text-center text-red-400 py-6">Lỗi: ${err.message}</p>`;
-  }
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  if (!requireLogin()) return;
-  loadDashboard();
-  document.getElementById('btn-close-recs').addEventListener('click', () => {
-    document.getElementById('recommended-section').classList.add('hidden');
-  });
-});
-</script>
+        <!-- KPI 4: Tỷ lệ tuyển dụng thành công -->
+        <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100 flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Tỷ lệ tuyển dụng thành công</span>
+            <p id="bi-kpi-hiring-rate" class="text-3xl font-black text-emerald-600 mt-2">0%</p>
+            <p id="bi-kpi-hiring-sub" class="text-[11px] text-gray-500 mt-1">0 ứng viên trúng tuyển</p>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khối Biểu Đồ Thống Kê Hồ Sơ Ứng Tuyển Theo Thời Gian & Phân Bổ Trạng Thái -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Biểu đồ thống kê hồ sơ ứng tuyển theo thời gian -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-xs border border-gray-100">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-base font-extrabold text-gray-900">📈 Biểu Đồ Thống Kê Hồ Sơ Ứng Tuyển Theo Thời Gian</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Số lượng hồ sơ nộp vào hệ thống và số lượng trúng tuyển theo từng ngày (View: <code>bi.vw_applications_over_time</code>)</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Real-time SQL</span>
+          </div>
+          <div id="bi-timeseries-chart" class="h-60 flex items-end gap-3 pt-6 pb-2 px-2 border-b border-gray-100">
+            <p class="text-xs text-gray-400 m-auto">Đang tải biểu đồ thống kê theo thời gian...</p>
+          </div>
+          <div id="bi-timeseries-legend" class="flex items-center justify-between text-[11px] text-gray-500 mt-3">
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-blue-600 inline-block"></span> Tổng hồ sơ ứng tuyển</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-emerald-500 inline-block"></span> Hồ sơ trúng tuyển</span>
+            </div>
+            <span id="bi-timeseries-summary" class="font-semibold text-gray-700"></span>
+          </div>
+        </div>
+
+        <!-- Phân bổ hồ sơ theo trạng thái quy trình tuyển dụng -->
+        <div class="bg-white rounded-2xl p-6 shadow-xs border border-gray-100 flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-extrabold text-gray-900">📊 Tỷ Trọng Trạng Thái Hồ Sơ</h3>
+            <p class="text-xs text-gray-500 mt-0.5 mb-4">Phân bổ ứng viên ở từng bước quy trình</p>
+            <div id="bi-status-breakdown" class="space-y-3"></div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+            <span class="text-gray-500">Cập nhật trực tiếp từ CSDL</span>
+            <button type="button" onclick="switchEmployerTab('pipeline')" class="font-bold text-blue-600 hover:underline">Cập nhật quy trình &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KHỐI NHÚNG TRỰC TIẾP TRANG APACHE SUPERSET DASHBOARD -->
+      <div class="bg-white rounded-2xl shadow-xs border border-gray-200 overflow-hidden">
+        <div class="p-4 sm:px-6 bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-emerald-400 font-black text-sm border border-white/15">
+              BI
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-extrabold">Apache Superset Embedded Dashboard — SmartJob BI Tuyển Dụng</h2>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Live Port 8088</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-0.5">Bảng điều khiển tương tác xây dựng trên Apache Superset kết nối trực tiếp PostgreSQL (<code>bi.vw_dashboard_kpis</code>, <code>bi.vw_applications_over_time</code>)</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-reload-superset" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition">
+              ↻ Tải lại khung Superset
+            </button>
+          </div>
+        </div>
+
+        <div class="relative w-full bg-slate-100" style="height: 760px;">
+          <iframe
+            id="superset-iframe"
+            src="http://localhost:8088/superset/dashboard/smartjob-bi/?standalone=true"
+            title="Apache Superset SmartJob BI Dashboard"
+            class="w-full h-full border-0"
+            loading="lazy"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: QUẢN LÝ TIN TUYỂN DỤNG (TẠO, ĐĂNG, SỬA, GIA HẠN, XÓA) ==================== -->
+    <section id="emp-panel-jobs" class="emp-tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tab 2 · Quản Trị Tin Tuyển Dụng</span>
+          <h1 class="text-2xl font-extrabold text-gray-900 mt-0.5">Quản Lý Tin Tuyển Dụng</h1>
+          <p class="text-xs text-gray-500 mt-1">Tạo mới, đăng tải, chỉnh sửa nội dung, gia hạn thời hạn nhận hồ sơ và xóa các tin tuyển dụng của doanh nghiệp.</p>
+        </div>
+        <button type="button" id="btn-open-create-job" class="px-5 py-2.5 gradient-primary text-white rounded-xl text-xs font-extrabold hover:opacity-95 transition shadow-sm flex items-center gap-2 self-start sm:self-auto">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Tạo & Đăng Tin Tuyển Dụng Mới</span>
+        </button>
+      </div>
+
+      <!-- Bộ lọc tìm kiếm tin tuyển dụng -->
+      <div class="bg-white rounded-2xl p-4 shadow-xs border border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-1">
+          <input type="text" id="job-filter-search" placeholder="Tìm theo tiêu đề công việc, địa điểm..."
+            class="w-full sm:max-w-xs px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          <select id="job-filter-status" class="px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Tất cả trạng thái</option>
+            <option value="active">Đang hoạt động (Active)</option>
+            <option value="closed">Đã đóng (Closed)</option>
+            <option value="draft">Bản nháp (Draft)</option>
+          </select>
+        </div>
+        <span id="jobs-count-summary" class="text-xs font-bold text-gray-500">Hiển thị 0 tin tuyển dụng</span>
+      </div>
+
+      <!-- Danh sách tin tuyển dụng -->
+      <div id="emp-jobs-list" class="space-y-4"></div>
+    </section>
+
+    <!-- ==================== TAB 3: QUẢN LÝ HỒ SƠ ỨNG VIÊN ==================== -->
+    <section id="emp-panel-candidates" class="emp-tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">Tab 3 · Hồ Sơ Ứng Viên Đã Ứng Tuyển</span>
+          <h1 class="text-2xl font-extrabold text-gray-900 mt-0.5">Quản Lý Hồ Sơ Ứng Viên</h1>
+          <p class="text-xs text-gray-500 mt-1">Xem danh sách ứng viên đã nộp đơn, thông tin cá nhân trích xuất từ CV, điểm tương thích AI Matching và tệp CV gốc.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="cand-filter-job" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="">Tất cả vị trí tuyển dụng</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Danh sách thẻ hồ sơ ứng viên -->
+      <div id="emp-candidates-list" class="space-y-4"></div>
+    </section>
+
+    <!-- ==================== TAB 4: QUẢN LÝ QUY TRÌNH TUYỂN DỤNG ==================== -->
+    <section id="emp-panel-pipeline" class="emp-tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Tab 4 · Đồng Bộ Trạng Thái Tuyển Dụng</span>
+          <h1 class="text-2xl font-extrabold text-gray-900 mt-0.5">Quản Lý Quy Trình Tuyển Dụng</h1>
+          <p class="text-xs text-gray-500 mt-1">Cập nhật trạng thái xử lý hồ sơ: <strong>Đã tiếp nhận, Đang xem xét, Mời phỏng vấn, Trúng tuyển, Từ chối</strong>. Mọi thay đổi được đồng bộ tức thì sang trang "Ứng tuyển của tôi" của ứng viên.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="pipeline-filter-status" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Tất cả trạng thái xử lý</option>
+            <option value="pending">Đã tiếp nhận</option>
+            <option value="reviewing">Đang xem xét</option>
+            <option value="interviewed">Mời phỏng vấn</option>
+            <option value="offered">Trúng tuyển</option>
+            <option value="rejected">Từ chối</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 5 Cột Thống Kê Nhanh Quy Trình Tuyển Dụng -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div class="bg-white p-4 rounded-2xl border border-amber-200 text-center">
+          <p id="pipe-count-pending" class="text-2xl font-black text-amber-600">0</p>
+          <p class="text-xs font-bold text-gray-700 mt-0.5">1. Đã tiếp nhận</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-blue-200 text-center">
+          <p id="pipe-count-reviewing" class="text-2xl font-black text-blue-600">0</p>
+          <p class="text-xs font-bold text-gray-700 mt-0.5">2. Đang xem xét</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-purple-200 text-center">
+          <p id="pipe-count-interviewed" class="text-2xl font-black text-purple-600">0</p>
+          <p class="text-xs font-bold text-gray-700 mt-0.5">3. Mời phỏng vấn</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-emerald-200 text-center">
+          <p id="pipe-count-offered" class="text-2xl font-black text-emerald-600">0</p>
+          <p class="text-xs font-bold text-gray-700 mt-0.5">4. Trúng tuyển</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-rose-200 text-center col-span-2 sm:col-span-1">
+          <p id="pipe-count-rejected" class="text-2xl font-black text-rose-600">0</p>
+          <p class="text-xs font-bold text-gray-700 mt-0.5">5. Từ chối</p>
+        </div>
+      </div>
+
+      <!-- Danh sách hồ sơ cần xử lý quy trình -->
+      <div id="emp-pipeline-list" class="space-y-4"></div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL TẠO / CHỈNH SỬA TIN TUYỂN DỤNG ==================== -->
+  <div id="job-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-gray-100 space-y-4 my-8">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div>
+          <span id="job-modal-badge" class="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Đăng tin tuyển dụng</span>
+          <h3 id="job-modal-title" class="text-lg font-extrabold text-gray-900">Tạo Tin Tuyển Dụng Mới</h3>
+        </div>
+        <button type="button" id="btn-close-job-modal" class="text-gray-400 hover:text-gray-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="job-form" class="space-y-4">
+        <input type="hidden" id="form-job-id" value=""/>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề tin tuyển dụng *</label>
+            <input type="text" id="form-job-title" required placeholder="VD: Senior Python Backend Engineer (Django / AI)"
+              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Loại hình công việc</label>
+            <select id="form-job-type" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="full-time">Toàn thời gian (Full-time)</option>
+              <option value="part-time">Bán thời gian (Part-time)</option>
+              <option value="contract">Hợp đồng (Contract)</option>
+              <option value="internship">Thực tập (Internship)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Trạng thái đăng tin</label>
+            <select id="form-job-status" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="active">Đăng ngay (Đang hoạt động)</option>
+              <option value="draft">Lưu nháp (Draft)</option>
+              <option value="closed">Tạm đóng (Closed)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Địa điểm làm việc *</label>
+            <input type="text" id="form-job-location" required placeholder="VD: Hà Nội / TP. Hồ Chí Minh"
+              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Số năm kinh nghiệm yêu cầu</label>
+            <input type="number" id="form-job-exp" min="0" max="20" value="2"
+              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Mức lương tối thiểu (VNĐ)</label>
+            <input type="number" id="form-job-salary-min" step="1000000" placeholder="VD: 20000000"
+              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Mức lương tối đa (VNĐ)</label>
+            <input type="number" id="form-job-salary-max" step="1000000" placeholder="VD: 40000000"
+              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1">Hạn nộp hồ sơ (Gia hạn / Đặt lịch)</label>
+            <input type="date" id="form-job-deadline"
+              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-gray-700">Mô tả công việc & Yêu cầu chuyên môn (JD) *</label>
+            <button type="button" id="btn-ai-extract-jd-skills" class="text-[11px] font-bold text-purple-600 hover:underline">
+              ✨ Dùng AI bóc tách kỹ năng từ JD
+            </button>
+          </div>
+          <textarea id="form-job-description" rows="4" required placeholder="Mô tả chi tiết công việc, trách nhiệm và yêu cầu công nghệ (VD: Python, Django, PostgreSQL, Docker, AWS...)"
+            class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Danh sách kỹ năng yêu cầu (phân cách bởi dấu phẩy)</label>
+          <input type="text" id="form-job-skills" placeholder="VD: Python, Django, PostgreSQL, Docker, REST API"
+            class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
+          <button type="button" id="btn-cancel-job-modal" class="px-4 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50">
+            Hủy
+          </button>
+          <button type="submit" id="btn-save-job" class="px-6 py-2.5 gradient-primary text-white rounded-xl text-xs font-extrabold hover:opacity-95 shadow-sm">
+            Lưu & Đăng Tin Tuyển Dụng
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL GIA HẠN TIN TUYỂN DỤNG ==================== -->
+  <div id="extend-job-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Gia hạn thời hạn nhận hồ sơ</span>
+          <h3 id="extend-modal-job-title" class="text-base font-extrabold text-gray-900 mt-0.5">Tin tuyển dụng</h3>
+        </div>
+        <button type="button" id="btn-close-extend-modal" class="text-gray-400 hover:text-gray-600 p-1">✕</button>
+      </div>
+
+      <input type="hidden" id="extend-job-id" value=""/>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Chọn số ngày gia hạn thêm:</label>
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <button type="button" data-extend-days="15" class="btn-quick-extend px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold hover:border-blue-500 hover:text-blue-600">+15 ngày</button>
+          <button type="button" data-extend-days="30" class="btn-quick-extend px-3 py-2 rounded-xl border border-blue-500 bg-blue-50 text-blue-700 text-xs font-bold">+30 ngày</button>
+          <button type="button" data-extend-days="60" class="btn-quick-extend px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold hover:border-blue-500 hover:text-blue-600">+60 ngày</button>
+        </div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">Hoặc chọn ngày hết hạn cụ thể:</label>
+        <input type="date" id="extend-deadline-input" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button type="button" id="btn-cancel-extend" class="px-4 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-600">Hủy</button>
+        <button type="button" id="btn-confirm-extend" class="px-5 py-2 bg-emerald-600 text-white rounded-xl text-xs font-extrabold hover:bg-emerald-700">
+          Xác nhận gia hạn & kích hoạt
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL CHI TIẾT HỒ SƠ ỨNG VIÊN ==================== -->
+  <div id="candidate-detail-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-gray-100 space-y-4 my-8">
+      <div class="flex items-start justify-between gap-3 border-b border-gray-100 pb-4">
+        <div>
+          <span class="text-[11px] font-bold text-purple-600 uppercase tracking-wider">Hồ sơ ứng viên trích xuất từ CV</span>
+          <h3 id="cand-modal-name" class="text-xl font-extrabold text-gray-900 mt-0.5">Họ tên ứng viên</h3>
+          <p id="cand-modal-position" class="text-xs font-bold text-blue-600">Vị trí chuyên môn</p>
+        </div>
+        <button type="button" id="btn-close-cand-modal" class="text-gray-400 hover:text-gray-600 p-1">✕</button>
+      </div>
+
+      <div id="cand-modal-body" class="space-y-4 text-xs"></div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+        <button type="button" id="btn-close-cand-modal-bottom" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-xs font-bold text-gray-700">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js?v=20261106_01"></script>
+  <script src="js/auth.js?v=20261106_01"></script>
+  <script src="js/employer.js?v=20261106_01"></script>
 </body>
 </html>
