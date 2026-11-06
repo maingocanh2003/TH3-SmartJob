@@ -1,214 +1,26 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartJob - Tìm Việc Làm Thông Minh</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="css/style.css"/>
+  <title>SmartJob AI — Đang chuyển hướng...</title>
+  <script src="js/api.js?v=20261106_02"></script>
+  <script>
+    (function () {
+      try {
+        if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+          const u = getUser();
+          if (u && (u.user_type === 'company' || u.user_type === 'admin')) {
+            window.location.replace('employer-dashboard.html');
+            return;
+          }
+          window.location.replace('candidate-profile.html');
+          return;
+        }
+      } catch (e) {}
+      window.location.replace('login.html');
+    })();
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-800">
-
-<!-- NAVBAR -->
-<nav class="navbar-blur sticky top-0 z-40 border-b border-gray-100 shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-    <a href="index.html" class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-      </div>
-      <span class="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SmartJob</span>
-    </a>
-
-    <div class="hidden md:flex items-center gap-6 text-sm font-medium">
-      <a href="index.html" class="text-blue-600">Trang chủ</a>
-      <a href="index.html#jobs" class="text-gray-600 hover:text-blue-600 transition">Việc làm</a>
-      <a href="bi-dashboard.html" class="text-gray-600 hover:text-blue-600 transition">Thị trường</a>
-      <div data-nav-login class="flex items-center gap-3">
-        <a href="login.html" class="text-gray-600 hover:text-blue-600 transition">Đăng nhập</a>
-        <a href="login.html" class="px-4 py-2 gradient-primary text-white rounded-lg hover:opacity-90 transition text-sm">Đăng ký</a>
-      </div>
-      <div data-nav-user class="hidden items-center gap-3">
-        <span class="text-gray-600">Xin chào, <span data-nav-username class="font-semibold text-blue-600"></span></span>
-        <a href="candidate-profile.html" class="text-gray-600 hover:text-blue-600 transition" id="nav-profile-link">Hồ sơ</a>
-        <a href="employer-dashboard.html" class="text-gray-600 hover:text-blue-600 transition hidden" id="nav-dashboard-link">Dashboard</a>
-        <button data-logout class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition" onclick="clearUser(); window.location.href='login.html';">Đăng xuất</button>
-      </div>
-    </div>
-
-    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
-  </div>
-  <!-- Mobile menu -->
-  <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100 px-4 py-3 space-y-2">
-    <a href="index.html" class="block py-2 text-blue-600 font-medium">Trang chủ</a>
-    <a href="bi-dashboard.html" class="block py-2 text-gray-600">Thị trường</a>
-    <a href="login.html" class="block py-2 text-gray-600" data-nav-login>Đăng nhập / Đăng ký</a>
-    <div data-nav-user class="hidden">
-      <a href="candidate-profile.html" class="block py-2 text-gray-600">Hồ sơ</a>
-      <button data-logout class="block w-full text-left py-2 text-red-500" onclick="clearUser(); window.location.href='login.html';">Đăng xuất</button>
-    </div>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="gradient-hero text-white py-20 px-4">
-  <div class="max-w-4xl mx-auto text-center">
-    <div class="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm mb-6">
-      <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-      AI Matching Technology
-    </div>
-    <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-      Tìm Việc Làm <span class="text-yellow-300">Thông Minh</span><br/>với AI Matching
-    </h1>
-    <p class="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">Kết nối ứng viên với công việc phù hợp nhất dựa trên AI. Điểm Matching Score giúp bạn biết mức độ phù hợp ngay lập tức.</p>
-
-    <!-- Search -->
-    <div class="bg-white rounded-2xl p-4 shadow-2xl">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <input id="search-keyword" type="text" placeholder="🔍 Từ khóa, chức danh..."
-          class="col-span-1 md:col-span-2 px-4 py-3 border border-gray-200 rounded-xl text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-        <input id="search-location" type="text" placeholder="📍 Địa điểm"
-          class="px-4 py-3 border border-gray-200 rounded-xl text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-        <button id="btn-search" class="gradient-primary text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition">
-          Tìm kiếm
-        </button>
-      </div>
-      <div class="flex flex-wrap gap-2 mt-3 justify-center">
-        <span class="text-xs text-gray-400">Phổ biến:</span>
-        <button class="quick-tag text-xs px-3 py-1 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition">Python Developer</button>
-        <button class="quick-tag text-xs px-3 py-1 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition">UI/UX Designer</button>
-        <button class="quick-tag text-xs px-3 py-1 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition">Data Analyst</button>
-        <button class="quick-tag text-xs px-3 py-1 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition">Project Manager</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- STATS -->
-<section class="bg-white py-12 border-b">
-  <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-    <div>
-      <div id="stat-jobs" class="text-3xl font-bold text-blue-600">--</div>
-      <div class="text-gray-500 text-sm mt-1">Việc làm đang tuyển</div>
-    </div>
-    <div>
-      <div id="stat-companies" class="text-3xl font-bold text-purple-600">--</div>
-      <div class="text-gray-500 text-sm mt-1">Công ty đối tác</div>
-    </div>
-    <div>
-      <div id="stat-candidates" class="text-3xl font-bold text-green-600">--</div>
-      <div class="text-gray-500 text-sm mt-1">Ứng viên đăng ký</div>
-    </div>
-    <div>
-      <div id="stat-applications" class="text-3xl font-bold text-orange-600">--</div>
-      <div class="text-gray-500 text-sm mt-1">Đơn ứng tuyển</div>
-    </div>
-  </div>
-</section>
-
-<!-- JOBS LIST -->
-<section id="jobs" class="max-w-7xl mx-auto px-4 py-14">
-  <div class="flex items-center justify-between mb-8">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800">Việc Làm Nổi Bật</h2>
-      <p class="text-gray-500 text-sm mt-1">Cơ hội việc làm mới nhất từ các công ty hàng đầu</p>
-    </div>
-    <!-- Filter -->
-    <div class="hidden md:flex gap-3">
-      <select id="filter-industry" class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="">Tất cả ngành</option>
-        <option value="IT">Công nghệ thông tin</option>
-        <option value="Finance">Tài chính</option>
-        <option value="Marketing">Marketing</option>
-        <option value="Design">Thiết kế</option>
-        <option value="Sales">Kinh doanh</option>
-      </select>
-      <select id="filter-location" class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="">Tất cả địa điểm</option>
-        <option value="Hà Nội">Hà Nội</option>
-        <option value="TP.HCM">TP.HCM</option>
-        <option value="Đà Nẵng">Đà Nẵng</option>
-        <option value="Remote">Remote</option>
-      </select>
-    </div>
-  </div>
-
-  <div id="jobs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Loading skeleton -->
-    <div class="animate-pulse bg-white rounded-2xl p-6 border"><div class="h-5 bg-gray-200 rounded w-3/4 mb-3"></div><div class="h-4 bg-gray-100 rounded w-1/2 mb-6"></div><div class="h-8 bg-gray-100 rounded"></div></div>
-    <div class="animate-pulse bg-white rounded-2xl p-6 border"><div class="h-5 bg-gray-200 rounded w-3/4 mb-3"></div><div class="h-4 bg-gray-100 rounded w-1/2 mb-6"></div><div class="h-8 bg-gray-100 rounded"></div></div>
-    <div class="animate-pulse bg-white rounded-2xl p-6 border"><div class="h-5 bg-gray-200 rounded w-3/4 mb-3"></div><div class="h-4 bg-gray-100 rounded w-1/2 mb-6"></div><div class="h-8 bg-gray-100 rounded"></div></div>
-  </div>
-
-  <div class="text-center mt-10">
-    <button id="btn-load-more" class="px-8 py-3 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition hidden">
-      Xem thêm việc làm
-    </button>
-  </div>
-</section>
-
-<!-- TOP SKILLS -->
-<section class="bg-white py-14">
-  <div class="max-w-7xl mx-auto px-4">
-    <h2 class="text-2xl font-bold text-gray-800 mb-2">Top Kỹ Năng Được Tìm Kiếm</h2>
-    <p class="text-gray-500 text-sm mb-8">Dữ liệu từ thị trường tuyển dụng thực tế</p>
-    <div id="skills-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      <div class="animate-pulse bg-gray-100 h-20 rounded-xl"></div>
-      <div class="animate-pulse bg-gray-100 h-20 rounded-xl"></div>
-      <div class="animate-pulse bg-gray-100 h-20 rounded-xl"></div>
-      <div class="animate-pulse bg-gray-100 h-20 rounded-xl"></div>
-      <div class="animate-pulse bg-gray-100 h-20 rounded-xl"></div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="gradient-primary py-16 text-white text-center px-4">
-  <h2 class="text-3xl font-bold mb-3">Bạn là nhà tuyển dụng?</h2>
-  <p class="text-blue-100 mb-8 max-w-xl mx-auto">Đăng tin tuyển dụng miễn phí và tìm kiếm ứng viên phù hợp với AI Matching Score</p>
-  <div class="flex flex-col sm:flex-row gap-4 justify-center">
-    <a href="post-job.html" class="px-8 py-3 bg-white text-blue-600 rounded-xl font-bold hover:bg-blue-50 transition">Đăng tin ngay</a>
-    <a href="employer-dashboard.html" class="px-8 py-3 border-2 border-white text-white rounded-xl font-bold hover:bg-white/10 transition">Dashboard tuyển dụng</a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="bg-gray-900 text-gray-400 py-12">
-  <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
-    <div class="col-span-1 md:col-span-2">
-      <div class="flex items-center gap-2 mb-4">
-        <div class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        </div>
-        <span class="text-white font-bold text-xl">SmartJob</span>
-      </div>
-      <p class="text-sm leading-relaxed">Nền tảng tuyển dụng thông minh với AI Matching Score, kết nối ứng viên và nhà tuyển dụng hiệu quả nhất.</p>
-    </div>
-    <div>
-      <h4 class="text-white font-semibold mb-4">Ứng viên</h4>
-      <ul class="space-y-2 text-sm">
-        <li><a href="index.html" class="hover:text-white transition">Tìm việc làm</a></li>
-        <li><a href="candidate-profile.html" class="hover:text-white transition">Hồ sơ của tôi</a></li>
-        <li><a href="bi-dashboard.html" class="hover:text-white transition">Thị trường lao động</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4 class="text-white font-semibold mb-4">Nhà tuyển dụng</h4>
-      <ul class="space-y-2 text-sm">
-        <li><a href="post-job.html" class="hover:text-white transition">Đăng tin tuyển dụng</a></li>
-        <li><a href="employer-dashboard.html" class="hover:text-white transition">Quản lý tuyển dụng</a></li>
-        <li><a href="bi-dashboard.html" class="hover:text-white transition">Báo cáo BI</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="max-w-7xl mx-auto px-4 pt-8 mt-8 border-t border-gray-800 text-center text-sm">
-    &copy; 2024 SmartJob. All rights reserved.
-  </div>
-</footer>
-
-<script src="js/api.js?v=20261104_03"></script>
-<script src="js/auth.js?v=20261104_03"></script>
-<script src="js/main.js?v=20261104_03"></script>
-</body>
+<body></body>
 </html>

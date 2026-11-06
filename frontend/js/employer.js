@@ -905,3 +905,4 @@ async function updateApplicationPipelineStatus(appId, status, notes = '') {
     showToast('Lỗi cập nhật trạng thái quy trình: ' + err.message, 'error');
   }
 }
+

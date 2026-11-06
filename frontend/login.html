@@ -9,14 +9,14 @@
 </head>
 <body class="min-h-screen gradient-hero flex items-center justify-center px-4 py-10">
   <div class="w-full max-w-lg">
-    <!-- Logo & Branding -->
+    <!-- Logo & Branding (Không liên kết về trang chủ tìm việc) -->
     <div class="text-center mb-6">
-      <a href="index.html" class="inline-flex items-center gap-2.5">
+      <div class="inline-flex items-center gap-2.5 select-none">
         <div class="w-11 h-11 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg border border-white/20">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         </div>
         <span class="text-white font-extrabold text-3xl tracking-tight">SmartJob</span>
-      </a>
+      </div>
       <p class="text-blue-100 mt-1.5 text-sm">Hệ thống Tuyển dụng & Gợi ý Việc làm Thông minh tích hợp AI & BI</p>
     </div>
 
@@ -73,45 +73,39 @@
             <span>Đăng nhập vào hệ thống</span>
           </button>
 
-          <!-- QUICK DEMO ACCOUNTS -->
-          <div class="mt-5 pt-4 border-t border-gray-100">
-            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 text-center">Tài khoản Demo phân quyền sẵn (Bấm để đăng nhập 1 chạm)</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button type="button" class="btn-quick-login text-left p-2.5 rounded-xl border border-blue-100 bg-blue-50/40 hover:border-blue-500 hover:bg-blue-50 transition flex items-center justify-between text-xs"
-                data-email="le.quocv@gmail.com" data-pass="123456" data-role="candidate">
-                <div class="min-w-0">
-                  <p class="font-bold text-gray-800 truncate">👨‍💻 Lê Quốc Việt</p>
-                  <p class="text-[11px] text-blue-600 font-medium">Quyền: Ứng viên (Frontend)</p>
-                </div>
-                <span class="text-blue-600 font-bold ml-1">&rarr;</span>
+          <!-- Gợi ý tạo tài khoản ứng viên mới & Đăng nhập nhanh Nhà tuyển dụng -->
+          <div class="mt-5 pt-4 border-t border-gray-100 space-y-3">
+            <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center justify-between gap-2 text-xs">
+              <div>
+                <p class="font-bold text-blue-900">Bạn là Ứng viên mới?</p>
+                <p class="text-[11px] text-blue-700">Tạo tài khoản mới để tải CV và nhận gợi ý việc làm từ AI.</p>
+              </div>
+              <button type="button" id="btn-switch-to-register" class="px-3.5 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition flex-shrink-0">
+                + Tạo tài khoản ứng viên
               </button>
+            </div>
 
-              <button type="button" class="btn-quick-login text-left p-2.5 rounded-xl border border-blue-100 bg-blue-50/40 hover:border-blue-500 hover:bg-blue-50 transition flex items-center justify-between text-xs"
-                data-email="nguyen.vana@gmail.com" data-pass="123456" data-role="candidate">
-                <div class="min-w-0">
-                  <p class="font-bold text-gray-800 truncate">👨‍💻 Nguyễn Văn An</p>
-                  <p class="text-[11px] text-blue-600 font-medium">Quyền: Ứng viên (Backend)</p>
-                </div>
-                <span class="text-blue-600 font-bold ml-1">&rarr;</span>
-              </button>
+            <div>
+              <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">Tài khoản Nhà tuyển dụng mẫu</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button type="button" class="btn-quick-login text-left p-2.5 rounded-xl border border-indigo-100 bg-indigo-50/40 hover:border-indigo-500 hover:bg-indigo-50 transition flex items-center justify-between text-xs"
+                  data-email="hr@fpt.com" data-pass="123456" data-role="company">
+                  <div class="min-w-0">
+                    <p class="font-bold text-gray-800 truncate">🏢 FPT Software</p>
+                    <p class="text-[11px] text-indigo-600 font-medium">Quyền: Nhà tuyển dụng</p>
+                  </div>
+                  <span class="text-indigo-600 font-bold ml-1">&rarr;</span>
+                </button>
 
-              <button type="button" class="btn-quick-login text-left p-2.5 rounded-xl border border-indigo-100 bg-indigo-50/40 hover:border-indigo-500 hover:bg-indigo-50 transition flex items-center justify-between text-xs"
-                data-email="hr@fpt.com" data-pass="123456" data-role="company">
-                <div class="min-w-0">
-                  <p class="font-bold text-gray-800 truncate">🏢 FPT Software</p>
-                  <p class="text-[11px] text-indigo-600 font-medium">Quyền: Nhà tuyển dụng</p>
-                </div>
-                <span class="text-indigo-600 font-bold ml-1">&rarr;</span>
-              </button>
-
-              <button type="button" class="btn-quick-login text-left p-2.5 rounded-xl border border-indigo-100 bg-indigo-50/40 hover:border-indigo-500 hover:bg-indigo-50 transition flex items-center justify-between text-xs"
-                data-email="recruitment@vng.com.vn" data-pass="123456" data-role="company">
-                <div class="min-w-0">
-                  <p class="font-bold text-gray-800 truncate">🏢 VNG Corporation</p>
-                  <p class="text-[11px] text-indigo-600 font-medium">Quyền: Nhà tuyển dụng</p>
-                </div>
-                <span class="text-indigo-600 font-bold ml-1">&rarr;</span>
-              </button>
+                <button type="button" class="btn-quick-login text-left p-2.5 rounded-xl border border-indigo-100 bg-indigo-50/40 hover:border-indigo-500 hover:bg-indigo-50 transition flex items-center justify-between text-xs"
+                  data-email="recruitment@vng.com.vn" data-pass="123456" data-role="company">
+                  <div class="min-w-0">
+                    <p class="font-bold text-gray-800 truncate">🏢 VNG Corporation</p>
+                    <p class="text-[11px] text-indigo-600 font-medium">Quyền: Nhà tuyển dụng</p>
+                  </div>
+                  <span class="text-indigo-600 font-bold ml-1">&rarr;</span>
+                </button>
+              </div>
             </div>
           </div>
         </form>
@@ -168,21 +162,29 @@
         </form>
       </div>
     </div>
-
-    <p class="text-center text-blue-100 text-xs mt-5">
-      <a href="index.html" class="hover:text-white underline transition">&larr; Quay về trang chủ cổng việc làm</a>
-    </p>
   </div>
 
-  <script src="js/api.js?v=20261106_01"></script>
-  <script src="js/auth.js?v=20261106_01"></script>
+  <script src="js/api.js?v=20261106_02"></script>
+  <script src="js/auth.js?v=20261106_02"></script>
   <script>
-    // Redirect if already logged in
+    // Xóa phiên đăng nhập ứng viên demo cũ (nếu còn lưu trong trình duyệt)
+    const DELETED_DEMO_EMAILS = [
+      'nguyen.vana@gmail.com',
+      'tran.thib@gmail.com',
+      'le.quocv@gmail.com',
+      'nguyenvanan.dev@gmail.com',
+      'tranthibich.ai@gmail.com',
+      'lequocviet.fe@gmail.com',
+    ];
     if (isLoggedIn()) {
       const u = getUser();
-      window.location.href = (u.user_type === 'company' || u.user_type === 'admin')
-        ? 'employer-dashboard.html'
-        : 'candidate-profile.html';
+      if (u && DELETED_DEMO_EMAILS.includes((u.email || '').toLowerCase())) {
+        clearUser();
+      } else if (u) {
+        window.location.href = (u.user_type === 'company' || u.user_type === 'admin')
+          ? 'employer-dashboard.html'
+          : 'candidate-profile.html';
+      }
     }
 
     const tabLogin = document.getElementById('tab-login');
@@ -202,6 +204,12 @@
       tabLogin.className = 'flex-1 py-4 text-sm font-bold text-gray-500 border-b-2 border-transparent transition hover:text-gray-700';
       fReg.classList.remove('hidden');
       fLogin.classList.add('hidden');
+    });
+
+    document.getElementById('btn-switch-to-register')?.addEventListener('click', () => {
+      tabReg.click();
+      document.getElementById('type-candidate')?.click();
+      document.getElementById('reg-fullname')?.focus();
     });
 
     // Role selector on Login
@@ -247,10 +255,10 @@
       inp.type = inp.type === 'password' ? 'text' : 'password';
     });
 
-    // Quick Demo Login
+    // Quick Demo Login (Employer only)
     document.querySelectorAll('.btn-quick-login').forEach(btn => {
       btn.addEventListener('click', () => {
-        setLoginRoleUI(btn.dataset.role || 'candidate');
+        setLoginRoleUI(btn.dataset.role || 'company');
         document.getElementById('login-email').value = btn.dataset.email;
         document.getElementById('login-password').value = btn.dataset.pass;
         document.getElementById('form-login').dispatchEvent(new Event('submit', { cancelable: true }));
@@ -330,7 +338,7 @@
           } else {
             tabLogin.click();
           }
-        }, 700);
+        }, 600);
       } catch (err) {
         errEl.textContent = err.message || 'Đăng ký thất bại, vui lòng kiểm tra lại thông tin.';
         errEl.classList.remove('hidden');

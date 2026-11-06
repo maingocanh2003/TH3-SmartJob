@@ -178,6 +178,12 @@ async function loadProfile() {
     currentCandidateData = data;
     renderCandidateProfile(data);
   } catch (err) {
+    // Nếu tài khoản ứng viên demo cũ đã bị xóa khỏi CSDL, tự động đăng xuất về trang login
+    if (String(err.message).includes('404') || String(err.message).includes('Not found')) {
+      clearUser();
+      window.location.href = 'login.html';
+      return;
+    }
     showToast('Không thể tải hồ sơ ứng viên: ' + err.message, 'error');
   }
 }
@@ -530,7 +536,7 @@ function renderRecommendationCard(r) {
             ${r.salary_min || r.salary_max ? `<span class="text-xs text-gray-400">•</span><span class="text-xs font-bold text-emerald-700">💰 ${formatViSalary(r.salary_min, r.salary_max)}</span>` : ''}
           </div>
           <h3 class="text-lg font-extrabold text-gray-900">
-            <a href="job-detail.html?id=${jobId}" class="hover:text-blue-600 transition">${escapeHtml(title)}</a>
+            ${escapeHtml(title)}
           </h3>
           <p class="text-xs font-semibold text-gray-500">🏢 ${escapeHtml(company)}</p>
         </div>
@@ -584,7 +590,7 @@ function renderRecommendationCard(r) {
           <div class="flex flex-wrap gap-1.5">
             ${matchedSkills.length
               ? matchedSkills.map(s => `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-emerald-700 border border-emerald-200">✓ ${escapeHtml(s)}</span>`).join('')
-              : `<span class="text-xs text-gray-500 italic">Đang đối chiếu kỹ năng...</span>`
+              : `<span class="text-xs text-gray-500 italic">Hãy tải CV để AI đối chiếu kỹ năng</span>`
             }
           </div>
         </div>
@@ -613,9 +619,6 @@ function renderRecommendationCard(r) {
         </div>
 
         <div class="flex items-center gap-2.5 flex-shrink-0">
-          <a href="job-detail.html?id=${jobId}" class="px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition">
-            Chi tiết JD
-          </a>
           ${isApplied
             ? `<button type="button" onclick="switchCandidateTab('applications')" class="px-4 py-2.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5">
                  <span>✓ Đã ứng tuyển (${escapeHtml(existingApp.status_label || 'Đã tiếp nhận')})</span>
@@ -730,29 +733,36 @@ function renderAiAnalysis(data) {
   if (compBar) compBar.style.width = `${Math.min(100, compScore)}%`;
 
   safeSetText('analysis-exp-years', `${exp.years_of_experience ?? 0} năm`);
-  safeSetText('analysis-seniority', `${exp.seniority_level || 'Junior'} · ${exp.current_position || 'Ứng viên'}`);
+  safeSetText('analysis-seniority', `${exp.seniority_level || 'Junior'} · ${exp.current_position || data.desired_position || 'Ứng viên'}`);
   safeSetText('analysis-exp-compare', `Trung bình thị trường yêu cầu: ${exp.market_avg_required_years ?? 2} năm kinh nghiệm.`);
 
-  safeSetText('analysis-best-match', `${Math.round(Number(matchOv.best_matching_score ?? 0))}%`);
-  safeSetText('analysis-high-match-count', `${matchOv.high_match_jobs_count ?? 0}/${matchOv.total_active_jobs ?? 0} công việc tương thích cao (≥70%)`);
-  safeSetText('analysis-avg-match', `Điểm tương thích trung bình trên toàn thị trường: ${Math.round(Number(matchOv.average_matching_score ?? 0))}%`);
+  const bestScore = Math.round(Number(matchOv.best_matching_score ?? matchOv.best_match_score ?? 0));
+  const avgScore = Math.round(Number(matchOv.average_matching_score ?? matchOv.avg_match_score ?? 0));
+  const totalJobs = matchOv.total_active_jobs ?? matchOv.total_jobs_analyzed ?? 0;
+
+  safeSetText('analysis-best-match', `${bestScore}%`);
+  safeSetText('analysis-high-match-count', `${matchOv.high_match_jobs_count ?? 0}/${totalJobs} công việc tương thích cao`);
+  safeSetText('analysis-avg-match', `Điểm tương thích trung bình trên toàn thị trường: ${avgScore}%`);
 
   // Checklist mức độ hoàn thiện hồ sơ
   const checklistEl = document.getElementById('analysis-checklist');
   if (checklistEl && Array.isArray(comp.checklist)) {
-    checklistEl.innerHTML = comp.checklist.map(item => `
-      <div class="flex items-center justify-between p-3 rounded-xl border ${item.done ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/50 border-amber-200'}">
-        <div class="flex items-center gap-2.5">
-          <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${item.done ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'}">
-            ${item.done ? '✓' : '!'}
+    checklistEl.innerHTML = comp.checklist.map(item => {
+      const isDone = !!(item.done ?? item.completed);
+      return `
+        <div class="flex items-center justify-between p-3 rounded-xl border ${isDone ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/50 border-amber-200'}">
+          <div class="flex items-center gap-2.5">
+            <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${isDone ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'}">
+              ${isDone ? '✓' : '!'}
+            </span>
+            <span class="text-xs font-semibold ${isDone ? 'text-gray-800' : 'text-amber-900'}">${escapeHtml(item.label)}</span>
+          </div>
+          <span class="text-[11px] font-bold ${isDone ? 'text-emerald-700' : 'text-amber-700'}">
+            ${isDone ? `+${item.weight}%` : `Thiếu (+${item.weight}%)`}
           </span>
-          <span class="text-xs font-semibold ${item.done ? 'text-gray-800' : 'text-amber-900'}">${escapeHtml(item.label)}</span>
         </div>
-        <span class="text-[11px] font-bold ${item.done ? 'text-emerald-700' : 'text-amber-700'}">
-          ${item.done ? `+${item.weight}%` : `Thiếu (+${item.weight}%)`}
-        </span>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // Kỹ năng theo nhóm chuyên môn
@@ -761,7 +771,7 @@ function renderAiAnalysis(data) {
     const byCat = skillAn.by_category || {};
     const entries = Object.entries(byCat);
     if (!entries.length) {
-      catEl.innerHTML = `<p class="text-xs text-gray-400 italic">Chưa có dữ liệu nhóm kỹ năng.</p>`;
+      catEl.innerHTML = `<p class="text-xs text-gray-400 italic">Chưa có dữ liệu nhóm kỹ năng. Hãy tải lên CV để AI phân tích!</p>`;
     } else {
       catEl.innerHTML = entries.map(([cat, names]) => `
         <div class="p-3 rounded-xl bg-slate-50 border border-gray-100">
@@ -780,14 +790,16 @@ function renderAiAnalysis(data) {
   // Kỹ năng thị trường cần nhưng CV còn thiếu
   const missingMarketEl = document.getElementById('analysis-missing-market-skills');
   if (missingMarketEl) {
-    const missingList = Array.isArray(skillAn.missing_market_skills) ? skillAn.missing_market_skills : [];
+    const missingList = Array.isArray(skillAn.missing_market_skills)
+      ? skillAn.missing_market_skills
+      : (Array.isArray(skillAn.recommended_missing_skills) ? skillAn.recommended_missing_skills : []);
     if (!missingList.length) {
       missingMarketEl.innerHTML = `<span class="text-xs font-semibold text-emerald-700">🎉 Hồ sơ của bạn đã bao phủ hầu hết các kỹ năng trọng tâm trên thị trường!</span>`;
     } else {
       missingMarketEl.innerHTML = missingList.map(m => `
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
           <span>+ ${escapeHtml(m.skill_name)}</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-200/70 text-amber-900">${m.job_demand_count} tin cần</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-200/70 text-amber-900">${m.job_demand_count ?? m.job_count ?? 1} tin cần</span>
         </span>
       `).join('');
     }
@@ -809,7 +821,7 @@ function renderAiAnalysis(data) {
             <span class="text-xs font-extrabold text-gray-900">${escapeHtml(s.title)}</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${st.badge}">${st.label}</span>
           </div>
-          <p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(s.detail)}</p>
+          <p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(s.detail || s.description || '')}</p>
           ${s.impact ? `<p class="text-[11px] font-bold text-blue-700">🚀 Tác động: ${escapeHtml(s.impact)}</p>` : ''}
         </div>
       `;
@@ -958,7 +970,7 @@ function renderApplicationItem(app) {
         <div>
           <div class="flex flex-wrap items-center gap-2">
             <h3 class="text-base font-extrabold text-gray-900">
-              <a href="job-detail.html?id=${app.job_id}" class="hover:text-blue-600 transition">${escapeHtml(app.job_title || `Công việc #${app.job_id}`)}</a>
+              ${escapeHtml(app.job_title || `Công việc #${app.job_id}`)}
             </h3>
             ${aiScore != null ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">AI Match: ${aiScore}%</span>` : ''}
           </div>
